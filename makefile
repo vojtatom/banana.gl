@@ -12,7 +12,10 @@ react:
 	@-( \
 		cd metaworkspace-react; \
 		npm run build; \
-		mv metaworkspace-react/build/ metaworkspace/client; \
+		cd ..; \
+		rm -r metaworkspace/client/; \
+		mkdir metaworkspace/client/; \
+		cp -a metaworkspace-react/build/. metaworkspace/client/; \
 	)
 
 build: clean

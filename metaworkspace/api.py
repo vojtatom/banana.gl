@@ -8,8 +8,8 @@ from fastapi.templating import Jinja2Templates
 
 
 DIR = os.path.realpath(os.path.dirname(__file__))
-STATIC = os.path.join(DIR, "client", "build", "static")
-TEMPLATES = os.path.join(DIR, "client", "build")
+STATIC = os.path.join(DIR, "client", "static")
+TEMPLATES = os.path.join(DIR, "client")
 
 
 app = FastAPI()
