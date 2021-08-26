@@ -1,6 +1,6 @@
 import json
 import os
-from metaworkspace import init, install, api
+from metaworkspace import init, install, run
 
 
 class MetacityWorkspace:
@@ -42,5 +42,5 @@ class MetacityWorkspace:
             self.update_config(k, v)
 
     def run(self):
-        api.run()
+        run.run(self.path)
 
