@@ -1,6 +1,6 @@
 import json
 import os
-from workspace import init, install
+from metaworkspace import init, install
 
 
 class MetacityWorkspace:
