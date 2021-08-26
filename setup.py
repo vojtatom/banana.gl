@@ -11,11 +11,11 @@ README = (HERE / "README.md").read_text()
 setup(
     name="metaworkspace",
     packages=find_packages("."),
-    version="0.0.1",
+    version="0.0.2",
     description="Python tool simplyfing work with Metacity Modules",
     long_description=README,
     long_description_content_type="text/markdown",
-    url="https://github.com/MetacitySuite/Metacity-workspace",
+    url="https://github.com/MetacitySuite/Metacity-Workspace",
     author="Metacity",
     license="MIT",
     classifiers=[
