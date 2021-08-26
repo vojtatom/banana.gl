@@ -11,6 +11,7 @@ GML_TOOLS_URL = "https://github.com/citygml4j/citygml-tools/releases/download/v1
 LOCAL_JAVA_FILE = "java.tar.gz"
 LOCAL_GML_TOOLS_FILE = "gmltools.zip"
 
+
 def create_dir_if_not_exists(dir):
     if not os.path.exists(dir):
         os.makedirs(dir)
@@ -107,3 +108,5 @@ def reinstall(workspace_path: str):
     print(f"Installing GML Tools...")
     config["gmltools"] = install_gml_tools(workspace_path)
     return config
+
+

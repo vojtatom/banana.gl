@@ -8,6 +8,13 @@ all: build
 #to automate this, update the version number and run make deploy
 
 #environments
+react:
+	@-( \
+		cd metaworkspace-react; \
+		npm run build; \
+		mv metaworkspace-react/build/ metaworkspace/client; \
+	)
+
 build: clean
 	@-( \
 		python setup.py sdist bdist_wheel \

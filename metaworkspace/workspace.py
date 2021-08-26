@@ -1,6 +1,6 @@
 import json
 import os
-from metaworkspace import init, install
+from metaworkspace import init, install, api
 
 
 class MetacityWorkspace:
@@ -14,13 +14,15 @@ class MetacityWorkspace:
 
 
     def update_config(self, key, value):
-        with open(self.config_file, "w+") as config:
-            try:
+        try:
+            with open(self.config_file, "r") as config:
                 data = json.load(config)
-            except:
-                data = {}
-            data[key] = value
-            json.dump(data, config)
+        except:
+            data = {}
+        
+        data[key] = value
+        with open(self.config_file, "w") as config:
+            json.dump(data, config, indent=4)
 
 
     @property
@@ -38,3 +40,7 @@ class MetacityWorkspace:
         config = install.reinstall(self.path)
         for k, v in config.items():
             self.update_config(k, v)
+
+    def run(self):
+        api.run()
+

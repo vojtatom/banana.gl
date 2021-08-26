@@ -26,6 +26,8 @@ setup(
     python_requires='>=3.8',                # Minimum version requirement of the package
     install_requires=[
         "metacity>=0.0.11",
-        "requests>=2.26.0"
+        "requests>=2.26.0",
+        "fastapi>=0.68.1",
+        "uvicorn>=0.15.0"
     ] # Install other dependencies if any
 )
