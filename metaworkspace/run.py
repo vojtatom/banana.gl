@@ -10,7 +10,7 @@ def print_output(proc):
 def run(workspace_path: str):
     os.environ["METACITYWS"] = workspace_path
 
-    proc = subprocess.Popen(["uvicorn", "metaworkspace.api:app", "--reload", "--port", "5000"], 
+    proc = subprocess.Popen(["uvicorn", "metaworkspace.api.api:app", "--reload", "--port", "5000"], 
                             stdout=subprocess.PIPE,
                             stderr=subprocess.STDOUT)
                  
