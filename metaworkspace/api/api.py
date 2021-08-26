@@ -15,7 +15,6 @@ TEMPLATES = os.path.join(DIR, "../client")
 app = FastAPI()
 app.mount("/static", StaticFiles(directory=STATIC), name="static")
 app.include_router(project.router)
-
 templates = Jinja2Templates(directory=TEMPLATES)
 
 

@@ -1,16 +1,15 @@
 import React from 'react';
-import './App.css';
+import { Page } from '@geist-ui/react'
 
-function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
-      </header>
-    </div>
-  );
+
+class App extends React.Component {
+  render() {
+    return (
+      <Page>
+          <h1>Hello World</h1>
+      </Page>
+    )
+  }
 }
 
 export default App;

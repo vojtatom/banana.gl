@@ -25,7 +25,7 @@ build: clean
 
 upload: 
 	@-( \
-		rm dist/metacity*; \
+		rm dist/metaworkspace*; \
 		python setup.py sdist; \
 		python -m twine upload dist/*; \
 	)
@@ -33,7 +33,7 @@ upload:
 deploy: clean
 	@-( \
 		python setup.py sdist bdist_wheel; \
-		rm dist/metacity*; \
+		rm dist/metaworkspace*; \
 		python setup.py sdist; \
 		python -m twine upload dist/*; \
 	)
