@@ -23,7 +23,7 @@ setup(
         "Programming Language :: Python :: 3",
         "Programming Language :: Python :: 3.8",
     ],
-    python_requires='>=3.8',                # Minimum version requirement of the package
+    python_requires='>=3.8', # Minimum version requirement of the package
     install_requires=[
         "metacity>=0.0.11",
         "requests>=2.26.0",

@@ -4,3 +4,5 @@ requests>=2.26.0
 twine>=3.4.2
 fastapi>=0.68.1
 uvicorn>=0.15.0
+aiofiles>=0.7.0
+jinja2>=3.0.1

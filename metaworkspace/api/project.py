@@ -5,7 +5,6 @@ from pydantic import BaseModel
 
 router = APIRouter()
 
-
 @router.get("/projects", response_class=JSONResponse)
 async def list_projects(request: Request):
     projects = []
