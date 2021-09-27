@@ -10,7 +10,7 @@ router = APIRouter()
 @router.get("/projects", response_class=JSONResponse)
 async def list_projects(request: Request):
     projects = []
-    for project in mws.projects:
+    for project in mws.project_names:
         projects.append({'name' : project})
     return JSONResponse(projects)
 
@@ -20,7 +20,7 @@ class ProjectData(BaseModel):
 
 @router.post("/project/exists")
 async def project_exists(project: ProjectData):
-    for p in mws.projects:
+    for p in mws.project_names:
         if p == project.name:
             return JSONResponse({ 'exists': True })
     return JSONResponse({ 'exists': False })

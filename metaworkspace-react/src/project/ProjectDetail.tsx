@@ -1,9 +1,39 @@
 import { useParams } from "react-router"
-import { Page } from "../elements/Page";
-import { CgRename } from 'react-icons/cg';
-import { FiDelete } from 'react-icons/fi';
-import { BiAddToQueue } from 'react-icons/bi';
+import { useDropzone } from 'react-dropzone';
+import iaxios from "../axios";
 
+
+interface IDropzone {
+  submit: (files: File[]) => void;
+};
+
+function Dropzone(props: IDropzone) {
+  const {acceptedFiles, getRootProps, getInputProps} = useDropzone();
+  
+  const files = acceptedFiles.map(file => (
+    <li key={file.name}>
+      {file.name} - {file.size} bytes
+    </li>
+  ));
+
+  const submit = () => {
+    props.submit(acceptedFiles);
+  }
+
+  return (
+    <section className="container">
+      <div {...getRootProps({className: 'dropzone'})}>
+        <input {...getInputProps()} />
+        <p>Drag 'n' drop some files here, or click to select files</p>
+      </div>
+      <aside>
+        <h4>Files</h4>
+        <ul>{files}</ul>
+      </aside>
+      <button onClick={submit}>Upload File</button>
+    </section>
+  );
+}
 
 interface IPair {
   name: string;
@@ -33,12 +63,40 @@ interface IWidget {
 function Widget(props: IWidget) {
   
   return (
-    <div className={`widget ${props.bordered ? 'bordered' : ''} ${props.row ? 'row' : ''}`}>
+    <div className={`widget`}>
       {props.children}
     </div>
   )
 }
 
+interface IAddLayer {
+  project: string
+}
+
+function AddLayer(props: IAddLayer) {
+  
+  const submit = (files: File[]) => {
+    console.log(files);
+    let formData = new FormData();
+    formData.append("project", props.project)
+    files.forEach(dataset => {
+      formData.append("files", dataset)
+    });
+
+    iaxios.post('/layer/add', formData, {
+      headers: {
+        "Content-Type": "multipart/form-data"
+      }
+    }).then((response) => {
+      console.log(response)
+    })
+  }
+
+  return (
+    <Dropzone submit={submit}/>
+  )
+
+}
 
 export function Project() {
     const { name } = useParams<{name: string}>();
@@ -49,19 +107,19 @@ export function Project() {
             <div className="title">XYZ</div>
           </Widget>
           <Widget bordered row>
-            <div className="action"><CgRename />rename project</div>
-            <div className="action"><BiAddToQueue />add layer</div>
-            <div className="action"><FiDelete />delete project</div>
+            <AddLayer project={name}/>
+            <button>delete project</button>
           </Widget>
           <Widget>
             <div className="subtitle">Layers</div>
           </Widget>
+
+
           <Widget bordered>
             <div className="subsubtitle">Terrain</div>
             <Pair name='Original file' value='test.json'/>
             <div className="controler">
-              <div className="action"><CgRename />rename layer</div>
-              <div className="action"><FiDelete />delete layer</div>
+              <button>delete layer</button>
             </div>
           </Widget>
         </div>
