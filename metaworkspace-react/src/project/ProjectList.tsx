@@ -6,7 +6,7 @@ import { Page } from '../elements/Page';
 
 
 interface IProject {
-   'name': string;
+   name: string;
 }
 
 
@@ -16,11 +16,12 @@ export function ProjectList() {
   useEffect(() => {
     iaxios.get('/projects').then((response) => {
       setProjects(response.data);
+      console.log(response.data);
       return () => {
         setProjects([]); // This worked for me
       };
     })
-  })
+  }, []);
 
   return (
     <Page>
@@ -30,8 +31,9 @@ export function ProjectList() {
         </Link>
         {projects.map( (project) => {
           return (
-            <Link to={`/project/detail/${project.name}`}>
-            <div className='line' key={project.name}>
+            <Link key={project.name} 
+                  to={`/project/detail/${project.name}`}>
+            <div className='line'>
               {project.name}
             </div>
             </Link>
