@@ -1,14 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
+import { IconContext } from 'react-icons/lib';
 import App from './App';
-import { GeistProvider, CssBaseline } from '@geist-ui/react'
 
 ReactDOM.render(
   <React.StrictMode>
-    <GeistProvider>
-      <CssBaseline /> 
+    <IconContext.Provider value={{ className: 'react-icons' }}>
       <App /> 
-    </GeistProvider>
+      </IconContext.Provider>
   </React.StrictMode>,
   document.getElementById('root')
 );

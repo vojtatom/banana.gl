@@ -1,6 +1,8 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
 from metaworkspace.api.workspace import mws
+from metaworkspace import filesystem as fs
+from metacity.datamodel.project import MetacityProject
 from pydantic import BaseModel
 
 router = APIRouter()
@@ -9,14 +11,24 @@ router = APIRouter()
 async def list_projects(request: Request):
     projects = []
     for project in mws.projects:
-        projects.append(project)
+        projects.append({'name' : project})
     return JSONResponse(projects)
 
 
 class ProjectData(BaseModel):
     name: str
 
+@router.post("/project/exists")
+async def project_exists(project: ProjectData):
+    for p in mws.projects:
+        if p == project.name:
+            return JSONResponse({ 'exists': True })
+    return JSONResponse({ 'exists': False })
 
-@router.post("/project")
-async def create_project(project: ProjectData):
-    return project
+
+@router.post("/project/add")
+async def add_project(project: ProjectData):
+    pd = fs.project_dir(mws.projects_dir, project.name)
+    project = MetacityProject(pd, load_existing=False)
+    return JSONResponse({ 'dir': pd }) 
+

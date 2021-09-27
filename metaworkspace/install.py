@@ -4,7 +4,7 @@ import requests
 import tarfile
 import zipfile
 import json
-import metaworkspace.tree as tree
+import metaworkspace.filesystem as fs
 
 
 JAVA_URL = "https://download.java.net/java/GA/jdk16.0.2/d4a915d82b4c4fbb9bde534da945d746/7/GPL/openjdk-16.0.2_linux-x64_bin.tar.gz"
@@ -64,14 +64,14 @@ def unzip(src, dst):
 
 
 def install_java(workspace_path: str):
-    tools_dir = tree.tools_dir_module(workspace_path, "java")    
+    tools_dir = fs.tools_dir_module(workspace_path, "java")    
     java_archive = download_java(tools_dir)
     java_dir = untar(java_archive, tools_dir)
     return os.path.abspath(os.path.join(tools_dir, java_dir))
 
 
 def install_gml_tools(workspace_path: str):
-    tools_dir = tree.tools_dir_module(workspace_path, "gmltools")  
+    tools_dir = fs.tools_dir_module(workspace_path, "gmltools")  
     gml_tools_archive = download_gml_tools(tools_dir)
     gml_tools_dir = unzip(gml_tools_archive, tools_dir)
     return os.path.abspath(os.path.join(tools_dir, gml_tools_dir))
@@ -80,7 +80,7 @@ def install_gml_tools(workspace_path: str):
 def reinstall(workspace_path: str):
     config = {}
     print(f"Creating workspace directory...")
-    tree.recreate_workspace(workspace_path)
+    fs.recreate_workspace(workspace_path)
     print(f"Installing Java...")
     config["java"] = install_java(workspace_path)
     print(f"Installing GML Tools...")

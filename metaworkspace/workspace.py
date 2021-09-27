@@ -1,6 +1,7 @@
 import json
 import os
-from metaworkspace import init, install, run, tree
+from metaworkspace import init, install, run
+from metaworkspace import filesystem as fs
 
 
 class MetacityWorkspace:
@@ -10,12 +11,12 @@ class MetacityWorkspace:
 
     @property
     def config_file(self):
-        return tree.config(self.path)
+        return fs.config(self.path)
 
     
     @property
     def projects_dir(self):
-        return tree.projects_dir(self.path)
+        return fs.projects_dir(self.path)
 
 
     def update_config(self, key, value):
@@ -52,5 +53,5 @@ class MetacityWorkspace:
 
     @property
     def projects(self):
-        return tree.get_projects(self.path)
+        return fs.get_projects(self.path)
 

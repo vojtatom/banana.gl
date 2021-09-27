@@ -21,6 +21,10 @@ def projects_dir(workspace_path):
     return os.path.join(workspace_path, "projects")
 
 
+def project_dir(projects_dir, project_name):
+    return os.path.join(projects_dir, project_name)
+
+
 def get_projects(workspace_path):
     projects = projects_dir(workspace_path)
     for project in os.listdir(projects):

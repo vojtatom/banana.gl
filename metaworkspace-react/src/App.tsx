@@ -1,45 +1,26 @@
 import React from 'react';
-import { Page, Card } from '@geist-ui/react'
-import axios from 'axios';
-import ProjectBar from './ProjectBar';
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Redirect
+} from "react-router-dom";
+import {ProjectRouter} from './project/ProjectRoute';
 
-interface IPropsApp {
-}
 
-interface IStateApp {
-  projects: string[]
-}
-
-class App extends React.Component<IPropsApp, IStateApp> {
-  constructor(props: IPropsApp) {
-    super(props);
-    this.state = {
-      projects: []
-    };
-  }
-
-  componentDidMount() {
-    axios.get('http://127.0.0.1:5000/projects').then((response) => {
-      console.log(response.data)
-      this.setState({
-        projects: response.data
-      })
-    })
-  }
-  
-  render() {
+function App() {  
     return (
-      <Page>
-          <h1>Projects</h1>
-          <ProjectBar />
-          {this.state.projects.map((project: string) => {
-            return(<Card shadow>
-              <h2>project</h2>
-            </Card>)
-          })}
-      </Page>
+      <Router>
+        <Switch>
+          <Route exact path="/">
+            <Redirect to="/project/list" />
+          </Route>
+          <Route path="/project">
+            <ProjectRouter />
+          </Route>
+        </Switch>
+    </Router>
     )
-  }
 }
 
 export default App;
