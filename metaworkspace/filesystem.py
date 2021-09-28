@@ -1,5 +1,6 @@
 import os
 import shutil
+import uuid
 
 
 def create_dir_if_not_exists(dir):
@@ -21,6 +22,14 @@ def jobs_dir(workspace_path):
     return os.path.join(workspace_path, "jobs")
 
 
+def server_log(workspace_path):
+    return os.path.join(workspace_path, "server_log.txt")
+
+
+def jobs_log(workspace_path):
+    return os.path.join(workspace_path, "jobs_log.txt")
+
+
 def project_dir(workspace_path, project_name):
     return os.path.join(projects_dir(workspace_path), project_name)
 
@@ -33,6 +42,22 @@ def get_projects(workspace_path):
 
 def config(workspace_path):
     return os.path.join(workspace_path, "config.json")
+
+
+def current_jobs(workspace_path):
+    jobs = jobs_dir(workspace_path)
+    return [job for job in os.listdir(jobs)]
+
+
+def generate_job_dir(workspace_path):
+    jobs = jobs_dir(workspace_path)
+    names = current_jobs(workspace_path)
+    jid = str(uuid.uuid4())
+    while jid in names:
+        jid = str(uuid.uuid4())
+    job_dir = os.path.join(jobs, jid)
+    create_dir_if_not_exists(job_dir)
+    return job_dir
 
 
 def recreate_workspace(workspace_path):

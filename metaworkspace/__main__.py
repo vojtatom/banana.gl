@@ -1,5 +1,32 @@
 from metaworkspace.workspace import MetacityWorkspace
 from argparse import ArgumentParser
+import metaworkspace.filesystem as fs
+import os
+import subprocess
+
+
+def install(workspace_path: str):
+    print(f"Creating workspace directory...")
+    fs.recreate_workspace(workspace_path)
+
+
+def run(mws: MetacityWorkspace):
+    os.environ["METACITYWS"] = mws.path
+    server_log = open(mws.server_log, 'w+')
+    jobs_log = open(mws.jobs_log, 'w+')
+    
+    proc = subprocess.Popen(["uvicorn", "metaworkspace.runtime.api.api:app", "--port", "5000"], 
+                            stdout=server_log,
+                            stderr=server_log)
+
+    jobs = subprocess.Popen(["python", "-m", "metaworkspace.runtime.processing"], 
+                            stdout=jobs_log,
+                            stderr=jobs_log)
+                 
+    return_code = proc.wait()
+    #print(return_code)
+    return_code = jobs.wait()
+    print(return_code)
 
 
 usage = ("Sets up Metacity Workspace."
@@ -17,7 +44,7 @@ if __name__ == "__main__":
     mws = MetacityWorkspace(path)
 
     if args.install:
-        mws.reinstall() 
+        install(mws.path)
     
     if args.run:
-        mws.run()
+        run(mws)

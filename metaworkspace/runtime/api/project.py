@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Request
 from fastapi.responses import JSONResponse
-from metaworkspace.api.workspace import mws
+from metaworkspace.runtime.workspace import mws
 from pydantic import BaseModel
 
 router = APIRouter()

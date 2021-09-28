@@ -1,5 +1,5 @@
+from metaworkspace.runtime.processing.jobs.job import Job
 import os
-from metaworkspace import install, run
 from metaworkspace import filesystem as fs
 from metacity.datamodel.project import MetacityProject
 
@@ -7,6 +7,10 @@ from metacity.datamodel.project import MetacityProject
 class MetacityWorkspace:
     def __init__(self, workspace_path: str):
         self.path = os.path.abspath(workspace_path)
+
+    @property
+    def jobs_dir(self):
+        return fs.jobs_dir(self.path)
 
     @property
     def project_names(self):
@@ -22,10 +26,18 @@ class MetacityWorkspace:
         fs.create_dir_if_not_exists(prj)
         return MetacityProject(prj)
 
-    def reinstall(self):
-        install.reinstall(self.path)
+    def clear_logs(self):
+        log_path = fs.server_log(self.path)
+        open(log_path, 'w').close()
 
-    def run(self):
-        run.run(self.path)
+    @property
+    def server_log(self):
+        return fs.server_log(self.path) 
 
+    @property
+    def jobs_log(self):
+        return fs.jobs_log(self.path) 
 
+    def add_job(self, job: Job):
+        job_dir = fs.generate_job_dir(self.path)
+        job.serialize(job_dir)
