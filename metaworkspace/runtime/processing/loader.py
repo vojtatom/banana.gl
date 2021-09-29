@@ -1,26 +1,33 @@
 from typing import Dict, Type
 from metaworkspace.runtime.processing.jobs.job import Job
 from metaworkspace.runtime.processing.jobs.loaddataset import JobLoadDataset
-
+import json
+import os
 
 jobs: Dict[str, Type[Job]] = {
-    'JobLoadDataset': JobLoadDataset
+    JobLoadDataset.TYPE: JobLoadDataset
 }
 
 
 def job_object_hook(data):
-    if 'job' not in data:
+    if 'type' not in data:
         raise Exception(f"Job {data} missing job type")
     
-    if data['job'] not in jobs:
-        raise Exception(f"Uknown job type: {data['job']}")
+    t = data['type']
+    if t not in jobs:
+        raise Exception(f"Uknown job type: {t}")
 
-    job = jobs[data['job']]()
+    job = jobs[t]()
     job.deserialize(data)
     return job
     
      
-
+def load_job(job_dir):
+    jobfile = os.path.join(job_dir, 'job.json')
+    with open(jobfile, 'r') as job_file:
+        job: Job = json.load(job_file, object_hook=job_object_hook)
+    job.job_dir = job_dir
+    return job
 
 
 

@@ -14,8 +14,9 @@ def add_layer(project: str = Form(...),
 
     job = JobLoadDataset()
     layer = os.path.splitext(files[0].filename)[0]
-    job.add_data(project, layer, files)
-    mws.add_job(job)
-
+    job_dir = mws.generate_job_dir()
+    job.setup(job_dir, project, layer, files)
+    job.submit()
+    
     return JSONResponse({ 'response': 'OK' })
 

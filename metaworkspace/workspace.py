@@ -38,6 +38,5 @@ class MetacityWorkspace:
     def jobs_log(self):
         return fs.jobs_log(self.path) 
 
-    def add_job(self, job: Job):
-        job_dir = fs.generate_job_dir(self.path)
-        job.serialize(job_dir)
+    def generate_job_dir(self):
+        return fs.generate_job_dir(self.path)

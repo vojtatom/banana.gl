@@ -1,29 +1,27 @@
-import time
-from watchdog.observers import Observer
-from watchdog.events import PatternMatchingEventHandler
-from multiprocessing import Process, Queue
-import sys
-import json
 import os
+import sys
+import time
+from multiprocessing import Process, Queue
 from typing import List
 
-from metaworkspace.runtime.processing.loader import job_object_hook
+from metaworkspace.runtime.processing.loader import load_job
+from watchdog.events import PatternMatchingEventHandler
+from watchdog.observers import Observer
 
 
 def JobWorker(queue: Queue, id: str):
     while True:
-        action = queue.get(block=True, timeout=None)
-        print(f"Worker {id}", action)
+        job_dir = queue.get(block=True, timeout=None)
+        print(f"Worker {id} - {job_dir}")
         sys.stdout.flush()
-        jobfile = os.path.join(os.path.dirname(action), 'job.json')
-        with open(jobfile, 'r') as job_file:
-            job = json.load(job_file, object_hook=job_object_hook)
+        job = load_job(job_dir)
+
         try:
-            job.run()
+            job.run() 
+            job.cleanup()
         except Exception as e:
             print(e)
         sys.stdout.flush()
-
 
 
 class JobQueue:
@@ -44,14 +42,23 @@ class JobQueue:
     def add_job(self, job):
         self.queue.put(job)
 
+    @property
+    def status(self):
+        status = "Worker Status\n"
+        for i, w in enumerate(self.workers):
+            status += f"{i} pid: {w.pid} alive:  {w.is_alive()}\n"
+        status += f"Queue full: {self.queue.full()} empty: {self.queue.empty()}"
+        return status
+
 
 class EventManager:
     def __init__(self, queue: JobQueue):
         self.queue = queue
 
     def on_created(self, event):
-        print(f"hey, {event.src_path} has been created!")
-        self.queue.add_job(event.src_path)
+        print(f"{event.src_path}")
+        job_dir = os.path.dirname(event.src_path)
+        self.queue.add_job(job_dir)
 
 
 
@@ -89,7 +96,8 @@ class JobManager:
         try:
             #fallback to stop the observer
             while True:
-                time.sleep(1)
+                print(self.queue.status)
+                time.sleep(15)
                 sys.stdout.flush()
                 sys.stderr.flush()
         except KeyboardInterrupt:
