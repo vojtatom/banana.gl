@@ -1,5 +1,9 @@
-from fastapi import APIRouter, Request
+import os
+from typing import List
+
+from fastapi import APIRouter, File, Form, Request, UploadFile
 from fastapi.responses import JSONResponse
+from metaworkspace.runtime.processing.jobs.loaddataset import JobLoadDataset
 from metaworkspace.runtime.workspace import mws
 from pydantic import BaseModel
 
@@ -28,4 +32,30 @@ async def project_exists(project: ProjectData):
 async def add_project(project: ProjectData):
     mws.project(project.name)
     return JSONResponse({ 'dir': project.name }) 
+
+
+@router.post("/project/layer/add")
+def add_layer(project: str = Form(...), 
+                    files: List[UploadFile] = File(...)):
+
+    job = JobLoadDataset()
+    layer = os.path.splitext(files[0].filename)[0]
+    job_dir = mws.generate_job_dir()
+    job.setup(job_dir, project, layer, files)
+    job.submit()
+    
+    return JSONResponse({ 'response': 'OK' })
+
+
+@router.post("/project/layer/list")
+async def list_layers(project: ProjectData):
+    prj = mws.project(project.name)
+    
+    data = []
+    for l in prj.layers:
+        data.append({
+            'name': l.name
+        })
+
+    return JSONResponse(data) 
 

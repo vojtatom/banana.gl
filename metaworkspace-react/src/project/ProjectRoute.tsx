@@ -8,6 +8,7 @@ import {
 import { ProjectList } from './ProjectList';
 import { ProjectAdd } from './ProjectAdd';
 import { Project } from './ProjectDetail';
+import { ProjectView } from './ProjectView';
 
 
 export function ProjectRouter() {
@@ -22,6 +23,9 @@ export function ProjectRouter() {
         </Route>
         <Route path={`${path}/detail/:name`}>
           <Project />
+        </Route>
+        <Route path={`${path}/view/:name`}>
+          <ProjectView />
         </Route>
       </Switch>
     )

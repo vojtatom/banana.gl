@@ -1,4 +1,5 @@
-import { useParams } from "react-router"
+import { useParams } from "react-router";
+import { useEffect, useState } from 'react';
 import { useDropzone } from 'react-dropzone';
 import iaxios from "../axios";
 
@@ -83,7 +84,7 @@ function AddLayer(props: IAddLayer) {
       formData.append("files", dataset)
     });
 
-    iaxios.post('/layer/add', formData, {
+    iaxios.post('/project/layer/add', formData, {
       headers: {
         "Content-Type": "multipart/form-data"
       }
@@ -98,8 +99,23 @@ function AddLayer(props: IAddLayer) {
 
 }
 
+interface ILayer {
+  name: string;
+}
+
 export function Project() {
     const { name } = useParams<{name: string}>();
+    const [layers, setLayers] = useState<ILayer[]>([])
+
+    useEffect(() => {
+      iaxios.post('/project/layer/list', {name: name}).then((response) => {
+        setLayers(response.data);
+        console.log(response.data);
+        return () => {
+          setLayers([]); // This worked for me
+        };
+      })
+    }, []);
 
     return (
         <div className="dash">
@@ -108,22 +124,18 @@ export function Project() {
           </Widget>
           <Widget bordered row>
             <AddLayer project={name}/>
-            <button>delete project</button>
           </Widget>
           <Widget>
             <div className="subtitle">Layers</div>
           </Widget>
 
-          
-
-
-          <Widget bordered>
-            <div className="subsubtitle">Terrain</div>
-            <Pair name='Original file' value='test.json'/>
-            <div className="controler">
-              <button>delete layer</button>
+          {layers.map( (layer) => {
+          return (
+            <div className='line' key={layer.name}>
+              {layer.name}
             </div>
-          </Widget>
+          )
+        })}
         </div>
     )
 }
