@@ -15,7 +15,7 @@ def run(mws: MetacityWorkspace):
     server_log = open(mws.server_log, 'w+')
     jobs_log = open(mws.jobs_log, 'w+')
     
-    proc = subprocess.Popen(["uvicorn", "metaworkspace.runtime.api.api:app", "--reload", "--port", "5000"], 
+    proc = subprocess.Popen(["uvicorn", "metaworkspace.runtime.api.api:app", "--workers", "4", "--port", "5000"], 
                             stdout=server_log,
                             stderr=server_log)
 
