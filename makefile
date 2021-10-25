@@ -10,12 +10,12 @@ all: build
 #environments
 react:
 	@-( \
-		cd metaworkspace-react; \
+		cd react-metaworkspace; \
 		npm run build; \
 		cd ..; \
 		rm -r metaworkspace/client/; \
 		mkdir metaworkspace/client/; \
-		cp -a metaworkspace-react/build/. metaworkspace/client/; \
+		cp -a react-metaworkspace/build/. metaworkspace/client/; \
 	)
 
 build: clean

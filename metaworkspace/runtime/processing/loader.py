@@ -3,6 +3,8 @@ from metaworkspace.runtime.processing.jobs.job import Job
 from metaworkspace.runtime.processing.jobs.loaddataset import JobLoadDataset
 import json
 import os
+import uuid
+
 
 jobs: Dict[str, Type[Job]] = {
     JobLoadDataset.TYPE: JobLoadDataset
@@ -27,6 +29,7 @@ def load_job(job_dir):
     with open(jobfile, 'r') as job_file:
         job: Job = json.load(job_file, object_hook=job_object_hook)
     job.job_dir = job_dir
+    job.setup_log(str(uuid.uuid1()))
     return job
 
 

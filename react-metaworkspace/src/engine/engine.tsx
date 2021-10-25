@@ -2,7 +2,6 @@ import { Vector2 } from "three";
 import iaxios from "../axios";
 import { Layer } from "./layer";
 import { Renderer } from "./renderer";
-import { ILayerData } from "./types";
 
 
 export class MetacityEngine {
@@ -20,20 +19,22 @@ export class MetacityEngine {
     }
 
     init() {
-        iaxios.post('/layout', {name: this.project}).then((response) => {
-            const data: ILayerData[] = response.data;
-            for(let ldata of data){
-                let layer = new Layer(this.renderer, ldata);
-                this.layers.push(layer);
+        iaxios.get(`/data/${this.project}/layout.json`).then((response) => {
+            for (const layer of response.data)
+            {
+                if(!layer.init)
+                    return;
+                this.layers.push(new Layer(this.renderer, this.project, layer));
             }
 
-            this.moved();
+            //this.layers.push(new Layer(this.renderer, this.project, response.data[0]));
         });
 
         this.renderer.controls.addEventListener('change', () => this.moved())
     }
 
     moved() {
+        this.renderer.updateOnMove();
         const fp = this.renderer.focus_point
         const fp2 = new Vector2(fp.x, fp.y);
         for (let layer of this.layers) {

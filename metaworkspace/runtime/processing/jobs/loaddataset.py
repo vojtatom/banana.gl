@@ -1,8 +1,7 @@
 import os
 import shutil
 
-from metacity.grid.build import build_grid
-from metacity.io.load import load
+from metacity.io.parse import parse
 from metaworkspace.runtime.processing.jobs import job
 from metaworkspace.runtime.workspace import mws
 
@@ -34,8 +33,10 @@ class JobLoadDataset(job.Job):
 
     def run(self):
         layer = self.parse_files() 
+        layer.persist()
         self.update_status("building grid")
-        build_grid(layer, 1000)
+        grid = layer.build_grid()
+        grid.persist()
         self.update_status("finished")
 
     def setup_resources(self, job_dir, files):
@@ -54,9 +55,11 @@ class JobLoadDataset(job.Job):
             self.update_status(f"parsing files: {i}/{len(self.files)}")
             try:
                 layer.add_source_file(file)
-                load(layer, file)
+                objects = parse(file)
+                for o in objects:
+                    layer.add(o)
             except Exception as e:
-                print(e)
+                self.log(e)
         return layer
         
 

@@ -18,18 +18,16 @@ export function ProjectAdd() {
   let history = useHistory();
 
 
-
   const testAvailability = (event: React.FormEvent<HTMLInputElement>) => {
     const name = event.currentTarget.value;
     iaxios.post('/project/exists', { name: name }).then((response) => {
-      if (name.length == 0)
+      if (name.length === 0)
         setAvailability(NameState.empty);
       else if (response.data.exists)
-        setAvailability(NameState.exists)
-      else {
-        setAvailability(NameState.valid)
-        setName(name);
-      }
+        setAvailability(NameState.exists);
+      else 
+        setAvailability(NameState.valid);
+      setName(name);
     })
   };
 
@@ -61,7 +59,7 @@ export function ProjectAdd() {
                 onChange={ (e) => testAvailability(e)}
                 value={name}/>
         <button onClick={(e) => addProject()} 
-            className={availability != NameState.valid ? 'nonactive' : '' }>
+            className={availability !== NameState.valid ? 'nonactive' : '' }>
               {availabilityMessage()}
         </button>
     </Page>

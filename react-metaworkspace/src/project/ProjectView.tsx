@@ -10,7 +10,7 @@ export function ProjectView() {
     
     useEffect(() => {
         if (canvas.current == null)
-        return
+            return;
         
         renderer = new MetacityEngine(name, canvas.current);
         renderer.init();

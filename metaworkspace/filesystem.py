@@ -1,6 +1,7 @@
 import os
 import shutil
 import uuid
+from datetime import datetime
 
 
 def create_dir_if_not_exists(dir):
@@ -22,12 +23,16 @@ def jobs_dir(workspace_path):
     return os.path.join(workspace_path, "jobs")
 
 
+def logs_dir(workspace_path):
+    return os.path.join(workspace_path, "logs")
+
+
 def server_log(workspace_path):
-    return os.path.join(workspace_path, "server_log.txt")
+    return os.path.join(logs_dir(workspace_path), "server_log.txt")
 
 
 def jobs_log(workspace_path):
-    return os.path.join(workspace_path, "jobs_log.txt")
+    return os.path.join(logs_dir(workspace_path), "jobs_log.txt")
 
 
 def project_dir(workspace_path, project_name):
@@ -37,7 +42,8 @@ def project_dir(workspace_path, project_name):
 def get_projects(workspace_path):
     projects = projects_dir(workspace_path)
     for project in os.listdir(projects):
-        yield project
+        if project[0] != '.':
+            yield project
 
 
 def config(workspace_path):
@@ -64,5 +70,12 @@ def recreate_workspace(workspace_path):
     recreate_dir(workspace_path)
     create_dir_if_not_exists(projects_dir(workspace_path))
     create_dir_if_not_exists(jobs_dir(workspace_path))
+    create_dir_if_not_exists(logs_dir(workspace_path))
 
-
+def archive_logs(workspace_path):
+    logs = logs_dir(workspace_path)
+    if os.path.exists(logs):
+        new_logs_name = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+        new_logs_path = os.path.join(workspace_path, f'logs-{new_logs_name}')
+        os.rename(logs, new_logs_path)
+    create_dir_if_not_exists(logs)

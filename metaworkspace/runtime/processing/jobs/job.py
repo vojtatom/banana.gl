@@ -1,6 +1,8 @@
 import json
+import logging
 import os
 import shutil
+from metaworkspace.runtime.logging import setup_logging
 from abc import ABC, abstractmethod
 
 
@@ -11,6 +13,7 @@ class Job(ABC):
     def __init__(self):
         super().__init__()
         self.job_dir = None
+        self.log_id = None
         self.status = 'created'
     
     #########################################
@@ -42,6 +45,8 @@ class Job(ABC):
         return os.path.join(self.job_dir, "job.ready")
 
     def cleanup(self):
+        log = logging.getLogger(self.log_id)
+        log.info(f"Job {os.path.basename(self.job_dir)}: {self.serialize()}")
         shutil.rmtree(self.job_dir)
 
     def submit(self):
@@ -55,9 +60,18 @@ class Job(ABC):
     def update_status(self, status):
         self.status = status
         data = self.serialize()
+        self.log(self.status)
         with open(self.job_file, 'w') as file:
             json.dump(data, file)
+
+    def log(self, message):
+        log = logging.getLogger(self.log_id)
+        log.info(f"Job {os.path.basename(self.job_dir)}: {message}")
 
     def submit_checks(self):
         if not self.job_dir:
             raise Exception("Cannot submit job without assigned directory")
+
+    def setup_log(self, logid):
+        self.log_id = logid
+        setup_logging(logid)

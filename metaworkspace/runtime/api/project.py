@@ -52,10 +52,13 @@ async def list_layers(project: ProjectData):
     prj = mws.project(project.name)
     
     data = []
-    for l in prj.layers:
-        data.append({
-            'name': l.name
-        })
+    try:
+        for l in prj.layers:
+            data.append({
+                'name': l.name
+            })
+    except:
+        pass
 
     return JSONResponse(data) 
 

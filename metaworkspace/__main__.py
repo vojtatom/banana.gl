@@ -1,8 +1,9 @@
-from metaworkspace.workspace import MetacityWorkspace
-from argparse import ArgumentParser
-import metaworkspace.filesystem as fs
 import os
 import subprocess
+from argparse import ArgumentParser
+
+import metaworkspace.filesystem as fs
+from metaworkspace.workspace import MetacityWorkspace
 
 
 def install(workspace_path: str):
@@ -12,6 +13,8 @@ def install(workspace_path: str):
 
 def run(mws: MetacityWorkspace):
     os.environ["METACITYWS"] = mws.path
+    mws.clear_logs()
+
     server_log = open(mws.server_log, 'w+')
     jobs_log = open(mws.jobs_log, 'w+')
     
@@ -24,9 +27,7 @@ def run(mws: MetacityWorkspace):
                             stderr=jobs_log)
                  
     return_code = proc.wait()
-    #print(return_code)
     return_code = jobs.wait()
-    print(return_code)
 
 
 usage = ("Sets up Metacity Workspace."

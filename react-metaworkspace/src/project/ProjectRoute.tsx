@@ -12,7 +12,7 @@ import { ProjectView } from './ProjectView';
 
 
 export function ProjectRouter() {
-  let { path, url } = useRouteMatch();
+  let { path } = useRouteMatch();
     return (
       <Switch>
         <Route path={`${path}/list`}>

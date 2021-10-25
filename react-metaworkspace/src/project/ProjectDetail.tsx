@@ -36,13 +36,12 @@ function Dropzone(props: IDropzone) {
   );
 }
 
-interface IPair {
+/*interface IPair {
   name: string;
   value: string | number;
 };
 
-function Pair(props: IPair) {
-  
+/*function Pair(props: IPair) {
   return (
     <div className="pair">
       <div className="name">
@@ -53,7 +52,7 @@ function Pair(props: IPair) {
       </div>
     </div>
   )
-}
+}*/
 
 interface IWidget {
   bordered?: boolean;
@@ -107,6 +106,8 @@ export function Project() {
     const { name } = useParams<{name: string}>();
     const [layers, setLayers] = useState<ILayer[]>([])
 
+    console.log("name", name);
+
     useEffect(() => {
       iaxios.post('/project/layer/list', {name: name}).then((response) => {
         setLayers(response.data);
@@ -115,7 +116,7 @@ export function Project() {
           setLayers([]); // This worked for me
         };
       })
-    }, []);
+    }, [name]);
 
     return (
         <div className="dash">
