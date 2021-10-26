@@ -34,11 +34,15 @@ export class MetacityEngine {
     }
 
     moved() {
-        this.renderer.updateOnMove();
         const fp = this.renderer.focus_point
         const fp2 = new Vector2(fp.x, fp.y);
         for (let layer of this.layers) {
             layer.focus(fp2);
         }
+        this.renderer.changed = true;
+    }
+
+    doubleclick(x: number, y: number) {
+        this.renderer.click(x, y);
     }
 }

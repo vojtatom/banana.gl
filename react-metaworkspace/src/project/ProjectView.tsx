@@ -19,7 +19,7 @@ export function ProjectView() {
 
     return (
         <div>
-            <canvas ref={canvas}>Your browser does not support HTML5 canvas</canvas>
+            <canvas ref={canvas} onDoubleClick={(event) => renderer.doubleclick(event.clientX, event.clientY)}>Your browser does not support HTML5 canvas</canvas>
         </div>
     )
 }

@@ -1,6 +1,7 @@
 import os
 import shutil
 
+from metacity.datamodel.project import Project
 from metacity.io.parse import parse
 from metaworkspace.runtime.processing.jobs import job
 from metaworkspace.runtime.workspace import mws
@@ -15,7 +16,7 @@ class JobLoadDataset(job.Job):
     def setup(self, job_dir, project, layer, files):
         super().setup(job_dir)
         lfiles = self.setup_resources(job_dir, files)
-        self.project = project
+        self.project: str = project
         self.layer = layer
         self.files = lfiles
 
@@ -32,11 +33,13 @@ class JobLoadDataset(job.Job):
         self.files = data['files']
 
     def run(self):
-        layer = self.parse_files() 
+        layer, proj = self.parse_files() 
         layer.persist()
         self.update_status("building grid")
         grid = layer.build_grid()
         grid.persist()
+        self.update_status("building layout")
+        proj.build_layout()
         self.update_status("finished")
 
     def setup_resources(self, job_dir, files):
@@ -60,7 +63,7 @@ class JobLoadDataset(job.Job):
                     layer.add(o)
             except Exception as e:
                 self.log(e)
-        return layer
+        return layer, proj
         
 
 

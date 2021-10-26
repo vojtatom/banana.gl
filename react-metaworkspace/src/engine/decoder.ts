@@ -31,21 +31,38 @@ export class Decoder {
 
         iteration();
     }
-    
-    static base64toint32(data: string) {
-        let blob:  string|null = window.atob(data);
-        let array;
+
+    static base64toint32(data: string, callback: CallableFunction) {
+        let blob: string = window.atob(data);
         let len = blob.length / Int32Array.BYTES_PER_ELEMENT;
-        let view: DataView|null = new DataView(new ArrayBuffer(Int32Array.BYTES_PER_ELEMENT));
-        array = new Int32Array(len);
+        let view: DataView = new DataView(new ArrayBuffer(Int32Array.BYTES_PER_ELEMENT));
+		let array = new Uint8Array(len * Int32Array.BYTES_PER_ELEMENT);
+        let p = 0;
+        let it = 1;
+        const itStep = 10000;
         
-        for (let p = 0; p < len * Int32Array.BYTES_PER_ELEMENT; p = p + Int32Array.BYTES_PER_ELEMENT) {
-            for(let i = 0; i < Float64Array.BYTES_PER_ELEMENT; ++i)
-                view.setUint8(i, blob.charCodeAt(p + i));
-            array[p / Int32Array.BYTES_PER_ELEMENT] = view.getInt32(0, true);
+        const iteration = () => {
+            const stepStop = it * itStep * Int32Array.BYTES_PER_ELEMENT;
+            const totalStop = len * Int32Array.BYTES_PER_ELEMENT;
+            
+            for (; p < Math.min(stepStop, totalStop); p = p + Int32Array.BYTES_PER_ELEMENT) {
+                for(let i = 0; i < Int32Array.BYTES_PER_ELEMENT; ++i)
+                    view.setUint8(i, blob.charCodeAt(p + i));
+
+                for(let i = 0; i < Int32Array.BYTES_PER_ELEMENT; ++i)
+                    array[p + i] = view.getUint8(i);
+            }
+
+            if (p < totalStop) {
+                it++;
+                setTimeout(iteration, 10);
+            } else {
+                view = null as unknown as DataView;
+                blob = null as unknown as string;
+                callback(array);
+            }
         }
-        view = null;
-        blob = null;
-		return array;
-	}
+
+        iteration();
+    }
 }
