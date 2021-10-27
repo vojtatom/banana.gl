@@ -2,8 +2,7 @@ import * as THREE from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 import { CSM } from 'three/examples/jsm/csm/CSM';
 import Stats from 'three/examples/jsm/libs/stats.module';
-import { INVSCALE } from './types';
-import { select_phong_material, picking_material } from './shaders'
+import { select_phong_material, picking_material, line_material } from './shaders'
 
 
 class MapControls extends OrbitControls {
@@ -90,6 +89,7 @@ export class Renderer {
     picker: GPUPickHelper;
 
     material: THREE.ShaderMaterial;
+    lineMaterial: THREE.RawShaderMaterial;
     pickingMaterial: THREE.ShaderMaterial;
 
     stats1: Stats;
@@ -100,10 +100,11 @@ export class Renderer {
         this.canvas = canvas;
         this.scene = new THREE.Scene();
         this.pickingScene = new THREE.Scene();
-        this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 500 );
+        this.camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 5000 );
 
         //this.scene.fog = new THREE.Fog(0xffffff, 150, 250);
         this.renderer = new THREE.WebGLRenderer( { canvas: this.canvas, antialias: true } );
+
         this.renderer.setPixelRatio(window.devicePixelRatio);
         this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.autoUpdate = false;
@@ -119,7 +120,7 @@ export class Renderer {
         this.controls.enableDamping = true;
         this.controls.minDistance = 5;
         this.controls.minPolarAngle = 0.001;
-        this.controls.maxPolarAngle = Math.PI * 0.4;
+        //this.controls.maxPolarAngle = Math.PI * 0.4;
         this.controls.update();
 
         this.scene.add(new THREE.HemisphereLight( 0xdddddd, 0x555555, 0.6 ));
@@ -130,22 +131,29 @@ export class Renderer {
             mode: 'practical',
             cascades: 4,
             near: 1,
-            far: 500,
+            far: 5000,
             shadowBias: -0.0005,
             shadowMapSize: 2048,
             lightDirection: new THREE.Vector3(-1, -1, -2).normalize(),
             camera: this.camera,
             parent: this.scene,
-            margin: 500,
-            lightFar: 2000,
+            margin: 5000,
+            lightFar: 20000,
             lightNear: 1,
             lightIntensity: 0.3
         });
 
         //materials
-        this.material = select_phong_material();//new THREE.MeshToonMaterial( { color: '#FFFFFF', side: THREE.DoubleSide } );
+        this.material = select_phong_material();
         this.csm.setupMaterial( this.material );
         this.pickingMaterial = picking_material();
+        this.lineMaterial = line_material();
+
+        this.lineMaterial.onBeforeCompile = (shader, renderer) => {
+            console.log(shader);
+        }
+
+        //this.csm.setupMaterial( this.lineMaterial );
 
         //picker
         this.picker = new GPUPickHelper(this.renderer);
@@ -167,8 +175,8 @@ export class Renderer {
         this.controls.update();
         
         if(this.changed) {
-            this.renderer.shadowMap.needsUpdate = true;
             this.csm.update();
+            this.renderer.shadowMap.needsUpdate = true;
             this.renderer.render( this.scene, this.camera );
         }
         
@@ -181,7 +189,7 @@ export class Renderer {
         this.controls.target = new THREE.Vector3(focusPoint.x, focusPoint.y, 0);
         this.camera.position.x = focusPoint.x;
         this.camera.position.y = focusPoint.y - 20;
-        this.camera.position.z = 1000 * INVSCALE;   
+        this.camera.position.z = 1000;   
     }
 
     click(x: number, y: number){

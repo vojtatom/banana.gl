@@ -1,10 +1,9 @@
-import { ITile, ILayer, SCALE } from "./types";
+import { ITile, ILayer } from "./types";
 import { Renderer } from "./renderer"
 import * as THREE from "three";
 import { Vector2, Vector3 } from "three";
 import iaxios from "../axios";
-import { Decoder } from "./decoder";
-import { Model, PolygonalModel } from "./models";
+import { Model, PolygonalModel, LineModel } from "./models";
 
 
 export class Tile {
@@ -23,8 +22,8 @@ export class Tile {
 
 
     constructor(data: ITile, renderer: Renderer, layer: ILayer) {
-        this.bbox = [new Vector3(...data.box[0]).divideScalar(SCALE), new Vector3(...data.box[1]).divideScalar(SCALE)];
-        this.brect = [new Vector2(this.bbox[0].x, this.bbox[0].y).divideScalar(SCALE), new Vector2(this.bbox[1].x, this.bbox[1].y).divideScalar(SCALE)];
+        this.bbox = [new Vector3(...data.box[0]), new Vector3(...data.box[1])];
+        this.brect = [new Vector2(this.bbox[0].x, this.bbox[0].y), new Vector2(this.bbox[1].x, this.bbox[1].y)];
         this.x = data.x;
         this.y = data.y;
         this.sourceFile = data.file;
@@ -67,6 +66,8 @@ export class Tile {
                 for(const data of response.data) {
                     if (data.type === "simplepolygon")
                         this.models.push(new PolygonalModel(data, this.renderer));
+                    if (data.type === "simpleline")
+                        this.models.push(new LineModel(data, this.renderer));
                 }
 
                 if (response.data.length > 0) {

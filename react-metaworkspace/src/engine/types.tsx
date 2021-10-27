@@ -42,6 +42,3 @@ export interface IModel {
     type: string,
     vertices: string
 }
-
-export const SCALE = 10;
-export const INVSCALE = 1 / SCALE;

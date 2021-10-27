@@ -1,7 +1,7 @@
 import { Vector2, Vector3 } from "three";
 import { Renderer } from "./renderer";
 import { Tile } from "./tile";
-import { IVecBBox, ILayout, ILayer, INVSCALE } from "./types";
+import { IVecBBox, ILayout, ILayer } from "./types";
 
 
 function getNthTriangularNumber(n: number) {
@@ -56,7 +56,7 @@ export class Grid {
     layer: ILayer;
 
     constructor(data: ILayout, renderer: Renderer, layer: ILayer) {
-        this.tileSize = data.tile_size * INVSCALE;
+        this.tileSize = data.tile_size;
         this.bbox = [new Vector3(Infinity, Infinity, Infinity), new Vector3(-Infinity, -Infinity, -Infinity)];
         this.tiles = new Map<number, Tile>();
 
@@ -73,7 +73,7 @@ export class Grid {
         this.renderer = renderer;
         this.layer = layer;
 
-        this.visible_radius = 2000 * INVSCALE;
+        this.visible_radius = 2000;
         this.visible = new Set<Tile>();
         this.visibleSwap = new Set<Tile>();
 

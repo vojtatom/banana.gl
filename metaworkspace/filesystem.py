@@ -75,7 +75,7 @@ def recreate_workspace(workspace_path):
 def archive_logs(workspace_path):
     logs = logs_dir(workspace_path)
     if os.path.exists(logs):
-        new_logs_name = datetime.now().strftime('%Y-%m-%d-%H:%M:%S')
+        new_logs_name = datetime.now().strftime('%Y-%m-%d-%H-%M–%S')
         new_logs_path = os.path.join(workspace_path, f'logs-{new_logs_name}')
         os.rename(logs, new_logs_path)
     create_dir_if_not_exists(logs)

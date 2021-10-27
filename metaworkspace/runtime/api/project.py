@@ -53,9 +53,9 @@ async def list_layers(project: ProjectData):
     
     data = []
     try:
-        for l in prj.layers:
+        for l in prj.layer_names:
             data.append({
-                'name': l.name
+                'name': l
             })
     except:
         pass
