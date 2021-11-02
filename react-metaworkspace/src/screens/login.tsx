@@ -24,7 +24,6 @@ export function Login() {
 
   const login = (event: FormEvent) => {
     event.preventDefault();
-    console.log(name.current?.value, pass.current?.value);
 
     let formData = new FormData();
     formData.append("username", name.current?.value || "");

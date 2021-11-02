@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 setup(
     name="metaworkspace",
     packages=find_packages("."),
-    version="0.0.5",
+    version="0.0.9",
     description="Python tool simplyfing work with Metacity Modules",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -27,8 +27,18 @@ setup(
     install_requires=[
         "metacity>=0.0.54",
         "requests>=2.26.0",
+        "twine>=3.4.2",
         "fastapi>=0.68.1",
         "uvicorn>=0.15.0",
+        "aiofiles>=0.7.0",
+        "jinja2>=3.0.1",
+        "watchdog>=2.1.5",
+        "bcrypt>=3.2.0",
+        "python-jose>=3.3.0",
+        "python-jwt>=2.0.1",
+        "passlib>=1.7.4",
         "python-multipart>=0.0.5"
-    ] # Install other dependencies if any
+    ],
+    zip_safe=False,
+    include_package_data=True
 )

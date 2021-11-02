@@ -20,7 +20,7 @@ export class MetacityEngine {
     }
 
     init() {
-        iaxios.get(`api/data/${this.project}/layout.json`).then((response) => {
+        iaxios.get(`/api/data/${this.project}/layout.json`).then((response) => {
             for (const layer of response.data)
             {
                 if(!layer.init)
