@@ -1,24 +1,55 @@
 import os
 import subprocess
 from argparse import ArgumentParser
+from getpass import getpass
 
 import metaworkspace.filesystem as fs
-from metaworkspace.workspace import MetacityWorkspace
+from metaworkspace.workspace import MetacityWorkspace, UserAuthenticator
 
 
 def install(workspace_path: str):
     print(f"Creating workspace directory...")
     fs.recreate_workspace(workspace_path)
+    print(f"Generating secrets...")
+    UserAuthenticator.generate(workspace_path)
+    print(f"Done.")
 
 
-def run(mws: MetacityWorkspace):
+def regen(workspace_path: str):
+    secret = fs.security_config(workspace_path)
+    if fs.file_exists(secret):
+        os.remove(secret)
+    print(f"Generating secrets...")
+    UserAuthenticator.generate(workspace_path)
+    print(f"Done.")
+
+def createuser(mws: MetacityWorkspace):
+    print(f"Generating new user...")
+    username =    input("username:              ")
+    fullname =    input("full name:             ")
+    email =       input("email:                 ")
+    while True:
+        pass1 = getpass("password (first time): ")
+        pass2 = getpass("password (again):      ")
+        if pass1 != pass2:
+            print("Passwords do not match, try again.")
+        else:
+            break
+    mws.security.create_user(username, fullname, pass1, email)
+    print(f"Created user {username}. GLHF! =^.^=")
+
+
+def run(mws: MetacityWorkspace, ip_adress, port):
+    print(f"The server runs on {ip_adress}:{port}")
+    print(f"For more information, see logs located in directory {mws.logs_dir}.")
+    print(f"Running server...")
     os.environ["METACITYWS"] = mws.path
     mws.clear_logs()
 
     server_log = open(mws.server_log, 'w+')
     jobs_log = open(mws.jobs_log, 'w+')
     
-    proc = subprocess.Popen(["uvicorn", "metaworkspace.runtime.api.api:app", "--workers", "4", "--port", "5000"], 
+    proc = subprocess.Popen(["uvicorn", "metaworkspace.runtime.api.server:app", "--workers", "6", "--host", str(ip_adress), "--port", str(port)], 
                             stdout=server_log,
                             stderr=server_log)
 
@@ -39,13 +70,31 @@ if __name__ == "__main__":
     parser = ArgumentParser(description=usage)
     parser.add_argument('--install', help='Run the installation process', action="store_true")
     parser.add_argument('--run', help='Run the application', action="store_true")
+    parser.add_argument('--regen', help='Re-generate the secret of the app, it will disable access to all existing users', action="store_true")
+    parser.add_argument('--createuser', help='Create new user', action="store_true")
+    parser.add_argument('--ip', nargs=1, help='IP adress to run on', default=['127.0.0.1'])
+    parser.add_argument('--port', nargs=1, help='Port to run on', default=['5000'])
     parser.add_argument('workspace_dir', type=str, help='Path to newly created Metacity workspace')
     args = parser.parse_args()    
     path = args.workspace_dir
-    mws = MetacityWorkspace(path)
 
     if args.install:
-        install(mws.path)
-    
+        install(path)
+
+    if args.regen:
+        regen(path)
+
+    try:
+        mws = MetacityWorkspace(path)
+    except Exception as e:
+        print(e)
+        print("Could not open the environemnt, please check if the name is right and the secret key is present.")
+        quit()
+
+    if args.createuser:
+        createuser(mws)
+
     if args.run:
-        run(mws)
+        run(mws, args.ip[0], args.port[0])
+
+

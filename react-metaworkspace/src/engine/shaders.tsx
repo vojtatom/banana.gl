@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CSM } from 'three/examples/jsm/csm/CSM';
 
 export const PHONG_SELECT_VERT = `
 #define PHONG
@@ -143,7 +144,7 @@ void main() {
 `;
 
 
-export function select_phong_material() {
+export function polygonSelectMaterial() {
 
 	const customUniforms = THREE.UniformsUtils.merge([
 		THREE.ShaderLib.phong.uniforms,
@@ -157,6 +158,12 @@ export function select_phong_material() {
 		lights: true,
 		side: THREE.DoubleSide,
 		name: 'custom-polygon-material'
+	});
+}
+
+export function polygonMaterial() {
+	return new THREE.MeshPhongMaterial({
+		side: THREE.DoubleSide,
 	});
 }
 
@@ -302,10 +309,10 @@ void main() {
 	#include <emissivemap_fragment>
 
 	// accumulation
-	#include <lights_phong_fragment>
-	#include <lights_fragment_begin>
-	#include <lights_fragment_maps>
-	#include <lights_fragment_end>
+	//#include <lights_phong_fragment>
+	//#include <lights_fragment_begin>
+	//#include <lights_fragment_maps>
+	//#include <lights_fragment_end>
 
 	// modulation
 	#include <aomap_fragment>
@@ -324,10 +331,10 @@ void main() {
 `;
 
 
-export function line_material() {
+export function lineMaterial() {
 
 	const customUniforms = THREE.UniformsUtils.merge([
-		THREE.ShaderLib.phong.uniforms,
+		//THREE.ShaderLib.phong.uniforms,
 		{ zoffset: { value: 1 } }
 	]);
 
@@ -336,7 +343,7 @@ export function line_material() {
 		vertexShader: PHONG_LINE_VERT,
 		fragmentShader: PHONG_LINE_FRAG,
 		side: THREE.DoubleSide,
-		lights: true,
+		//lights: true,
 		name: 'custom-line-material'
 	});
 }
@@ -361,7 +368,7 @@ void main() {
 `;
 
 
-export function picking_material() {
+export function pickingMaterial() {
 
 	const customUniforms = THREE.UniformsUtils.merge([]);
 
@@ -372,4 +379,23 @@ export function picking_material() {
 		side: THREE.DoubleSide,
 		name: 'custom-picking-material'
 	});
+}
+
+
+export class MaterialLibrary {
+	polygonMaterial: THREE.Material;
+    polygonSelectMaterial: THREE.ShaderMaterial;
+    lineMaterial: THREE.Material;
+    pickingMaterial: THREE.Material;
+
+	constructor(csm: CSM) {
+        this.polygonMaterial = polygonMaterial();
+        csm.setupMaterial(this.polygonMaterial);
+        
+		this.polygonSelectMaterial = polygonSelectMaterial();
+        csm.setupMaterial(this.polygonSelectMaterial);
+
+        this.lineMaterial = lineMaterial();
+        this.pickingMaterial = pickingMaterial();
+	}
 }

@@ -5,6 +5,7 @@ from multiprocessing import Process, Queue
 from typing import List
 from metaworkspace.runtime.logging import setup_logging
 import logging
+import fnmatch
 
 from metaworkspace.runtime.processing.loader import load_job
 from watchdog.events import PatternMatchingEventHandler
@@ -79,6 +80,12 @@ class JobManager:
         self.job_directory = job_directory
         self.queue = JobQueue()
         self.em = EventManager(self.queue)
+
+    def load_jobs(self):
+        for root, dirs, files in os.walk(self.job_directory):
+            for name in files:
+                if fnmatch.fnmatch(name, 'job.ready'):
+                    self.queue.add_job(root)
         
     @property
     def event_handler(self):
@@ -97,7 +104,8 @@ class JobManager:
         return o
 
     def run(self):
-        self.queue.run_workers(2)
+        self.load_jobs()
+        self.queue.run_workers(1)
         observer = self.observer
         observer.start()
         try:

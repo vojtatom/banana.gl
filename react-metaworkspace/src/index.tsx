@@ -1,7 +1,7 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import { IconContext } from 'react-icons/lib';
-import App from './App';
+import React from 'react'
+import ReactDOM from 'react-dom'
+import { IconContext } from 'react-icons/lib'
+import { App } from './app'
 
 ReactDOM.render(
   <React.StrictMode>

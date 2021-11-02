@@ -1,9 +1,10 @@
-import { ITile, ILayer } from "./types";
+import { ITile, ILayer, IOverlay } from "./types";
 import { Renderer } from "./renderer"
 import * as THREE from "three";
 import { Vector2, Vector3 } from "three";
 import iaxios from "../axios";
-import { Model, PolygonalModel, LineModel } from "./models";
+import axios from "axios";
+import { Model, PolygonalModel, LineModel, LineProxyModel } from "./models";
 
 
 export class Tile {
@@ -12,16 +13,17 @@ export class Tile {
     x: number;
     y: number;
     renderer: Renderer;
-    layer: ILayer;
+    layer: ILayer | IOverlay;
     sourceFile: string;
 
+    //axios stop request
+    stopFlag: any;
+
     private isVisible: boolean;
-    private placeholder: THREE.Mesh;
     private models: Model[];
 
 
-
-    constructor(data: ITile, renderer: Renderer, layer: ILayer) {
+    constructor(data: ITile, renderer: Renderer, layer: ILayer | IOverlay) {
         this.bbox = [new Vector3(...data.box[0]), new Vector3(...data.box[1])];
         this.brect = [new Vector2(this.bbox[0].x, this.bbox[0].y), new Vector2(this.bbox[1].x, this.bbox[1].y)];
         this.x = data.x;
@@ -31,65 +33,70 @@ export class Tile {
         this.renderer = renderer;
         this.isVisible = false;
         this.models = [];
-        this.placeholder = this.renderPlaceholder();
     }
 
     set visible(isVisible: boolean) {
         if (this.isVisible === isVisible)
             return;
-        
+
         this.isVisible = isVisible;
 
         if (isVisible)
             this.forRender();
-        else
+        else 
             this.stopRender();
     }
 
-    renderPlaceholder() {
-        const dxy = this.brect[1].clone().sub(this.brect[0]);
-        const dz = this.bbox[1].z - this.bbox[0].z;
-        const geometry = new THREE.BoxGeometry(1, 1, 1);
-        geometry.translate(0.5, 0.5, 0.5);
-        geometry.scale(dxy.x, dxy.y, dz)
-        geometry.translate(this.brect[0].x, this.brect[0].y, this.bbox[0].z);
-        const material = new THREE.MeshBasicMaterial( {color: 0xF8f8f8, side: THREE.DoubleSide} );
-        const placeholder = new THREE.Mesh( geometry, material );
-        this.renderer.scene.add( placeholder );
-        placeholder.visible = false;
-        return placeholder
-    }
-
     forRender() {
-        iaxios.get(`/data/${this.layer.project}/${this.layer.name}/grid/tiles/${this.sourceFile}`).then(
+        this.stopFlag = axios.CancelToken.source();
+        iaxios.get(`/api/data/${this.layer.project}/${this.layer.name}/grid/tiles/${this.sourceFile}`, {
+            cancelToken: this.stopFlag.token
+          }).then(
             (response) => {
-                for(const data of response.data) {
-                    if (data.type === "simplepolygon")
-                        this.models.push(new PolygonalModel(data, this.renderer));
-                    if (data.type === "simpleline")
-                        this.models.push(new LineModel(data, this.renderer));
-                }
-
-                if (response.data.length > 0) {
-                    this.placeholder.visible = false;
-                }
-
+                this.createModels(response.data);
                 this.postRenderCheck();
             }
-        )
+        ).catch((reject) => {
+            console.log(reject);
+        })
+    }
+
+    private createModels(data: Array<any>) {
+        for (let modeldata of data) {
+            const model = this.deserializeModel(modeldata);
+            if (model)
+                this.models.push(model);
+        }
+    }
+
+    private deserializeModel(data: any) {
+        if (data.tags && data.tags.proxy === true) {
+            if (data.type === "simpleline")
+                return new LineProxyModel(data, this.renderer, this.layer as IOverlay);
+        } else {
+            if (data.type === "simplepolygon")
+                return new PolygonalModel(data, this.renderer, this.layer);
+
+            if (data.type === "simpleline")
+                return new LineModel(data, this.renderer, this.layer);
+        }
     }
 
     postRenderCheck() {
-        if(!this.isVisible)
+        if (!this.isVisible)
             this.stopRender();
     }
 
     stopRender() {
-        if (this.models.length > 0){
-            for(const m of this.models)
+        if (this.models.length > 0) {
+            for (const m of this.models)
                 m.remove();
             this.models = [];
-            //this.placeholder.visible = true;
+        }
+
+        if (this.stopFlag){
+            this.stopFlag.cancel();
+            this.stopFlag = null;
         }
     }
 }

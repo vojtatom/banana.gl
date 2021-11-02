@@ -52,7 +52,7 @@ class JobLoadDataset(job.Job):
         return lfiles
 
     def parse_files(self):
-        proj = mws.project(self.project)
+        proj = mws.get_project(self.project)
         layer = proj.create_layer(self.layer)
         for i, file in enumerate(self.files):
             self.update_status(f"parsing files: {i}/{len(self.files)}")

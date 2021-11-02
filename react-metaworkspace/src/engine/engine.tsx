@@ -1,7 +1,8 @@
 import { Vector2 } from "three";
 import iaxios from "../axios";
-import { Layer } from "./layer";
+import { Layer, Overlay } from "./layer";
 import { Renderer } from "./renderer";
+import { ILayer } from "./types";
 
 
 export class MetacityEngine {
@@ -9,7 +10,7 @@ export class MetacityEngine {
     canvas: HTMLCanvasElement;
     
     renderer: Renderer;
-    layers: Layer[];
+    layers: ILayer[];
 
     constructor(project: string, canvas: HTMLCanvasElement) {
         this.project = project;
@@ -19,15 +20,18 @@ export class MetacityEngine {
     }
 
     init() {
-        iaxios.get(`/data/${this.project}/layout.json`).then((response) => {
+        iaxios.get(`api/data/${this.project}/layout.json`).then((response) => {
             for (const layer of response.data)
             {
                 if(!layer.init)
-                    return;
-                this.layers.push(new Layer(this.renderer, this.project, layer));
-            }
+                    continue;
+                
+                if (layer.type === "layer")
+                    this.layers.push(new Layer(this.renderer, this.project, layer));
+                if (layer.type === "overlay")
+                    this.layers.push(new Overlay(this.renderer, this.project, layer));
 
-            //this.layers.push(new Layer(this.renderer, this.project, response.data[0]));
+            }
         });
 
         this.renderer.controls.addEventListener('change', () => this.moved())
@@ -44,5 +48,9 @@ export class MetacityEngine {
 
     doubleclick(x: number, y: number) {
         this.renderer.click(x, y);
+    }
+
+    exit() {
+        
     }
 }

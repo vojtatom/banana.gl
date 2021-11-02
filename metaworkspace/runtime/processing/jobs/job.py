@@ -4,7 +4,7 @@ import os
 import shutil
 from metaworkspace.runtime.logging import setup_logging
 from abc import ABC, abstractmethod
-
+import metaworkspace.filesystem as fs
 
 
 class Job(ABC):
@@ -13,6 +13,7 @@ class Job(ABC):
     def __init__(self):
         super().__init__()
         self.job_dir = None
+        self.job_id = None
         self.log_id = None
         self.status = 'created'
     
@@ -20,11 +21,14 @@ class Job(ABC):
     # Job Interface:
     def setup(self, job_dir):
         self.job_dir = job_dir
+        self.job_id = fs.id_from_jobdir(self.job_dir)
 
     def serialize(self):
         return {
             'type': self.TYPE, 
-            'status': self.status
+            'status': self.status,
+            'job_id': self.job_id,
+            'log_id': self.log_id
             }
 
     @abstractmethod

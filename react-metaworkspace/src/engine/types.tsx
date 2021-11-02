@@ -1,4 +1,4 @@
-import { Vector3 } from "three";
+import { Vector2, Vector3 } from "three";
 
 
 export type IBBox = [[number, number, number], [number, number, number]];
@@ -20,15 +20,30 @@ export interface ILayout {
     tiles: ITile[]
 }
 
-export interface ILayerData {
+export interface ILayerBaseData {
     layout: ILayout,
     name: string,
-    init: boolean,
+    init: boolean,  
+}
+
+export interface ILayerData extends ILayerBaseData {
+    size: number
+}
+
+export interface IOverlayData extends ILayerBaseData {
+    source: string,
+    target: string
 }
 
 export interface ILayer {
     name: string,
     project: string,
+    focus(point: Vector2): void,
+}
+
+export interface IOverlay extends ILayer{
+    source: string,
+    target: string
 }
 
 export interface IAttribute {

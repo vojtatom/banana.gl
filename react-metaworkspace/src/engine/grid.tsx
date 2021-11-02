@@ -1,7 +1,7 @@
 import { Vector2, Vector3 } from "three";
 import { Renderer } from "./renderer";
 import { Tile } from "./tile";
-import { IVecBBox, ILayout, ILayer } from "./types";
+import { IVecBBox, ILayout, ILayer, IOverlay } from "./types";
 
 
 function getNthTriangularNumber(n: number) {
@@ -53,33 +53,37 @@ export class Grid {
 
     readonly zero2: Vector2;
 
-    layer: ILayer;
+    layer: ILayer | IOverlay;
 
-    constructor(data: ILayout, renderer: Renderer, layer: ILayer) {
+    constructor(data: ILayout, renderer: Renderer, layer: ILayer | IOverlay) {
         this.tileSize = data.tile_size;
+        this.renderer = renderer;
+        this.layer = layer;
+
         this.bbox = [new Vector3(Infinity, Infinity, Infinity), new Vector3(-Infinity, -Infinity, -Infinity)];
         this.tiles = new Map<number, Tile>();
-
-
+        
+        this.createTiles(data, renderer, layer);
+        
+        this.brect = [new Vector2(this.bbox[0].x, this.bbox[0].y), new Vector2(this.bbox[1].x, this.bbox[1].y)];
+        this.focusPoint = center(this.bbox);
+        
+        this.visible_radius = 2000;
+        this.visibleSwap = new Set<Tile>();
+        this.visible = new Set<Tile>();
+        
+        this.zero2 = new Vector2();
+    }
+    
+    
+    private createTiles(data: ILayout, renderer: Renderer, layer: IOverlay | ILayer) {
         for (const tiledata of data.tiles) {
             let idx = toSpiral(tiledata.x, tiledata.y);
             const tile = new Tile(tiledata, renderer, layer);
             extend(this.bbox, tile.bbox);
             this.tiles.set(idx, tile);
         }
-
-        this.brect = [new Vector2(this.bbox[0].x, this.bbox[0].y), new Vector2(this.bbox[1].x, this.bbox[1].y)];
-        this.focusPoint = center(this.bbox);
-        this.renderer = renderer;
-        this.layer = layer;
-
-        this.visible_radius = 2000;
-        this.visible = new Set<Tile>();
-        this.visibleSwap = new Set<Tile>();
-
-        this.zero2 = new Vector2();
     }
-
 
     focus(fp: Vector2) {
         const visibleTile = this.focusPoint.clone().divideScalar(this.tileSize).floor()
