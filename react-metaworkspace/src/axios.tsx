@@ -1,8 +1,13 @@
 import axios from "axios";
 
-const iaxios = axios.create({
-  //baseURL: "http://127.0.0.1:5000"
-});
+let config = {};
+if (process.env.NODE_ENV !== 'production') {
+  config = {
+    baseURL: "http://localhost:5000" // leave unset if you are using the production server
+  };
+}
+
+const iaxios = axios.create(config);
 
 (function() { 
   let authToken = localStorage.getItem("JWT");
@@ -14,5 +19,8 @@ const iaxios = axios.create({
       iaxios.defaults.headers.common.Authorization = `Bearer ${authToken}`;
   }
 })();
+
+
+
 
 export default iaxios;

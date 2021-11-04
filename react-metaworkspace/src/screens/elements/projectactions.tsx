@@ -1,4 +1,4 @@
-import { Pane, Button, CubeIcon, AddToArtifactIcon, StyleIcon, Tooltip, MergeColumnsIcon } from 'evergreen-ui'
+import { Pane, Button, CubeIcon, AddToArtifactIcon, Tooltip, MergeColumnsIcon } from 'evergreen-ui'
 import { useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import { RecompileProjectDialog } from './projectrecompile'
@@ -25,18 +25,15 @@ export function ProjectActions(props: IProjectProps) {
                 onSubmit={recompile}
                 name={props.name}
             />
-            <Button marginRight={12} height={48} iconBefore={AddToArtifactIcon} onClick={() => history.push(url.UPLOADLAYER + props.name)}>
+            <Button marginRight={12} marginBottom={12} height={48} iconBefore={AddToArtifactIcon} onClick={() => history.push(url.UPLOADLAYER + props.name)}>
                 Add Layer
             </Button>
             <Tooltip content="Recompile after updating layers or styles to view the changes in the visualization">
-            <Button marginRight={12} height={48} iconBefore={CubeIcon} onClick={() => setRecompileDialogShown(true)}>
+            <Button marginRight={12} marginBottom={12} height={48} iconBefore={CubeIcon} onClick={() => setRecompileDialogShown(true)}>
                 Recompile 3D
             </Button>
             </Tooltip>
-            <Button marginRight={12} height={48} iconBefore={StyleIcon} onClick={() => {}} disabled>
-                Add Styles
-            </Button>
-            <Button marginRight={12} height={48} iconBefore={MergeColumnsIcon} onClick={() => {}} disabled>
+            <Button marginRight={12} marginBottom={12} height={48} iconBefore={MergeColumnsIcon} onClick={() => {}} disabled>
                 Map Layers
             </Button>
         </Pane>

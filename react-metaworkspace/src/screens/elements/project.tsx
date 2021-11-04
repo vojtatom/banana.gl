@@ -1,4 +1,4 @@
-import { Pane, Heading, Button, TrashIcon, EditIcon, PresentationIcon } from 'evergreen-ui'
+import { Pane, Heading, Button, TrashIcon, EditIcon, PresentationIcon, StyleIcon } from 'evergreen-ui'
 import { RenameProjectDialog } from './projectrename'
 import { DeleteProjectDialog } from './projectdelete'
 import { useEffect, useState } from 'react'
@@ -54,6 +54,12 @@ export function Project(props: IProjectProps) {
             <Layers projectName={props.name} />
             <Heading is="h3">Actions</Heading>
             <ProjectActions name={props.name}/>
+            <Pane className="projectHeader">
+                <Heading className="wide" is="h3">Styles</Heading> 
+                <Button marginY={8} marginRight={12} iconBefore={StyleIcon} onClick={() => setDeleteDialogShown(true)}>
+                    Add Style
+                </Button>
+            </Pane>
         </Pane>
     );
 }

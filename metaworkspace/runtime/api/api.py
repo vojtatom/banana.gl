@@ -5,9 +5,11 @@ from fastapi import APIRouter, File, Form, UploadFile, Depends, HTTPException, s
 from fastapi.responses import JSONResponse
 from metaworkspace.runtime.processing.jobs.loaddataset import JobLoadDataset
 from metaworkspace.runtime.processing.jobs.buildlayout import JobBuildLayout
+from metaworkspace.runtime.processing.jobs.applystyle import JobApplyStyle
 from metaworkspace.runtime.workspace import mws
 from pydantic import BaseModel
 from metaworkspace.runtime.api.auth import User, get_current_active_user
+
 
 router = APIRouter(prefix="/api",
                    tags=["api"])
@@ -35,6 +37,22 @@ class RenameLayerData(BaseModel):
 
 class LogData(BaseModel):
     name: str
+
+
+class StyleData(BaseModel):
+    project: str
+    name: str
+    styles: str
+
+
+class ActionStyleData(BaseModel):
+    project: str
+    name: str
+
+class RenameStyleData(BaseModel):
+    project: str
+    old: str
+    new: str
 
 
 #### PROJECT
@@ -81,7 +99,8 @@ async def delete_project(project: ProjectData, current_user: User = Depends(get_
 
 @router.post("/layers", response_class=JSONResponse)
 async def list_layers(project: ProjectData, current_user: User = Depends(get_current_active_user)):
-    prj = mws.get_project(project.name)    
+    prj = mws.get_project(project.name)
+    print(prj)
     data = []
     for l in prj.ilayers:
         data.append({ 'name': l.name, 'size': l.size })
@@ -153,12 +172,51 @@ async def get_log(log: LogData, current_user: User = Depends(get_current_active_
 ##### ACTIONS
 
 @router.post("/project/build")
-def add_layer(project: ProjectData, current_user: User = Depends(get_current_active_user)):
+def build_project(project: ProjectData, current_user: User = Depends(get_current_active_user)):
 
     job = JobBuildLayout()
     job_dir = mws.generate_job_dir()
     job.setup(job_dir, project.name)
     job.submit()
     
+    return Response(status_code=status.HTTP_200_OK)
+
+@router.post("/style/apply")
+def apply_style(style: ActionStyleData, current_user: User = Depends(get_current_active_user)):
+    
+        job = JobApplyStyle()
+        job_dir = mws.generate_job_dir()
+        job.setup(job_dir, style.project, style.name)
+        job.submit()
+        
+        return Response(status_code=status.HTTP_200_OK)
+
+
+#### STYLES
+@router.post("/styles", response_class=JSONResponse)
+def get_styles(project: ProjectData, current_user: User = Depends(get_current_active_user)):
+    proj = mws.get_project(project.name)
+    styles = proj.styles.list_styles()
+    return JSONResponse(styles) 
+
+
+@router.post("/style")
+def update_style(style: StyleData, current_user: User = Depends(get_current_active_user)):
+    proj = mws.get_project(style.project)
+    proj.styles.update_style(style.name, style.styles)
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@router.delete("/style")
+def delete_style(style: ActionStyleData, current_user: User = Depends(get_current_active_user)):
+    proj = mws.get_project(style.project)
+    proj.styles.delete_style(style.name)
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@router.post("/style/rename")
+def rename_style(style: RenameStyleData, current_user: User = Depends(get_current_active_user)):
+    proj = mws.get_project(style.project)
+    proj.styles.rename_style(style.old, style.new)
     return Response(status_code=status.HTTP_200_OK)
 

@@ -26,7 +26,7 @@ export function Layers(props: ILayersProps) {
 
     const loadLayers = () => {
         iaxios.post(apiurl.LISTLAYER, { name: props.projectName }).then((response) => {
-            console.log(response.data);
+            console.log("layers", response.data);
             setLayers(response.data);
         });
     }
