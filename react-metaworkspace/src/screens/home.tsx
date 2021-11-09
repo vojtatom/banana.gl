@@ -12,7 +12,6 @@ export function Home() {
 
   const getProjects = () => {
     iaxios.get(apiurl.LISTPROJECT).then((response) => {
-      console.log(response.data);
       setProjects(response.data);
     });
   }

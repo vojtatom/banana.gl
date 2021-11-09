@@ -3,6 +3,8 @@ from metaworkspace.runtime.workspace import mws
 from metacity.styles.styles import Style
 
 class JobApplyStyle(job.Job):
+    TYPE = 'applystyle'
+
     def __init__(self):
         super().__init__()
 
@@ -26,7 +28,13 @@ class JobApplyStyle(job.Job):
         proj = mws.get_project(self.project)
         self.update_status("parsing style")
         style = Style(proj, self.style_name)
-        style.parse()
+       
+        try:
+            style.parse()
+        except Exception:
+            self.update_status("parsing failed") 
+            return
+
         self.update_status("applying style")
         style.apply()
         self.update_status("finished")

@@ -3,6 +3,7 @@ from typing import List
 from time import sleep
 from fastapi import APIRouter, File, Form, UploadFile, Depends, HTTPException, status, Response
 from fastapi.responses import JSONResponse
+from metacity.styles.styles import parse
 from metaworkspace.runtime.processing.jobs.loaddataset import JobLoadDataset
 from metaworkspace.runtime.processing.jobs.buildlayout import JobBuildLayout
 from metaworkspace.runtime.processing.jobs.applystyle import JobApplyStyle
@@ -49,6 +50,7 @@ class ActionStyleData(BaseModel):
     project: str
     name: str
 
+
 class RenameStyleData(BaseModel):
     project: str
     old: str
@@ -74,7 +76,7 @@ async def add_project(project: ProjectData, current_user: User = Depends(get_cur
                 detail=f"Project {project.name} already exists"
             )
 
-    mws.get_project(project.name)
+    mws.create_project(project.name)
     return Response(status_code=status.HTTP_201_CREATED) 
 
 
@@ -100,10 +102,16 @@ async def delete_project(project: ProjectData, current_user: User = Depends(get_
 @router.post("/layers", response_class=JSONResponse)
 async def list_layers(project: ProjectData, current_user: User = Depends(get_current_active_user)):
     prj = mws.get_project(project.name)
+    if prj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
     print(prj)
     data = []
     for l in prj.ilayers:
-        data.append({ 'name': l.name, 'size': l.size })
+        data.append({ 'name': l.name, 'size': l.size, 'type' : l.type })
     return JSONResponse(data) 
 
 
@@ -128,6 +136,12 @@ def add_layer(project: str = Form(...),
 @router.post("/layer/rename")
 async def rename_project(layer: RenameLayerData, current_user: User = Depends(get_current_active_user)):
     prj = mws.get_project(layer.project)
+    if prj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
     if prj.rename_layer(layer.old, layer.new):
         return Response(status_code=status.HTTP_200_OK) 
     else:
@@ -140,6 +154,12 @@ async def rename_project(layer: RenameLayerData, current_user: User = Depends(ge
 @router.delete("/layer")
 async def delete_project(layer: LayerData, current_user: User = Depends(get_current_active_user)):
     prj = mws.get_project(layer.project)
+    if prj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
     prj.delete_layer(layer.name)
     return Response(status_code=status.HTTP_200_OK)
 
@@ -183,26 +203,79 @@ def build_project(project: ProjectData, current_user: User = Depends(get_current
 
 @router.post("/style/apply")
 def apply_style(style: ActionStyleData, current_user: User = Depends(get_current_active_user)):
-    
-        job = JobApplyStyle()
-        job_dir = mws.generate_job_dir()
-        job.setup(job_dir, style.project, style.name)
-        job.submit()
-        
-        return Response(status_code=status.HTTP_200_OK)
+    job = JobApplyStyle()
+    job_dir = mws.generate_job_dir()
+    job.setup(job_dir, style.project, style.name)
+    job.submit()
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@router.post("/style/parse")
+def parse_style(style: StyleData, current_user: User = Depends(get_current_active_user)):
+    try:
+        parse(style.styles)
+    except Exception as e:
+            return JSONResponse({
+                'status': 'error',
+                'error': str(e)
+            }) 
+    return Response(status_code=status.HTTP_200_OK)
+
+
 
 
 #### STYLES
 @router.post("/styles", response_class=JSONResponse)
 def get_styles(project: ProjectData, current_user: User = Depends(get_current_active_user)):
-    proj = mws.get_project(project.name)
-    styles = proj.styles.list_styles()
+    prj = mws.get_project(project.name)
+    if prj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    styles = prj.styles.list_styles()
     return JSONResponse(styles) 
 
 
+@router.post("/style/create")
+def create_style(style: ActionStyleData, current_user: User = Depends(get_current_active_user)):
+    prj = mws.get_project(style.project)
+    if prj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    if prj.styles.create_style(style.name):
+        return Response(status_code=status.HTTP_200_OK)
+    else:
+        raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Style {style.name} already exists"
+            )
+
+
 @router.post("/style")
+def get_style(style: ActionStyleData, current_user: User = Depends(get_current_active_user)):
+    proj = mws.get_project(style.project)
+    if proj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+    style_data = proj.styles.get_style(style.name)
+    return JSONResponse({'style': style_data, 'name': style.name }) 
+
+
+@router.post("/style/update", response_class=JSONResponse)
 def update_style(style: StyleData, current_user: User = Depends(get_current_active_user)):
     proj = mws.get_project(style.project)
+    if proj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
     proj.styles.update_style(style.name, style.styles)
     return Response(status_code=status.HTTP_200_OK)
 
@@ -210,6 +283,11 @@ def update_style(style: StyleData, current_user: User = Depends(get_current_acti
 @router.delete("/style")
 def delete_style(style: ActionStyleData, current_user: User = Depends(get_current_active_user)):
     proj = mws.get_project(style.project)
+    if proj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
     proj.styles.delete_style(style.name)
     return Response(status_code=status.HTTP_200_OK)
 
@@ -217,6 +295,14 @@ def delete_style(style: ActionStyleData, current_user: User = Depends(get_curren
 @router.post("/style/rename")
 def rename_style(style: RenameStyleData, current_user: User = Depends(get_current_active_user)):
     proj = mws.get_project(style.project)
-    proj.styles.rename_style(style.old, style.new)
-    return Response(status_code=status.HTTP_200_OK)
-
+    if proj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+    if proj.styles.rename_style(style.old, style.new):
+        return Response(status_code=status.HTTP_200_OK)
+    raise HTTPException(
+            status_code=status.HTTP_409_CONFLICT,
+            detail=f"Style {style.name} already exists"
+        )

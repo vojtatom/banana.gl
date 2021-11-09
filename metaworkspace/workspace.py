@@ -84,7 +84,14 @@ class MetacityWorkspace:
         for prj_dir in fs.get_projects(self.path):
             yield Project(prj_dir)
 
+    def create_project(self, name: str):
+        prj = fs.project_dir(self.path, name)
+        fs.create_dir_if_not_exists(prj)
+        return Project(prj)
+
     def get_project(self, name: str):
+        if name not in self.project_names:
+            return None
         prj = fs.project_dir(self.path, name)
         fs.create_dir_if_not_exists(prj)
         return Project(prj)

@@ -1,9 +1,5 @@
 import { Pane, Pre } from 'evergreen-ui'
-import { RenameProjectDialog } from './projectrename'
-import { DeleteProjectDialog } from './projectdelete'
 import { useEffect, useState } from 'react'
-import { Layers } from './layers'
-import { ProjectActions } from './projectactions'
 import iaxios from '../../axios'
 import { apiurl } from '../../url'
 

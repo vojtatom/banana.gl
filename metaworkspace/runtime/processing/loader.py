@@ -1,5 +1,6 @@
 from typing import Dict, Type
 from metaworkspace.runtime.processing.jobs.job import Job
+from metaworkspace.runtime.processing.jobs.applystyle import JobApplyStyle
 from metaworkspace.runtime.processing.jobs.loaddataset import JobLoadDataset
 from metaworkspace.runtime.processing.jobs.buildlayout import JobBuildLayout
 import json
@@ -9,7 +10,8 @@ import uuid
 
 jobs: Dict[str, Type[Job]] = {
     JobLoadDataset.TYPE: JobLoadDataset,
-    JobBuildLayout.TYPE: JobBuildLayout
+    JobBuildLayout.TYPE: JobBuildLayout,
+    JobApplyStyle.TYPE: JobApplyStyle
 }
 
 

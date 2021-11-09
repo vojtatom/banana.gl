@@ -1,28 +1,28 @@
-import { Renderer } from "./renderer";
+import { Renderer } from "../renderer/renderer";
 import { Grid } from "./grid";
-import { ILayerData, IOverlayData, ILayerBaseData, ILayer, IOverlay } from "./types";
-import { Vector2 } from "three";
+import { ILayerData, IOverlayData, ILayerBaseData } from "../types";
+import * as THREE from "three";
+import { LayerStyle } from "./style";
 
 
 
-class LayerBase implements ILayer {
+class LayerBase {
     name: string;
     project: string;
     renderer: Renderer;
     grid: Grid | undefined; //undefined if the layer is not visible
+
     
     constructor(renderer: Renderer, project: string, data: ILayerBaseData) {
         this.name = data.name;
         this.project = project;
         this.renderer = renderer;
-
-        if (this.renderer.style.layer(this.name).visible)
-            this.grid = new Grid(data.layout, renderer, this);
+        this.grid = new Grid(data.layout, renderer, this as any);
     }
     
-    focus(point: Vector2) {
+    update_visible_tiles(point: THREE.Vector3) {
         if (this.grid)
-            this.grid.focus(point);
+            this.grid.update_visible_tiles(point);
     }
 }
 
@@ -35,12 +35,12 @@ export class Layer extends LayerBase{
         this.renderer.picker.registerLayer(this.name, this.size);
         
         if (this.grid)
-            this.renderer.focus(this.grid.focusPoint);
+            this.renderer.controls.focus(this.grid.focusPoint);
     }
 
 }
 
-export class Overlay extends LayerBase implements IOverlay{
+export class Overlay extends LayerBase {
     source: string;
     target: string;
 
@@ -50,7 +50,7 @@ export class Overlay extends LayerBase implements IOverlay{
         this.target = data.target;
 
         if (this.grid)
-            this.renderer.focus(this.grid.focusPoint);
+            this.renderer.controls.focus(this.grid.focusPoint);
     }
 }
 

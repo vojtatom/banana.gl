@@ -1,7 +1,8 @@
 import { Vector2, Vector3 } from "three";
-import { Renderer } from "./renderer";
+import { Renderer } from "../renderer/renderer";
 import { Tile } from "./tile";
-import { IVecBBox, ILayout, ILayer, IOverlay } from "./types";
+import { IVecBBox, ILayout } from "../types";
+import { Layer, Overlay } from "./layer";
 
 
 function getNthTriangularNumber(n: number) {
@@ -39,6 +40,7 @@ function center(b: IVecBBox) {
     return new Vector2((b[0].x + b[1].x) * 0.5, (b[0].y + b[1].y) * 0.5);
 }
 
+
 export class Grid {
     bbox: IVecBBox;
     brect: [Vector2, Vector2];
@@ -53,9 +55,9 @@ export class Grid {
 
     readonly zero2: Vector2;
 
-    layer: ILayer | IOverlay;
+    layer: Layer | Overlay;
 
-    constructor(data: ILayout, renderer: Renderer, layer: ILayer | IOverlay) {
+    constructor(data: ILayout, renderer: Renderer, layer: Layer | Overlay) {
         this.tileSize = data.tile_size;
         this.renderer = renderer;
         this.layer = layer;
@@ -75,8 +77,7 @@ export class Grid {
         this.zero2 = new Vector2();
     }
     
-    
-    private createTiles(data: ILayout, renderer: Renderer, layer: IOverlay | ILayer) {
+    private createTiles(data: ILayout, renderer: Renderer, layer: Layer | Overlay) {
         for (const tiledata of data.tiles) {
             let idx = toSpiral(tiledata.x, tiledata.y);
             const tile = new Tile(tiledata, renderer, layer);
@@ -85,29 +86,26 @@ export class Grid {
         }
     }
 
-    focus(fp: Vector2) {
+    update_visible_tiles(fp: Vector3) {
         const visibleTile = this.focusPoint.clone().divideScalar(this.tileSize).floor()
-        const nvisibleTile = fp.clone().sub(this.brect[0]).divideScalar(this.tileSize).floor();
+        const nvisibleTile = new Vector2(fp.x, fp.y).divideScalar(this.tileSize).floor();
 
         if (!visibleTile.equals(nvisibleTile)) {
-            this.focusPoint = fp;
-            this.update_visibility()
+            this.update_visibility(nvisibleTile)
         } 
     }
 
-
-    update_visibility() {
+    update_visibility(visibleTile: Vector2) {
         const tmpVisible = this.visible;
         this.visible = this.visibleSwap;
         this.visibleSwap = tmpVisible;
-
-        const visibleTile = this.focusPoint.clone().divideScalar(this.tileSize).floor()
 
         const trad = Math.ceil(this.visible_radius / this.tileSize);
         const sid = visibleTile.clone().subScalar(trad);
         const eid = visibleTile.clone().addScalar(trad + 1);
 
         this.visible.clear();
+
         for (let x = sid.x; x < eid.x; ++x) {
             for (let y = sid.y; y < eid.y; ++y) {
                 let idx = toSpiral(x, y);

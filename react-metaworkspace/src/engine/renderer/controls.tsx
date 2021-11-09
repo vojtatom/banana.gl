@@ -4,7 +4,7 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 export class MapControls extends OrbitControls {
 
-    constructor(camera: THREE.PerspectiveCamera, domElement: HTMLCanvasElement) {
+    constructor(camera: THREE.Camera, domElement: HTMLCanvasElement) {
 
         camera.up = new THREE.Vector3(0, 0, 1);
         super(camera, domElement);
@@ -20,9 +20,9 @@ export class MapControls extends OrbitControls {
         this.zoomSpeed = 0.5;
         this.dampingFactor = 0.1;
         this.enableDamping = true;
-        this.minDistance = 5;
+        this.minDistance = 400;
         this.minPolarAngle = 0.001;
-        //this.maxPolarAngle = Math.PI * 0.4;
+        this.maxPolarAngle = Math.PI * 0.4;
         this.update();
     }
 }

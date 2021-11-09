@@ -1,3 +1,4 @@
+import { Pane } from "evergreen-ui";
 import { useEffect, createRef } from "react"
 import { useParams } from "react-router"
 import { MetacityEngine } from "../engine/engine"
@@ -25,8 +26,16 @@ export function View() {
 
 
     return (
-        <div>
-            <canvas ref={canvas} onDoubleClick={(event) => renderer.doubleclick(event.clientX, event.clientY)}>Your browser does not support HTML5 canvas</canvas>
-        </div>
+        <Pane className="canvasAnchor">
+            <canvas 
+                ref={canvas}
+                onDoubleClick={(event) => renderer.doubleclick(event.clientX, event.clientY)}
+                onKeyDown={(event) => { if (event.repeat) return; renderer.keyDown(event.code); }}
+                onKeyUp={(event) => { if (event.repeat) return; renderer.keyUp(event.code); }}
+                tabIndex={0}
+            >
+                    Your browser does not support HTML5 canvas
+            </canvas>
+        </Pane>
     )
 }

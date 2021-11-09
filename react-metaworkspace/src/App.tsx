@@ -15,20 +15,21 @@ import { UploadLayer } from './screens/upload'
 import { Jobs } from './screens/jobs'
 import { View } from './screens/view'
 import { ToastContainer, toast } from 'react-toastify';
+import { StyleEditor } from './screens/style';
 
 export function App() {
   return (
     <Router>
       <ToastContainer
         position="top-center"
-        autoClose={10000}
+        autoClose={5000}
         hideProgressBar={false}
         newestOnTop={false}
         closeOnClick
         rtl={false}
         pauseOnFocusLoss
         //draggable
-        pauseOnHover
+        //pauseOnHover
       />
       <Switch>
         <Route exact path={["/"]}>
@@ -42,6 +43,9 @@ export function App() {
         </Route>
         <Route path={url.PROJECTSTEMPLATE}>
           <Projects />
+        </Route>
+        <Route path={url.STYLETEMPLATE}>
+          <StyleEditor />
         </Route>
         <Route path={url.JOBS}>
           <Jobs />

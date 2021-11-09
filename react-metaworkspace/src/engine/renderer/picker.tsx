@@ -51,7 +51,7 @@ export class GPUPickHelper {
         }
     }
 
-    pick(x: number, y: number, scene: THREE.Scene, camera: THREE.PerspectiveCamera) {
+    pick(x: number, y: number, scene: THREE.Scene, camera: THREE.OrthographicCamera | THREE.PerspectiveCamera) {
         const { pickingTexture, pixelBuffer } = this;
 
         // set the view offset to represent just a single pixel under the mouse

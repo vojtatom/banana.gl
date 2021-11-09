@@ -21,7 +21,6 @@ export function JobList() {
 
     const loadJobs = () => {
         iaxios.get(apiurl.LISTJOBS).then((response) => {
-            console.log(response.data);
             setJobs(response.data);
             update = setTimeout(loadJobs, 2000);
         });

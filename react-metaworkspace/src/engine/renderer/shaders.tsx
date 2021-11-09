@@ -105,9 +105,9 @@ void main() {
 
 	#include <clipping_planes_fragment>
 
-    vec3 marked = vec3(0.5 * float(varyingObjectID > 0.5));
+    vec3 marked = vec3(float(varyingObjectID > 0.5) * 0.5 + 0.5, 0.5, 0.5);
 
-	vec4 diffuseColor = vec4( diffuse + marked, opacity );
+	vec4 diffuseColor = vec4(diffuse, opacity);
 	ReflectedLight reflectedLight = ReflectedLight( vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ), vec3( 0.0 ) );
 	vec3 totalEmissiveRadiance = emissive;
 
@@ -130,7 +130,26 @@ void main() {
 	// modulation
 	#include <aomap_fragment>
 
-	vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
+	//vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
+	vec3 outgoingLight = clamp(reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance, 0.75, 1.0);
+	//vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;
+	
+	if (varyingObjectID > 0.5) 
+		outgoingLight -= vec3(0.0, 0.6, 0.6); 
+
+
+	//outgoingLight -= vec3(0.8);
+	//vec3 shade = outgoingLight;
+	//const vec3 slices = vec3(10.0);
+	//const vec3 slices_inv = vec3(1.0) / slices;
+	//outgoingLight *= vec3(5.0);
+	//outgoingLight *= slices;
+	//outgoingLight = floor(outgoingLight + vec3(0.5));
+	//outgoingLight *= slices_inv;
+	//outgoingLight = pow(outgoingLight, vec3(0.4));
+	//outgoingLight *= vec3(0.3);
+	//outgoingLight += vec3(0.7);
+
 
 	#include <envmap_fragment>
 	#include <output_fragment>
@@ -148,7 +167,8 @@ export function polygonSelectMaterial() {
 
 	const customUniforms = THREE.UniformsUtils.merge([
 		THREE.ShaderLib.phong.uniforms,
-		{ selectedID: { value: [-1, -1, -1, -1] } }
+		{ selectedID: { value: [-1, -1, -1, -1] } },
+		{ shininess: { value: 1000 } }
 	]);
 
 	return new THREE.ShaderMaterial({
@@ -166,6 +186,21 @@ export function polygonMaterial() {
 		side: THREE.DoubleSide,
 	});
 }
+
+export function polygonSelectMaterialToon() {
+
+	const data = new Uint8Array( [0, 0, 0, 125, 125, 125, 255, 255, 255] );
+	const texture = new THREE.DataTexture( data, 3, 1, THREE.RGBFormat );
+	texture.minFilter = THREE.NearestFilter
+	texture.magFilter = THREE.NearestFilter
+
+	return new THREE.MeshToonMaterial({
+		side: THREE.DoubleSide,
+		gradientMap: texture
+		//color: 0x49ef4
+	});
+}
+
 
 export const PHONG_LINE_VERT = `
 #define PHONG
@@ -385,17 +420,26 @@ export function pickingMaterial() {
 export class MaterialLibrary {
 	polygonMaterial: THREE.Material;
     polygonSelectMaterial: THREE.ShaderMaterial;
+    //polygonSelectToonMaterial: THREE.ShaderMaterial;
+    //polygonSelectToonMaterial: THREE.MeshToonMaterial;
     lineMaterial: THREE.Material;
     pickingMaterial: THREE.Material;
 
+	lineSelectorMaterial: THREE.LineBasicMaterial;
+
 	constructor(csm: CSM) {
         this.polygonMaterial = polygonMaterial();
-        csm.setupMaterial(this.polygonMaterial);
+        //csm.setupMaterial(this.polygonMaterial);
         
 		this.polygonSelectMaterial = polygonSelectMaterial();
         csm.setupMaterial(this.polygonSelectMaterial);
 
+		//this.polygonSelectToonMaterial = polygonSelectMaterialToon();
+        //csm.setupMaterial(this.polygonSelectToonMaterial);
+
         this.lineMaterial = lineMaterial();
         this.pickingMaterial = pickingMaterial();
+
+		this.lineSelectorMaterial = new THREE.LineBasicMaterial({ color: 0x000000 });
 	}
 }

@@ -1,8 +1,6 @@
-import { Model } from "./models";
-
 
 export class Decoder {
-    static base64tofloat32(data: string, model: Model, callback: CallableFunction) {
+    static base64tofloat32(data: string, callback: CallableFunction) {
         let blob: string = window.atob(data);
         let len = blob.length / Float64Array.BYTES_PER_ELEMENT;
         let view: DataView = new DataView(new ArrayBuffer(Float64Array.BYTES_PER_ELEMENT));
@@ -11,7 +9,6 @@ export class Decoder {
         let it = 1;
         const itStep = 10000;
         const totalStop = len * Float64Array.BYTES_PER_ELEMENT;
-        console.log(totalStop);
         
         const iteration = () => {
             const stepStop = it * itStep * Float64Array.BYTES_PER_ELEMENT;
@@ -20,9 +17,6 @@ export class Decoder {
                     view.setUint8(i, blob.charCodeAt(p + i));
                 array[p / Float64Array.BYTES_PER_ELEMENT] = view.getFloat64(0, true);
             }
-
-            if (model.removed)
-                return;
 
             if (p < totalStop) {
                 it++;
@@ -37,7 +31,7 @@ export class Decoder {
         iteration();
     }
 
-    static base64toint32(data: string, offset: number = 0, model: Model, callback: CallableFunction) {
+    static base64toint32(data: string, offset: number = 0, callback: CallableFunction) {
         let blob: string = window.atob(data);
         let len = blob.length / Int32Array.BYTES_PER_ELEMENT;
         let view: DataView = new DataView(new ArrayBuffer(Int32Array.BYTES_PER_ELEMENT));
@@ -55,9 +49,6 @@ export class Decoder {
                     view.setUint8(i, blob.charCodeAt(p + i));
                 array[p / Int32Array.BYTES_PER_ELEMENT] = view.getUint32(0, true) + offset;
             }
-
-            if (model.removed)
-                return;
 
             if (p < totalStop) {
                 it++;
