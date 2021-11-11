@@ -67,7 +67,6 @@ export class CSM {
 			light.shadow.camera.near = this.lightNear;
 			light.shadow.camera.far = this.lightFar;
 			light.shadow.bias = this.shadowBias[i];
-			console.log(light.shadow.bias);
 
 			this.parent.add( light );
 			this.parent.add( light.target );

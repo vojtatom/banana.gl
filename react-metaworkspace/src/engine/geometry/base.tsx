@@ -1,12 +1,18 @@
 import { Renderer } from "../renderer/renderer"
 import * as THREE from "three";
+import { color, color_default, LayerStyle } from "../renderer/style";
 
 
+export enum OIDType {
+    source,
+    target,
+    object
+}
 
-export abstract class Model {
+export class Model {
     renderer: Renderer;
-    mesh: THREE.Mesh | undefined;
-    pickingMesh: THREE.Mesh | undefined;
+    mesh?: THREE.Mesh;
+    pickingMesh?: THREE.Mesh;
     private visibility: boolean;
 
     constructor(renderer: Renderer) {
@@ -33,4 +39,57 @@ export abstract class Model {
         }
         return undefined;
     }
+
+    baseColors(threeVertLength: number) {
+        const colors = new Uint8Array(threeVertLength);
+        for (let i = 0; i < threeVertLength; i++)
+            colors[i] = 255;
+        return colors;
+    }
+
+    afterApplyStyle() {
+        this.renderer.status.actions.applyingStyles.stop();
+        if (this.mesh)
+        {
+            this.mesh.geometry.attributes.color.needsUpdate = true;
+            this.renderer.changed = true;
+        }
+    }
+
+    applyStyle(offset: number, style?: LayerStyle, type?: OIDType) {
+        if (!this.mesh || !this.mesh.geometry.attributes.objectID)
+            return;
+
+        this.renderer.status.actions.applyingStyles.start();
+        const oids = this.mesh.geometry.attributes.objectID.array;
+        const out = this.mesh.geometry.attributes.color.array;
+
+        if (style) {
+            color(offset, oids as Uint8Array, style.color_buffer, out, this.afterApplyStyle.bind(this));
+        } else {
+            color_default(oids.length, out, this.afterApplyStyle.bind(this));
+        }
+    }
+
 }
+
+export class ModelProxy extends Model {
+    applyStyle(offset: number, style?: LayerStyle, type: OIDType = OIDType.source) {
+        if (!this.mesh || !this.mesh.geometry.attributes.objectID)
+            return;
+
+        this.renderer.status.actions.applyingStyles.start();
+        const oids = this.mesh.geometry.attributes.objectID.array;
+        const out = this.mesh.geometry.attributes.color.array;
+
+        if (style) {
+            if (type === OIDType.source)
+                color(offset, oids as Uint8Array, style.color_buffer_source, out, this.afterApplyStyle.bind(this))
+            else
+                color(offset, oids as Uint8Array, style.color_buffer_target, out, this.afterApplyStyle.bind(this))
+        } else {
+            color_default(oids.length, out, this.afterApplyStyle.bind(this));
+        }
+    }
+}
+

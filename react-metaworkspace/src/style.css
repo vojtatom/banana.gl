@@ -219,14 +219,16 @@ form {
     justify-content: center;
 }
 
-.upload {
+.upload,
+.mapping {
     display: flex;
     flex-direction: column;
     align-items: center;
     margin-top: 2rem;
 }
 
-.upload .uploadTitle {
+.upload .uploadTitle,
+.mapping .mappingTitle {
     margin: 1.5rem;
     color: var(--muted);
 }
@@ -452,9 +454,8 @@ pre.parsedMessage {
     position: absolute;
     top: 20px;
     right: 20px;
-    width: 200px;
-    height: 100px;
     z-index: 3;
+    border-radius: 4px;
     background: #FFF;
 }
 
@@ -462,4 +463,77 @@ pre.parsedMessage {
     position: relative;
     width: 100vw;
     height: 100vh;
+    overflow: hidden;
 }
+
+#viewStatusBar {
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    width: 100vw;
+    background: #FFF;
+    color: var(--gray600);
+    z-index: 2;
+    padding: 4px 5px;
+    font-size: 0.8em;
+}
+
+.meta {
+    display: flex;
+    flex-direction: column;
+}
+
+.meta .attribute {
+    display: flex;
+    flex-direction: row;
+}
+
+.meta .attribute .key {
+    flex-grow: 1;
+    color: var(--gray500);
+    padding-right: 1rem;
+}
+
+.meta .attibute .value {
+    flex-grow: 1;
+    color: var(--gray800);
+}
+
+.mappingDialog {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#layerMappingForm {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 2rem 0 2rem;
+    border-radius: 4px;
+}
+
+#layerMappingForm .layerName {
+    width: 100%;
+}
+
+.mappingLayerPicker {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+}
+
+.mappingDialog .dialogPart {
+    margin: 1rem;
+}
+
+.mappingDialog .mappingDescription {
+    width: 100%;
+    max-width: 40rem;
+    margin: 1rem 0;
+    text-align: center;
+}
+
+

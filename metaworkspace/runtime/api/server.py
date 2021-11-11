@@ -9,6 +9,7 @@ from metaworkspace.runtime.api import api
 from metaworkspace.runtime.api import auth
 from metaworkspace.runtime.workspace import mws
 from starlette.middleware.cors import CORSMiddleware
+from starlette.middleware.gzip import GZipMiddleware
 
 
 DIR = os.path.realpath(os.path.dirname(__file__))
@@ -22,7 +23,7 @@ def create_app():
     """Create app wrapper to overcome middleware issues."""
     templates = Jinja2Templates(directory=TEMPLATES)
 
-    app = FastAPI()
+    app = FastAPI(debug=False)
     #app.include_router(project.router)
     #app.include_router(auth.router)
     app.mount("/static", StaticFiles(directory=STATIC), name="static")
@@ -32,16 +33,21 @@ def create_app():
     origins = [
         "http://localhost:3000",
         "http://127.0.0.1:5000",
-        "http://localhost:5000"
+        "http://localhost:5000",
+        "*"
     ]
 
-    return CORSMiddleware(
-        app=app,
-        allow_origins=origins,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    ), app, templates
+    app.add_middleware(GZipMiddleware, minimum_size=1000)
+    app.add_middleware(CORSMiddleware, allow_origins=origins, allow_credentials=True, allow_methods=["*"], allow_headers=["*"])
+    return app, app, templates
+
+    #return CORSMiddleware(
+    #    app=app,
+    #    allow_origins=origins,
+    #    allow_credentials=True,
+    #    allow_methods=["*"],
+    #    allow_headers=["*"],
+    #), app, templates
 
 
 app, fastapi, templates = create_app()

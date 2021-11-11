@@ -8,18 +8,18 @@ import { Overlay } from "../datamodel/layer";
 
 
 export class LineModel extends Model {
-    constructor(data: IModel, tile: Tile) {
+    constructor(data: IModel, tile: Tile, callback: CallableFunction, abort: CallableFunction) {
         super(tile.renderer);
         const offset = tile.renderer.picker.offsetForLayer(tile.layer.name);
 
-        Decoder.base64tofloat32(data.vertices, (vertices: Float32Array) => {
-            Decoder.base64toint32(data.attributes.oid.data, offset, (objectid: Uint8Array) => {
+        Decoder.base64tofloat32(data.vertices, abort, (vertices: Float32Array) => {
+            Decoder.base64toint32(data.attributes.oid.data, offset, abort, (objectid: Uint8Array) => {
                 const geometry = this.createGeometry(vertices); //offset
                 this.createMesh(geometry);
 
                 this.visible = tile.visible;
                 this.renderer.changed = true;
-
+                callback(this);
             });
         });
     }
@@ -46,17 +46,19 @@ export class LineModel extends Model {
 }
 
 export class LineProxyModel extends Model {
-    constructor(data: IModel, tile: Tile) {
+    constructor(data: IModel, tile: Tile, callback: CallableFunction, abort: CallableFunction) {
         super(tile.renderer);
         const offset = tile.renderer.picker.offsetForLayer((tile.layer as Overlay).source);
 
-        Decoder.base64tofloat32(data.vertices, (vertices: Float32Array) => {
-            Decoder.base64toint32(data.attributes.oid.data, offset, (objectid: Uint8Array) => {
+        Decoder.base64tofloat32(data.vertices, abort, (vertices: Float32Array) => {
+            Decoder.base64toint32(data.attributes.oid.data, offset, abort, (objectid: Uint8Array) => {
                 const geometry = this.createGeometry(vertices); //offset
                 this.createMesh(geometry);
                 //normal mesh
                 this.visible = tile.visible;
                 this.renderer.changed = true;
+
+                callback(this);
             });
         });
     }

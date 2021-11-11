@@ -5,33 +5,35 @@ import { MapControls } from './controls';
 
 class PerspectiveControls {
     camera: THREE.PerspectiveCamera;
-    controls!: MapControls;
-    csm!: CSM;
 
     constructor(canvas: HTMLCanvasElement) {
         this.camera = new THREE.PerspectiveCamera(65, window.innerWidth / window.innerHeight, 1, 6000)
     }
 
-    update() {
-        this.controls.update();
+    update(controls: MapControls) {
+        controls.update();
     }
 
-    topView() {
-        this.camera.position.copy(this.controls.target);
+    topView(controls: MapControls) {
+        this.camera.position.copy(controls.target);
         this.camera.position.z = 3000;
         this.camera.updateMatrixWorld();
     }
 
-    enable() {
-        this.controls.enableRotate = true;
-        this.controls.maxDistance = 5000;
+    enable(controls: MapControls) {
+        controls.enableRotate = true;
+        controls.maxDistance = 5000;
+    }
+
+    resize(width: number, height: number) {
+        this.camera.aspect = width / height;
+        this.camera.updateProjectionMatrix();
     }
 }
 
 
 class OrthographicControls {
     camera: THREE.OrthographicCamera;
-    controls!: MapControls;
     csm: CSM;
 
     constructor(canvas: HTMLCanvasElement, csm: CSM) {
@@ -45,9 +47,9 @@ class OrthographicControls {
         this.csm = csm;
     }
 
-    update() {
-        var size = this.controls.target.distanceTo( this.controls.object.position );
-        var aspect = (this.controls.object as any).aspect;
+    update(controls: MapControls) {
+        var size = controls.target.distanceTo( controls.object.position );
+        var aspect = (controls.object as any).aspect;
 
         this.camera.left = size * aspect / -2;
         this.camera.right = size * aspect / 2;
@@ -55,24 +57,34 @@ class OrthographicControls {
         this.camera.top = size / 2;
         this.camera.bottom = size / - 2;
 
-        this.camera.position.copy(this.controls.object.position);
+        this.camera.position.copy(controls.object.position);
         this.camera.updateProjectionMatrix();
-        this.controls.update();
+        controls.update();
         this.csm.updateFrustums();
     }
     
-    enable() {
-        this.camera.position.copy( this.controls.object.position );
-        this.controls.target.copy( this.camera.position );
-        this.controls.target.z = 0;
-        this.controls.maxDistance = 3000;
-        this.controls.enableRotate = false;
+    enable(controls: MapControls) {
+        this.camera.position.copy( controls.object.position );
+        controls.target.copy( this.camera.position );
+        controls.target.z = 0;
+        controls.maxDistance = 3000;
+        controls.enableRotate = false;
     }
 
-    topView() {
-        this.camera.position.copy(this.controls.target);
+    topView(controls: MapControls) {
+        this.camera.position.copy(controls.target);
         this.camera.position.z = 3000;
         this.camera.updateMatrixWorld()
+    }
+
+    resize(width: number, height: number) {
+        this.camera.left = -width / 2;
+        this.camera.right = width / 2;
+
+        this.camera.top = height / 2;
+        this.camera.bottom = -height / 2;
+
+        this.camera.updateProjectionMatrix();
     }
 }
 
@@ -86,27 +98,31 @@ export class CameraControls {
     constructor(canvas: HTMLCanvasElement) {
         this.perspective = new PerspectiveControls(canvas);
         this.controls = new MapControls(this.perspective.camera, canvas);
-        this.perspective.controls = this.controls;
         this.current = this.perspective;
-        this.current.enable();
+        this.current.enable(this.controls);
     }
 
     initOrthographic(canvas: HTMLCanvasElement, csm: CSM) {
         this.orthographic = new OrthographicControls(canvas, csm);
-        this.orthographic.controls = this.controls;
         this.csm = csm;
     }
 
+    resize(x: number, y: number){
+        this.perspective.resize(x, y);
+        if(this.orthographic)
+            this.orthographic.resize(x, y);
+    }
+
     update() {
-        this.current.update();
+        this.current.update(this.controls);
     }
 
     enable() {
-        this.current.enable();
+        this.current.enable(this.controls);
     }
 
     topView() {
-        this.current.topView();
+        this.current.topView(this.controls);
     }
 
     get camera() {
@@ -121,16 +137,16 @@ export class CameraControls {
         if (!this.orthographic || !this.csm)
             return; 
 
-        this.current.topView();
+        this.current.topView(this.controls);
         this.current = this.current === this.perspective ? this.orthographic : this.perspective;
-        this.current.enable();
+        this.current.enable(this.controls);
 
         this.csm.camera = this.current.camera;
         this.csm.updateFrustums();   
     }
 
     focus(focusPoint: THREE.Vector2) {
-        this.current.controls.target = new THREE.Vector3(focusPoint.x, focusPoint.y, 0);
+        this.controls.target = new THREE.Vector3(focusPoint.x, focusPoint.y, 0);
         this.current.camera.position.x = focusPoint.x;
         this.current.camera.position.y = focusPoint.y;
         this.current.camera.position.z = 1000;

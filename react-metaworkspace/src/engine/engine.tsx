@@ -1,9 +1,8 @@
-import { Vector2 } from "three";
-import iaxios from "../axios";
-import { Layer, Overlay } from "./datamodel/layer";
 import { Renderer } from "./renderer/renderer";
 import { Selector } from "./renderer/selector";
 import { Project } from "./datamodel/project";
+import iaxios from "../axios";
+import { apiurl } from "../url";
 
 
 export class MetacityEngine {
@@ -15,6 +14,7 @@ export class MetacityEngine {
     project!: Project;
 
     keymap: {[key: string]: boolean};
+    showMetaCallback?: (meta: {[name: string]: any}) => void;
 
     constructor(project_name: string, canvas: HTMLCanvasElement) {
         this.project_name = project_name;
@@ -34,18 +34,31 @@ export class MetacityEngine {
         this.renderer.changed = true;
     }
 
+    select(oid: number) {
+        this.renderer.select(oid);
+    }
+
     doubleclick(x: number, y: number) {
-        const position = this.renderer.click(x, y);
-        if (position) {
-            if (this.keymap['KeyS']) {
-                const selection = this.selector.select(position.x, position.y);
-                console.log(selection);
-            } else {
-                this.selector.clear();
-            }
-        } else {
-            this.selector.clear();
-        }
+        const selected = this.renderer.click(x, y);
+
+        console.log('doubleclick', selected);
+        if (!selected)
+            return;
+
+        iaxios.post(apiurl.GETMETA, {
+            project: this.project_name,
+            layer: selected.layer,
+            oid: selected.oid
+        }).then(res => {
+            console.log(res.data);
+            const data = res.data;
+            data['oid'] = selected.oid;
+            data['layer'] = selected.layer;
+
+            if (this.showMetaCallback)
+                this.showMetaCallback(res.data);
+
+        });
     }
 
     keyDown(key: string) {
@@ -70,6 +83,10 @@ export class MetacityEngine {
             this.renderer.updateHelper();
             this.keymap['KeyU'] = false;
         }
+    }
+
+    resize(x: number, y: number) {
+        this.renderer.resize(x, y);
     }
 
     exit() {

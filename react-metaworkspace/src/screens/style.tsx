@@ -304,7 +304,7 @@ export function StyleEditor() {
 
     }, [editor]);
 
-    const [isParsedShown, setParsedIsShown] = useState(false)
+    const [isParsedShown, setParsedIsShown] = useState(false);
     const [parsed, setParsed] = useState("");
 
     const parse = () => {
@@ -313,7 +313,6 @@ export function StyleEditor() {
 
         const style = editor.getValue();
         iaxios.post(apiurl.PARSESTYLE, { project: project_name, name: style_name, styles: style }).then((response) => {
-            console.log(response);
             if (response.data.status === "error")
             {
                 setParsed(response.data.error);
@@ -357,7 +356,7 @@ export function StyleEditor() {
                     method="post"
                     submitBody={() => { 
                         if (!editor)
-                            throw 'Error occured while saving the style.'; 
+                            throw new Error('Error occured while saving the style.'); 
 
                         return { project: project_name, name: style_name, styles: editor.getValue()} 
                     }}
@@ -380,7 +379,7 @@ export function StyleEditor() {
                     method="post"
                     submitBody={() => { 
                         if (!editor)
-                            throw 'Error occured while saving the style.'; 
+                            throw new Error('Error occured while saving the style.'); 
 
                         return { project: project_name, name: style_name, styles: editor.getValue()} 
                     }}

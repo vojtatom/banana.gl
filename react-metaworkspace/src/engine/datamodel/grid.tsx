@@ -3,6 +3,7 @@ import { Renderer } from "../renderer/renderer";
 import { Tile } from "./tile";
 import { IVecBBox, ILayout } from "../types";
 import { Layer, Overlay } from "./layer";
+import { LayerStyle } from "../renderer/style";
 
 
 function getNthTriangularNumber(n: number) {
@@ -28,7 +29,7 @@ function toSpiral(x: number, y: number) {
     } else if ((y < x) || ((-y === x) && (y < 0))) {
         return base + (level * 7) + x;
     }
-    throw "Cannot covert to 1D";
+    throw new Error("Cannot covert to 1D");
 }
 
 function extend(a: IVecBBox, b: IVecBBox) {
@@ -68,13 +69,17 @@ export class Grid {
         this.createTiles(data, renderer, layer);
         
         this.brect = [new Vector2(this.bbox[0].x, this.bbox[0].y), new Vector2(this.bbox[1].x, this.bbox[1].y)];
-        this.focusPoint = center(this.bbox);
+        this.focusPoint = new Vector2(Infinity, Infinity);
         
         this.visible_radius = 2000;
         this.visibleSwap = new Set<Tile>();
         this.visible = new Set<Tile>();
         
         this.zero2 = new Vector2();
+    }
+
+    get center() {
+        return center(this.bbox);
     }
     
     private createTiles(data: ILayout, renderer: Renderer, layer: Layer | Overlay) {

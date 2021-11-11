@@ -12,7 +12,9 @@ export const url = {
     UPLOADLAYERTEMPLATE: '/app/upload/:project_name',
     UPLOADLAYER: '/app/upload/',
     STYLETEMPLATE: '/app/style/:project_name/:style_name',
-    STYLE: '/app/style/'
+    STYLE: '/app/style/',
+    MAPPINGTEMPLATE: '/app/mapping/:project_name',
+    MAPPING: '/app/mapping/'
 };
 
 export const apiurl = {
@@ -22,11 +24,15 @@ export const apiurl = {
     RENAMEPROJECT: '/api/project/rename',
     DELETEPROJECT: '/api/project',
     BUILDPROJECT: '/api/project/build',
+    GETMETA: '/api/project/meta',
     
     LISTLAYER: '/api/layers',
     ADDLAYER: '/api/layer',
     RENAMELAYER: '/api/layer/rename',
     DELETELAYER: '/api/layer',
+    ENABLELAYER: '/api/layer/enable',
+    DISABLELAYER: '/api/layer/disable',
+    MAPLAYERS: '/api/layer/map',
     
     LISTJOBS: '/api/jobs',
     LISTLOGS: '/api/logs',

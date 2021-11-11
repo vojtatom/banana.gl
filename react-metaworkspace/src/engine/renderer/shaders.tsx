@@ -9,7 +9,9 @@ varying vec3 vViewPosition;
 uniform vec4 selectedID;
 
 attribute vec4 objectID;
+attribute vec3 color;
 varying float varyingObjectID;
+varying vec3 colorFrag;
 
 #include <common>
 #include <uv_pars_vertex>
@@ -33,6 +35,7 @@ void main() {
         marked *= int(floor(selectedID[i] * 255.0 + 0.5) == floor(objectID[i] * 255.0 + 0.5));
 
     varyingObjectID = float(marked);
+	colorFrag = color;
 
 	#include <uv_vertex>
 	#include <uv2_vertex>
@@ -73,6 +76,7 @@ uniform float shininess;
 uniform float opacity;
 
 varying float varyingObjectID;
+varying vec3 colorFrag;
 
 #include <common>
 #include <packing>
@@ -131,7 +135,7 @@ void main() {
 	#include <aomap_fragment>
 
 	//vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + reflectedLight.directSpecular + reflectedLight.indirectSpecular + totalEmissiveRadiance;
-	vec3 outgoingLight = clamp(reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance, 0.75, 1.0);
+	vec3 outgoingLight = clamp(reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance, 0.75, 1.0) * colorFrag;
 	//vec3 outgoingLight = reflectedLight.directDiffuse + reflectedLight.indirectDiffuse + totalEmissiveRadiance;
 	
 	if (varyingObjectID > 0.5) 

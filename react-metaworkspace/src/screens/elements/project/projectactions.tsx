@@ -46,17 +46,17 @@ export function ProjectActions(props: IProjectProps) {
                 label={`Are you sure you want to recompile project ${props.name}?`}
                 confirmLabel="Recompile"
                 method="post"
-                submitBody={() => { return { data: { name: props.name }}}}
+                submitBody={() => { return { name: props.name }}}
                 onSubmit={recompile}
                 onError={(reject) => {return "Project could not be recompiled"}} 
-                tooltip="Recompile after updating layers or styles to view the changes in the visualization"
+                tooltip="Recompile after changing which layers should be included in visualization"
             >
                 <Button marginRight={12} marginBottom={12} appearance="minimal" iconBefore={CubeIcon}>
                     Recompile 3D
                 </Button>
             </TextDialog>
 
-            <Button  marginBottom={12} appearance="minimal" iconBefore={MergeColumnsIcon} onClick={() => {}} disabled>
+            <Button  marginBottom={12} appearance="minimal" iconBefore={MergeColumnsIcon} onClick={() => { history.push(url.MAPPING + props.name) }}>
                 Map Layers
             </Button>
             <Button marginRight={12} marginBottom={12} appearance="minimal" iconBefore={PresentationIcon} onClick={() => { history.push(url.VIEW + props.name) }}>

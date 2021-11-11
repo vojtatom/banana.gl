@@ -24,21 +24,18 @@ export class GPUPickHelper {
         this.maxOffest = 0;
     }
 
-    registerLayer(name: string, size: number) {
-        if (this.offsets.has(name))
-            console.error(`Registering layer ${name} twice.`);
-
-        this.offsets.set(name, [this.maxOffest, this.maxOffest + size]);
-        this.maxOffest += size;
-    }
-
-    offsetForLayer(name: string) {
+    offsetForLayer(name: string, size: number = -1) {
         if (!this.offsets.has(name))
-            console.error(`Layer ${name} was not registered into the picker.`);
+        {
+            if (size === -1)
+                throw new Error(`Layer ${name} not registered.`);    
+
+            this.offsets.set(name, [this.maxOffest, this.maxOffest + size]);
+            this.maxOffest += size;
+        }
+
         let range = this.offsets.get(name);
-        if (range)
-            return range[0];
-        return 0;
+        return (range as [number, number])[0];
     }
 
     layerAndOidForId(id: number) {
@@ -49,6 +46,13 @@ export class GPUPickHelper {
                     oid: id - range[0]
                 };
         }
+    }
+
+    select(oid: number) {
+        this.id = oid;
+        const oid_array = new Uint32Array([oid]);
+        const oid_view = new DataView(oid_array.buffer);
+        this.selected = [oid_view.getUint8(0) / 255, oid_view.getUint8(1) / 255, oid_view.getUint8(2) / 255, oid_view.getUint8(3) / 255];
     }
 
     pick(x: number, y: number, scene: THREE.Scene, camera: THREE.OrthographicCamera | THREE.PerspectiveCamera) {

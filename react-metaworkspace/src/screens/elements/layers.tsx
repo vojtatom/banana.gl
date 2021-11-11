@@ -1,4 +1,4 @@
-import { Pane, Table, TrashIcon, EditIcon, IconButton, EmptyState, LayersIcon, Heading, Button, AddToArtifactIcon, Icon } from 'evergreen-ui'
+import { Pane, Table, TrashIcon, EditIcon, IconButton, EmptyState, LayersIcon, Heading, Button, AddToArtifactIcon, Icon, Switch, EyeOpenIcon, EyeOffIcon, CrossIcon, TickIcon, Tooltip } from 'evergreen-ui'
 import { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import iaxios from '../../axios'
@@ -12,10 +12,11 @@ interface ILayersProps {
     name: string;
 }
 
-interface ILayer {
+export interface ILayer {
     name: string;
-    size: number;
+    size: number | [number, number];
     type: string;
+    disabled: boolean;
 }
 
 export function Layers(props: ILayersProps) {
@@ -38,6 +39,19 @@ export function Layers(props: ILayersProps) {
         };
     }, [props.name]);
 
+    const changeDisabled = (layer: ILayer) => {
+        if (layer.disabled) {
+            iaxios.post(apiurl.ENABLELAYER, { project: props.name, name: layer.name }).then(() => {
+                loadLayers();
+            });
+        } else {
+            iaxios.post(apiurl.DISABLELAYER, { project: props.name, name: layer.name }).then(() => {
+                loadLayers();
+            });
+        }
+    };
+
+
     return (
         <Pane className="section">
             <Pane className="projectHeader">
@@ -49,6 +63,7 @@ export function Layers(props: ILayersProps) {
                     <Table.TextHeaderCell className="wide">Layer</Table.TextHeaderCell>
                     <Table.TextHeaderCell className="wide">Number of Objects</Table.TextHeaderCell>
                     <Table.TextHeaderCell className="wide">Type</Table.TextHeaderCell>
+                    <Table.TextHeaderCell className="narrow">include</Table.TextHeaderCell>
                     <Table.TextHeaderCell className="narrow">rename</Table.TextHeaderCell>
                     <Table.TextHeaderCell className="narrow">delete</Table.TextHeaderCell>
                 </Table.Head>
@@ -56,8 +71,15 @@ export function Layers(props: ILayersProps) {
                     {layers.length > 0 ? layers.map((layer) => (
                         <Table.Row key={layer.name} paddingY={12} height="auto" className="row">
                             <Table.TextCell className="wide">{layer.name}</Table.TextCell>
-                            <Table.TextCell className="wide">{layer.size}</Table.TextCell>
+                            <Table.TextCell className="wide">{typeof layer.size === 'number'? layer.size : `${layer.size[0]} x ${layer.size[1]}`}</Table.TextCell>
                             <Table.TextCell className="wide">{layer.type}</Table.TextCell>
+                            <Table.TextCell className="narrow">
+                                {   layer.disabled ?
+                                        <IconButton icon={CrossIcon} appearance="minimal" onClick={() => changeDisabled(layer)} />
+                                    :
+                                        <IconButton icon={TickIcon} intent="success" appearance="minimal" onClick={() => changeDisabled(layer)} />
+                                }
+                            </Table.TextCell>
                             <Table.TextCell className="narrow">
                                 <InputDialog
                                     submitUrl={apiurl.RENAMELAYER}

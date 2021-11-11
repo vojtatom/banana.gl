@@ -6,37 +6,48 @@ import iaxios from "../../axios";
 import axios from "axios";
 import { Model } from "../geometry/base"
 import { deserializeModel } from "../geometry/deserialize"
+import { LayerStyle } from "../renderer/style";
 
 class TileLoader {
     //axios stop request
-    stopFlag!: any;
+    stopFlag: any;
     loaded: boolean;
 
     constructor() {
         this.loaded = false;
     }
-    
+
     get(tile: Tile, callback: CallableFunction) {
         this.stopFlag = axios.CancelToken.source();
+        tile.renderer.status.actions.loadingGeometry.start();
+
         iaxios.get(`/api/data/${tile.layer.project}/${tile.layer.name}/grid/tiles/${tile.sourceFile}`, {
             cancelToken: this.stopFlag.token
         }).then(
             (response) => {
+                tile.renderer.status.actions.loadingGeometry.stop();
+
                 if (this.loaded) //to avoid race conditions
                     return;
 
                 this.loaded = true;
+                this.stopFlag = null;
                 callback(response.data);
             }
         ).catch((reject) => {
-            //TODO
+            tile.renderer.status.actions.loadingGeometry.stop();
+            this.stopFlag = null;
         });
     }
 
     abort() {
-        this.stopFlag.cancel();
+        if (this.stopFlag)
+            this.stopFlag.cancel();
+        this.stopFlag = null;
     }
 }
+
+const CACHE_TILES = true;
 
 
 export class Tile {
@@ -47,9 +58,8 @@ export class Tile {
     renderer: Renderer;
     layer: Layer | Overlay;
     sourceFile: string;
-
+    models: Model[];
     private isVisible: boolean;
-    private models: Model[];
     private loader: TileLoader;
 
 
@@ -74,7 +84,7 @@ export class Tile {
 
         if (isVisible)
             this.show();
-        else 
+        else
             this.hide();
     }
 
@@ -85,25 +95,50 @@ export class Tile {
     show() {
         if (!this.loader.loaded) {
             this.loader.get(this, (models: Array<any>) => {
+
+                if (!this.isVisible && !CACHE_TILES)
+                    return;
+
                 for (let modeldata of models) {
-                    const model = deserializeModel(modeldata, this);
-                    if (model)
+
+                    this.renderer.status.actions.parsingGeometry.start();
+                    deserializeModel(modeldata, this, (model: Model) => {
                         this.models.push(model);
+                        this.renderer.status.actions.parsingGeometry.stop();
+
+                        if (!this.isVisible && !CACHE_TILES)
+                            return this.hide();
+
+                        this.layer.applyStyleToModels(this.models);
+
+                        if (!this.isVisible && !CACHE_TILES)
+                            return this.hide();
+                    }, () => !this.isVisible );
                 }
             });
-        } 
+        }
 
-        for (const m of this.models)
-            m.visible = true;
+        if (CACHE_TILES) {
+            for (const m of this.models)
+                m.visible = true;
+        }
     }
 
     hide() {
-        if (!this.loader.loaded){
+        if (!this.loader.loaded) {
             this.loader.abort();
         }
+        
+        if (!CACHE_TILES) {
+            for (const m of this.models)
+                m.remove();
 
-        for (const m of this.models)
-            m.visible = false;
+            this.models = [];
+            this.loader.loaded = false;
+        } else {
+            for (const m of this.models)
+                m.visible = false;
+        }
     }
 
     remove() {

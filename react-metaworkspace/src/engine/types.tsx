@@ -30,6 +30,7 @@ export interface ILayerData extends ILayerBaseData {
 export interface IOverlayData extends ILayerBaseData {
     source: string,
     target: string
+    size: [number, number]
 }
 
 export interface IAttribute {
@@ -47,7 +48,7 @@ export interface IModel {
 export interface ILayerStyle {
     pickable?: boolean;
     visible?: boolean;
-    buffer?: string; 
-    buffer_source?: string;
-    buffer_target?: string;
+    buffer?: string | Uint8Array; 
+    buffer_source?: string | Uint8Array;
+    buffer_target?: string | Uint8Array;
 }

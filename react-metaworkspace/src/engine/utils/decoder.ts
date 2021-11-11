@@ -1,65 +1,114 @@
 
 export class Decoder {
-    static base64tofloat32(data: string, callback: CallableFunction) {
-        let blob: string = window.atob(data);
-        let len = blob.length / Float64Array.BYTES_PER_ELEMENT;
-        let view: DataView = new DataView(new ArrayBuffer(Float64Array.BYTES_PER_ELEMENT));
-		let array = new Float32Array(len);
-        let p = 0;
-        let it = 1;
-        const itStep = 10000;
-        const totalStop = len * Float64Array.BYTES_PER_ELEMENT;
-        
-        const iteration = () => {
-            const stepStop = it * itStep * Float64Array.BYTES_PER_ELEMENT;
-            for (; p < Math.min(stepStop, totalStop); p = p + Float64Array.BYTES_PER_ELEMENT) {
+    static base64tofloat32(data: string,  abort: CallableFunction, callback: CallableFunction) {        
+        const iteration = (c: {p: number, it: number, view: DataView, blob: string, totalStop: number, array: Float32Array}) => {
+            const itStep = 100000;
+            const stepStop = c.it * itStep * Float64Array.BYTES_PER_ELEMENT;
+            const stop = Math.min(stepStop, c.totalStop);
+
+            for (; c.p < stop; c.p += Float64Array.BYTES_PER_ELEMENT) {
                 for(let i = 0; i < Float64Array.BYTES_PER_ELEMENT; ++i)
-                    view.setUint8(i, blob.charCodeAt(p + i));
-                array[p / Float64Array.BYTES_PER_ELEMENT] = view.getFloat64(0, true);
+                    c.view.setUint8(i, c.blob.charCodeAt(c.p + i));
+                c.array[c.p / Float64Array.BYTES_PER_ELEMENT] = c.view.getFloat64(0, true);
             }
 
-            if (p < totalStop) {
-                it++;
-                setTimeout(iteration, 10);
+            if (abort())
+                return;
+
+            if (c.p < c.totalStop) {
+                c.it++;
+                Promise.resolve(c).then(iteration);
             } else {
-                view = null as unknown as DataView;
-                blob = null as unknown as string;
-                callback(array);
+                callback(c.array);
             }
+
+            c = null as any;
         }
 
-        iteration();
+        let conf: any = {
+            p: 0,
+            it: 1,
+            view: new DataView(new ArrayBuffer(Float64Array.BYTES_PER_ELEMENT)),
+            blob: window.atob(data)
+        };
+
+        const len = conf.blob.length / Float64Array.BYTES_PER_ELEMENT;
+        conf['array'] = new Float32Array(len);
+        conf['totalStop'] = len * Float64Array.BYTES_PER_ELEMENT;
+        
+        Promise.resolve(conf).then(iteration);
+        conf = null;
     }
 
-    static base64toint32(data: string, offset: number = 0, callback: CallableFunction) {
-        let blob: string = window.atob(data);
-        let len = blob.length / Int32Array.BYTES_PER_ELEMENT;
-        let view: DataView = new DataView(new ArrayBuffer(Int32Array.BYTES_PER_ELEMENT));
-		let array = new Uint32Array(len * Int32Array.BYTES_PER_ELEMENT);
-        let p = 0;
-        let it = 1;
-        const itStep = 10000;
-        const totalStop = len * Int32Array.BYTES_PER_ELEMENT;
-        
-        const iteration = () => {
-            const stepStop = it * itStep * Int32Array.BYTES_PER_ELEMENT;
-            
-            for (; p < Math.min(stepStop, totalStop); p = p + Int32Array.BYTES_PER_ELEMENT) {
+    static base64toint32(data: string, offset: number = 0, abort: CallableFunction, callback: CallableFunction) {        
+        const iteration = (c: {p: number, it: number, view: DataView, blob: string, totalStop: number, array: Uint32Array}) => {
+            const itStep = 100000;
+            const stepStop = c.it * itStep * Int32Array.BYTES_PER_ELEMENT;
+            const stop = Math.min(stepStop, c.totalStop);
+
+            for (; c.p < stop; c.p += Int32Array.BYTES_PER_ELEMENT) {
                 for(let i = 0; i < Int32Array.BYTES_PER_ELEMENT; ++i)
-                    view.setUint8(i, blob.charCodeAt(p + i));
-                array[p / Int32Array.BYTES_PER_ELEMENT] = view.getUint32(0, true) + offset;
+                    c.view.setUint8(i, c.blob.charCodeAt(c.p + i));
+                c.array[c.p / Int32Array.BYTES_PER_ELEMENT] = c.view.getInt32(0, true) + offset;
             }
 
-            if (p < totalStop) {
-                it++;
-                setTimeout(iteration, 10);
+            if (abort())
+                return;
+
+            if (c.p < c.totalStop) {
+                c.it++;
+                Promise.resolve(c).then(iteration);
             } else {
-                view = null as unknown as DataView;
-                blob = null as unknown as string;
-                callback(new Uint8Array(array.buffer));
+                callback(new Uint8Array(c.array.buffer));
             }
+
+            c = null as any;
         }
 
-        iteration();
+        let conf: any = {
+            p: 0,
+            it: 1,
+            view: new DataView(new ArrayBuffer(Int32Array.BYTES_PER_ELEMENT)),
+            blob: window.atob(data)
+        };
+
+        const len = conf.blob.length / Int32Array.BYTES_PER_ELEMENT;
+        conf['array'] = new Int32Array(len);
+        conf['totalStop'] = len * Int32Array.BYTES_PER_ELEMENT;
+        Promise.resolve(conf).then(iteration);
+        conf = null;
+    }
+
+    static base64touint8(data: string, callback: CallableFunction) {
+        const iteration = (c: {p: number, it: number, blob: string, totalStop: number, array: Uint32Array}) => {
+            const itStep = 1000000;
+            const stepStop = c.it * itStep * Uint8Array.BYTES_PER_ELEMENT;
+            const stop = Math.min(stepStop, c.totalStop);
+            
+            for (; c.p < stop; c.p += Uint8Array.BYTES_PER_ELEMENT) {
+                c.array[c.p] = c.blob.charCodeAt(c.p)
+            }
+
+            if (c.p < c.totalStop) {
+                c.it++;
+                Promise.resolve(c).then(iteration);
+            } else {
+                callback(c.array);
+            }
+
+            c = null as any;
+        }
+
+        let conf: any = {
+            p: 0,
+            it: 1,
+            blob: window.atob(data)
+        };
+
+        const len = conf.blob.length / Uint8Array.BYTES_PER_ELEMENT;
+        conf['array'] = new Uint8Array(len);
+        conf['totalStop'] = len;
+        Promise.resolve(conf).then(iteration);
+        conf = null;
     }
 }

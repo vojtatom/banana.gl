@@ -3,6 +3,7 @@ from metaworkspace.runtime.processing.jobs.job import Job
 from metaworkspace.runtime.processing.jobs.applystyle import JobApplyStyle
 from metaworkspace.runtime.processing.jobs.loaddataset import JobLoadDataset
 from metaworkspace.runtime.processing.jobs.buildlayout import JobBuildLayout
+from metaworkspace.runtime.processing.jobs.mapping import JobMapping
 import json
 import os
 import uuid
@@ -11,7 +12,8 @@ import uuid
 jobs: Dict[str, Type[Job]] = {
     JobLoadDataset.TYPE: JobLoadDataset,
     JobBuildLayout.TYPE: JobBuildLayout,
-    JobApplyStyle.TYPE: JobApplyStyle
+    JobApplyStyle.TYPE: JobApplyStyle,
+    JobMapping.TYPE: JobMapping
 }
 
 

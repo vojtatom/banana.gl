@@ -38,7 +38,7 @@ function Dropzone(props: IDropzone) {
                     <ul className="filelist">{files}</ul>
                 </div>
             </form>
-            <Button marginRight={16} appearance="primary" type="submit" form="layerUploadForm">
+            <Button appearance="primary" type="submit" form="layerUploadForm">
                 Upload
             </Button>
         </Pane>
@@ -89,7 +89,6 @@ export function UploadLayer() {
             },
             onUploadProgress: progressEvent => setProgress(progressEvent.loaded / progressEvent.total * 100)
         }).then((response) => {
-            console.log(response);
             history.push(url.JOBS);
         })
     }

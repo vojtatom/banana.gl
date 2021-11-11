@@ -13,6 +13,7 @@ import { Projects } from './screens/projects'
 import { Login } from './screens/login'
 import { UploadLayer } from './screens/upload'
 import { Jobs } from './screens/jobs'
+import { Mapping } from './screens/mapping'
 import { View } from './screens/view'
 import { ToastContainer, toast } from 'react-toastify';
 import { StyleEditor } from './screens/style';
@@ -37,6 +38,9 @@ export function App() {
         </Route>
         <Route path={url.LOGIN}>
           <Login />
+        </Route>
+        <Route path={url.MAPPINGTEMPLATE}>
+          <Mapping />
         </Route>
         <Route path={url.UPLOADLAYERTEMPLATE}>
           <UploadLayer />

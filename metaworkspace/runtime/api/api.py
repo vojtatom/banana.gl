@@ -7,6 +7,7 @@ from metacity.styles.styles import parse
 from metaworkspace.runtime.processing.jobs.loaddataset import JobLoadDataset
 from metaworkspace.runtime.processing.jobs.buildlayout import JobBuildLayout
 from metaworkspace.runtime.processing.jobs.applystyle import JobApplyStyle
+from metaworkspace.runtime.processing.jobs.mapping import JobMapping
 from metaworkspace.runtime.workspace import mws
 from pydantic import BaseModel
 from metaworkspace.runtime.api.auth import User, get_current_active_user
@@ -36,6 +37,12 @@ class RenameLayerData(BaseModel):
     new: str
 
 
+class MappingLayerData(BaseModel):
+    project: str
+    source: str
+    target: str
+    overlay: str
+
 class LogData(BaseModel):
     name: str
 
@@ -57,10 +64,16 @@ class RenameStyleData(BaseModel):
     new: str
 
 
+class MetaData(BaseModel):
+    project: str
+    layer: str
+    oid: int
+
+
 #### PROJECT
 
 @router.get("/projects", response_class=JSONResponse)
-async def list_projects():
+def list_projects():
     projects = []
     for project in mws.project_names:
         projects.append(project)
@@ -68,7 +81,7 @@ async def list_projects():
 
 
 @router.post("/project")
-async def add_project(project: ProjectData, current_user: User = Depends(get_current_active_user)):
+def add_project(project: ProjectData, current_user: User = Depends(get_current_active_user)):
     for p in mws.project_names:
         if p == project.name:
             raise HTTPException(
@@ -81,7 +94,7 @@ async def add_project(project: ProjectData, current_user: User = Depends(get_cur
 
 
 @router.post("/project/rename")
-async def rename_project(project: RenameProjectData, current_user: User = Depends(get_current_active_user)):
+def rename_project(project: RenameProjectData, current_user: User = Depends(get_current_active_user)):
     if mws.rename_project(project.old, project.new):
         return Response(status_code=status.HTTP_200_OK) 
     else:
@@ -92,15 +105,35 @@ async def rename_project(project: RenameProjectData, current_user: User = Depend
 
 
 @router.delete("/project")
-async def delete_project(project: ProjectData, current_user: User = Depends(get_current_active_user)):
+def delete_project(project: ProjectData, current_user: User = Depends(get_current_active_user)):
     mws.delete_project(project.name)
     return Response(status_code=status.HTTP_200_OK)
 
 
+@router.post("/project/meta")
+def get_metadata(meta: MetaData, current_user: User = Depends(get_current_active_user)):
+    prj = mws.get_project(meta.project)
+    if prj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Project {meta.project} not found"
+        )
+
+    layer = prj.get_layer(meta.layer, load_model=False)
+
+    try:
+        object = layer[meta.oid]
+        return JSONResponse(object.meta)
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail=f"Object {meta.oid} not found"
+        )
+
 #### LAYER
 
 @router.post("/layers", response_class=JSONResponse)
-async def list_layers(project: ProjectData, current_user: User = Depends(get_current_active_user)):
+def list_layers(project: ProjectData, current_user: User = Depends(get_current_active_user)):
     prj = mws.get_project(project.name)
     if prj is None:
         raise HTTPException(
@@ -110,8 +143,9 @@ async def list_layers(project: ProjectData, current_user: User = Depends(get_cur
 
     print(prj)
     data = []
-    for l in prj.ilayers:
-        data.append({ 'name': l.name, 'size': l.size, 'type' : l.type })
+    #TODO HERE
+    for l in prj.clayers(load_set=False):
+        data.append({ 'name': l.name, 'size': l.size, 'type' : l.type, 'disabled': l.disabled })
     return JSONResponse(data) 
 
 
@@ -120,9 +154,6 @@ def add_layer(project: str = Form(...),
               layer: str = Form(...), 
               files: List[UploadFile] = File(...),
               current_user: User = Depends(get_current_active_user)):
-
-    #sleep(3)
-
     job = JobLoadDataset()
     if layer is None:
         layer = os.path.splitext(files[0].filename)[0]
@@ -134,7 +165,7 @@ def add_layer(project: str = Form(...),
 
 
 @router.post("/layer/rename")
-async def rename_project(layer: RenameLayerData, current_user: User = Depends(get_current_active_user)):
+def rename_layer(layer: RenameLayerData, current_user: User = Depends(get_current_active_user)):
     prj = mws.get_project(layer.project)
     if prj is None:
         raise HTTPException(
@@ -151,8 +182,46 @@ async def rename_project(layer: RenameLayerData, current_user: User = Depends(ge
             )
 
 
+@router.post("/layer/disable")
+def disable_layer(layer: LayerData, current_user: User = Depends(get_current_active_user)):
+    prj = mws.get_project(layer.project)
+    if prj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    try:
+        lyr = prj.get_layer(layer.name, load_set=False)
+    except:
+        lyr = prj.get_overlay(layer.name)
+        
+    lyr.disabled = True
+    lyr.export()
+    return Response(status_code=status.HTTP_200_OK)
+
+
+@router.post("/layer/enable")
+def enable_layer(layer: LayerData, current_user: User = Depends(get_current_active_user)):
+    prj = mws.get_project(layer.project)
+    if prj is None:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Project not found"
+        )
+
+    try:
+        lyr = prj.get_layer(layer.name, load_set=False)
+    except:
+        lyr = prj.get_overlay(layer.name)
+        
+    lyr.disabled = False
+    lyr.export()
+    return Response(status_code=status.HTTP_200_OK)
+
+
 @router.delete("/layer")
-async def delete_project(layer: LayerData, current_user: User = Depends(get_current_active_user)):
+def delete_layer(layer: LayerData, current_user: User = Depends(get_current_active_user)):
     prj = mws.get_project(layer.project)
     if prj is None:
         raise HTTPException(
@@ -167,19 +236,19 @@ async def delete_project(layer: LayerData, current_user: User = Depends(get_curr
 ##### LOGS
 
 @router.get("/jobs", response_class=JSONResponse)
-async def list_jobs(current_user: User = Depends(get_current_active_user)):
+def list_jobs(current_user: User = Depends(get_current_active_user)):
     data = mws.get_current_job_configs()
     return JSONResponse(data) 
 
 
 @router.get("/logs", response_class=JSONResponse)
-async def list_logs(current_user: User = Depends(get_current_active_user)):
+def list_logs(current_user: User = Depends(get_current_active_user)):
     data = mws.get_logs()
     return JSONResponse(data) 
 
 
 @router.post("/log", response_class=JSONResponse)
-async def get_log(log: LogData, current_user: User = Depends(get_current_active_user)):
+def get_log(log: LogData, current_user: User = Depends(get_current_active_user)):
     data = mws.get_log(log.name)
     if data == None:
         raise HTTPException(
@@ -200,6 +269,17 @@ def build_project(project: ProjectData, current_user: User = Depends(get_current
     job.submit()
     
     return Response(status_code=status.HTTP_200_OK)
+
+@router.post("/layer/map")
+def map_layer(layer: MappingLayerData, current_user: User = Depends(get_current_active_user)):
+
+    job = JobMapping()
+    job_dir = mws.generate_job_dir()
+    job.setup(job_dir, layer.project, layer.source, layer.target, layer.overlay)
+    job.submit()
+    
+    return Response(status_code=status.HTTP_200_OK)
+
 
 @router.post("/style/apply")
 def apply_style(style: ActionStyleData, current_user: User = Depends(get_current_active_user)):
