@@ -63,8 +63,16 @@ export class LayerStyle {
 
 
 export function color(oid_offset: number, oids: Uint8Array, buffer: Uint8Array, outputbuffer: any, callback: CallableFunction) {
+    let c = {
+        i: 0,
+        ci: 0,
+        it: 1,
+        total_stop: oids.length / Uint32Array.BYTES_PER_ELEMENT,
+        view: new DataView(oids.buffer)
+    };
 
-    const iteration = (c: {i: number, ci: number, it: number, total_stop: number, view: DataView}) => {
+
+    const iteration = () => {
         const itStep = 100000;
         const step_stop = c.it * itStep;
         const stop = Math.min(step_stop, c.total_stop);
@@ -79,25 +87,26 @@ export function color(oid_offset: number, oids: Uint8Array, buffer: Uint8Array, 
 
         if (c.i < c.total_stop) {
             c.it++;
-            Promise.resolve(c).then(iteration);
+            setTimeout(iteration, 4);
         } else {
             callback();
+            c = null as any;
         }
 
-        c = null as any;
     }
 
-    Promise.resolve({
-        i: 0,
-        ci: 0,
-        it: 1,
-        total_stop: oids.length / Uint32Array.BYTES_PER_ELEMENT,
-        view: new DataView(oids.buffer)
-    }).then(iteration);
+    setTimeout(iteration, 4);
 }
 
 export function color_default(oid_length: number, outputbuffer: any, callback: CallableFunction) {    
-    const iteration = (c: {i: number, ci: number, it: number, total_stop: number}) => {
+    let c = {
+        i: 0,
+        ci: 0,
+        it: 1,
+        total_stop: oid_length
+    };
+    
+    const iteration = () => {
         const itStep = 100000;
         const step_stop = c.it * itStep * Uint8Array.BYTES_PER_ELEMENT;
         const stop = Math.min(step_stop, c.total_stop);
@@ -110,17 +119,12 @@ export function color_default(oid_length: number, outputbuffer: any, callback: C
 
         if (c.i < c.total_stop) {
             c.it++;
-            Promise.resolve(c).then(iteration);
+            setTimeout(iteration, 4);
         } else {
             callback();
+            c = null as any;
         }
-        c = null as any;
     }
 
-    Promise.resolve({
-        i: 0,
-        ci: 0,
-        it: 1,
-        total_stop: oid_length
-    }).then(iteration);
+    setTimeout(iteration, 4);
 }

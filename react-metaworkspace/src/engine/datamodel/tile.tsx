@@ -21,7 +21,7 @@ class TileLoader {
         this.stopFlag = axios.CancelToken.source();
         tile.renderer.status.actions.loadingGeometry.start();
 
-        iaxios.get(`/api/data/${tile.layer.project}/${tile.layer.name}/grid/tiles/${tile.sourceFile}`, {
+        iaxios.get(`/api/data/${tile.layer.project}/${tile.layer.name}/grid/stream/${tile.sourceFile}`, {
             cancelToken: this.stopFlag.token
         }).then(
             (response) => {
@@ -47,8 +47,6 @@ class TileLoader {
     }
 }
 
-const CACHE_TILES = true;
-
 
 export class Tile {
     bbox: [Vector3, Vector3];
@@ -61,6 +59,7 @@ export class Tile {
     models: Model[];
     private isVisible: boolean;
     private loader: TileLoader;
+    private caching: boolean; 
 
 
     constructor(data: ITile, renderer: Renderer, layer: Layer | Overlay) {
@@ -74,6 +73,7 @@ export class Tile {
         this.isVisible = false;
         this.models = [];
         this.loader = new TileLoader();
+        this.caching = false;
     }
 
     set visible(isVisible: boolean) {
@@ -96,29 +96,34 @@ export class Tile {
         if (!this.loader.loaded) {
             this.loader.get(this, (models: Array<any>) => {
 
-                if (!this.isVisible && !CACHE_TILES)
+                if (!this.isVisible && !this.caching)
                     return;
 
                 for (let modeldata of models) {
 
                     this.renderer.status.actions.parsingGeometry.start();
                     deserializeModel(modeldata, this, (model: Model) => {
-                        this.models.push(model);
                         this.renderer.status.actions.parsingGeometry.stop();
+                        this.models.push(model);
 
-                        if (!this.isVisible && !CACHE_TILES)
+                        if (!this.isVisible && !this.caching)
                             return this.hide();
 
                         this.layer.applyStyleToModels(this.models);
 
-                        if (!this.isVisible && !CACHE_TILES)
+                        if (!this.isVisible && !this.caching)
                             return this.hide();
-                    }, () => !this.isVisible );
+
+                    }, () => {
+                        if (!this.isVisible)
+                            this.renderer.status.actions.parsingGeometry.stop();
+                        return !this.isVisible;}
+                    );
                 }
             });
         }
 
-        if (CACHE_TILES) {
+        if (this.caching) {
             for (const m of this.models)
                 m.visible = true;
         }
@@ -129,12 +134,8 @@ export class Tile {
             this.loader.abort();
         }
         
-        if (!CACHE_TILES) {
-            for (const m of this.models)
-                m.remove();
-
-            this.models = [];
-            this.loader.loaded = false;
+        if (!this.caching) {
+            this.disposeCache();
         } else {
             for (const m of this.models)
                 m.visible = false;
@@ -147,5 +148,26 @@ export class Tile {
                 m.remove();
             this.models = [];
         }
+    }
+
+    enableCache() {
+        this.caching = true;
+    }
+
+    disableCache() {
+        this.caching = false;
+
+        if (!this.isVisible) {
+            this.disposeCache();
+        }
+    }
+    
+    disposeCache() {
+        console.log("dispose cache");
+        for (const m of this.models)
+            m.remove();
+
+        this.models = [];
+        this.loader.loaded = false;
     }
 }

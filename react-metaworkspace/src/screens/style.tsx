@@ -399,7 +399,7 @@ export function StyleEditor() {
                 </TextDialog>
             </Pane>
 
-            <Pane className="styles">
+            <Pane className="styleView">
                 <Editor
                     beforeMount={beforMountEditor}
                     onMount={(editor, monaco) => {

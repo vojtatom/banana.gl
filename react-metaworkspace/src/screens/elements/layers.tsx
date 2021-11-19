@@ -63,9 +63,9 @@ export function Layers(props: ILayersProps) {
                     <Table.TextHeaderCell className="wide">Layer</Table.TextHeaderCell>
                     <Table.TextHeaderCell className="wide">Number of Objects</Table.TextHeaderCell>
                     <Table.TextHeaderCell className="wide">Type</Table.TextHeaderCell>
-                    <Table.TextHeaderCell className="narrow">include</Table.TextHeaderCell>
-                    <Table.TextHeaderCell className="narrow">rename</Table.TextHeaderCell>
-                    <Table.TextHeaderCell className="narrow">delete</Table.TextHeaderCell>
+                    <Table.TextHeaderCell className="narrow">Public</Table.TextHeaderCell>
+                    <Table.TextHeaderCell className="narrow">Rename</Table.TextHeaderCell>
+                    <Table.TextHeaderCell className="narrow">Delete</Table.TextHeaderCell>
                 </Table.Head>
                 <Table.Body>
                     {layers.length > 0 ? layers.map((layer) => (

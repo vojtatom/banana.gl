@@ -28,13 +28,13 @@ export class PolygonalModel extends Model {
 
 
     private createPickingMesh(geometry: THREE.BufferGeometry) {
-        const pickingMesh = new THREE.Mesh(geometry, this.renderer.matlib.pickingMaterial);
+        const pickingMesh = new THREE.Mesh(geometry, this.renderer.matlib.pickingPolygonMaterial);
         this.renderer.pickingScene.add(pickingMesh);
         this.pickingMesh = pickingMesh;
     }
 
     private createMesh(geometry: THREE.BufferGeometry) {
-        const material = this.renderer.matlib.polygonSelectMaterial;
+        const material = this.renderer.matlib.polygonMaterial;
         const mesh = new THREE.Mesh(geometry, material);
         mesh.receiveShadow = true;
         mesh.castShadow = true;
@@ -77,13 +77,13 @@ export class PolygonalProxyModel extends ModelProxy {
 
 
     private createPickingMesh(geometry: THREE.BufferGeometry) {
-        const pickingMesh = new THREE.Mesh(geometry, this.renderer.matlib.pickingMaterial);
+        const pickingMesh = new THREE.Mesh(geometry, this.renderer.matlib.pickingPolygonMaterial);
         this.renderer.pickingScene.add(pickingMesh);
         this.pickingMesh = pickingMesh;
     }
 
     private createMesh(geometry: THREE.BufferGeometry) {
-        const material = this.renderer.matlib.polygonSelectMaterial;
+        const material = this.renderer.matlib.polygonMaterial;
         const mesh = new THREE.Mesh(geometry, material);
         mesh.receiveShadow = true;
         mesh.castShadow = true;

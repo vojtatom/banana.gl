@@ -49,10 +49,10 @@ export function ProjectActions(props: IProjectProps) {
                 submitBody={() => { return { name: props.name }}}
                 onSubmit={recompile}
                 onError={(reject) => {return "Project could not be recompiled"}} 
-                tooltip="Recompile after changing which layers should be included in visualization"
+                tooltip="Publish selected layers and compile data for visualization"
             >
                 <Button marginRight={12} marginBottom={12} appearance="minimal" iconBefore={CubeIcon}>
-                    Recompile 3D
+                    Publish 3D
                 </Button>
             </TextDialog>
 

@@ -111,7 +111,7 @@ def delete_project(project: ProjectData, current_user: User = Depends(get_curren
 
 
 @router.post("/project/meta")
-def get_metadata(meta: MetaData, current_user: User = Depends(get_current_active_user)):
+def get_metadata(meta: MetaData):
     prj = mws.get_project(meta.project)
     if prj is None:
         raise HTTPException(

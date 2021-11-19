@@ -27,7 +27,7 @@ export class Renderer {
     stats2!: Stats;
     changed: boolean;
 
-    updateLights = true;
+    updateShadows = false;
     actionCall: CallableFunction;
 
     status: StatusManager;
@@ -47,6 +47,7 @@ export class Renderer {
         this.setupRenderer();
         this.setupLightsAndShadows();
         this.controls.initOrthographic(this.canvas, this.csm);
+        this.controls.useOrtho();
         
         //materials
         this.matlib = new MaterialLibrary(this.csm);
@@ -100,13 +101,40 @@ export class Renderer {
 
     private setupRenderer() {
         this.renderer.setPixelRatio(window.devicePixelRatio);
-        this.renderer.shadowMap.enabled = false;
+        this.renderer.shadowMap.enabled = true;
         this.renderer.shadowMap.autoUpdate = false;
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 
-        this.renderer.setClearColor(0xa6fff3);
+        //this.renderer.setClearColor(0xa6fff3);
+        this.renderer.setClearColor(0x151920);
         this.renderer.setSize(window.innerWidth, window.innerHeight);
         this.renderer.setAnimationLoop(() => this.frame());
+    }
+
+    enableShadows() {
+        this.updateShadows = true;
+        this.changed = true;
+        console.log('shadows enabled');
+    }
+
+    disableShadows() {
+        this.updateShadows = false;
+        this.changed = true;
+
+        let light: THREE.DirectionalLight;
+        for(light of this.csm.lights)
+        {
+            const target = this.renderer.getRenderTarget();
+            if (light.shadow && light.shadow.map)
+            {
+
+                this.renderer.setRenderTarget( light.shadow.map as any);
+                this.renderer.clear();
+            }
+            this.renderer.setRenderTarget(target);
+        }
+
+        console.log('shadows disabled');
     }
 
     frame() {
@@ -114,8 +142,8 @@ export class Renderer {
         this.controls.update();
         
         if (this.changed) {
-            if (this.updateLights) {
-                this.csm.update();
+            this.csm.update();
+            if (this.updateShadows) {
                 this.renderer.shadowMap.needsUpdate = true;
             }
 
@@ -140,21 +168,25 @@ export class Renderer {
             this.picker.select(oid);
 
         const selected = this.picker.layerAndOidForId(oid);
+        console.log(selected);
 
         if (selected)
-            this.matlib.polygonSelectMaterial.uniforms.selectedID = { value: this.picker.selected };
-        else
-            this.matlib.polygonSelectMaterial.uniforms.selectedID = { value: [-1, -1, -1, -1] };
-        
+            this.matlib.setSelectedID(this.picker.selected);
+        else 
+            this.matlib.setSelectedID([-1, -1, -1, -1]);
 
-        this.matlib.polygonSelectMaterial.uniformsNeedUpdate = true;
         this.changed = true;
         return selected;
     }
 
+    setPointSize(size: number) {
+        this.matlib.setPointSize(size);
+        this.changed = true;
+    }
+
     updateHelper() {
         this.helper.update();
-        this.updateLights = false;
+        this.updateShadows = false;
         this.changed = true;
     }
 

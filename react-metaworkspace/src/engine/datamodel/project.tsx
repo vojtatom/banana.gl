@@ -9,6 +9,7 @@ export class Project {
     renderer: Renderer;
     layers: (Layer | Overlay)[];
     styles: string[];
+    usedStyle?: string;
 
     constructor(name: string, renderer: Renderer) {
         this.name = name;
@@ -16,7 +17,13 @@ export class Project {
         this.layers = [];
         this.styles = [];
 
-        iaxios.get(`/api/data/${this.name}/layout.json`).then((response) => {
+        iaxios.get(`/api/data/${this.name}/layout.json`, {
+            headers: {
+                'Cache-Control': 'no-cache',
+                'Pragma': 'no-cache',
+                'Expires': '0'
+            }
+        }).then((response) => {
             const styles = response.data.styles;
             this.styles = styles;
             for (const layer of response.data.layers)
@@ -39,10 +46,24 @@ export class Project {
         });
     }
 
-    update_visible_tiles(target: THREE.Vector3) {
+    updateVisibleRadius(target: THREE.Vector3) {
         for (const layer of this.layers){
-            layer.update_visible_tiles(target);
+            layer.updateVisibleRadius(target);
         }
+    }
+
+    setVisibleRadius(radius: number) {
+        for(let layer of this.layers)
+            layer.setVisibleRadius(radius);
+    }
+
+    setPointSize(size: number){
+        this.renderer.setPointSize(size);
+    }
+
+    useCache(enable: boolean){
+        for(let layer of this.layers)
+            enable? layer.enableCache() : layer.disableCache();
     }
 
     applyStyle(style: string){
@@ -50,8 +71,16 @@ export class Project {
             return;
         }
 
+        this.usedStyle = style;
         for(const layer of this.layers){
             layer.applyStyle(style);
+        }
+    }
+
+    clearStyle(){
+        this.usedStyle = undefined;
+        for(const layer of this.layers){
+            layer.clearStyle();
         }
     }
 }

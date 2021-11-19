@@ -5,33 +5,16 @@ import iaxios from "../axios";
 import { apiurl } from "../url";
 
 
-export class MetacityEngine {
-    project_name: string;
-    canvas: HTMLCanvasElement;
-    
+export class EngineControls {
     renderer: Renderer;
-    selector: Selector;
-    project!: Project;
-
+    project: Project;
     keymap: {[key: string]: boolean};
     showMetaCallback?: (meta: {[name: string]: any}) => void;
 
-    constructor(project_name: string, canvas: HTMLCanvasElement) {
-        this.project_name = project_name;
-        this.canvas = canvas;
-        this.renderer = new Renderer(this.canvas,  () => this.actions());
-        this.selector = new Selector(this.renderer);
-        this.keymap = {}
-    }
-
-    init() {
-        this.project = new Project(this.project_name, this.renderer);
-        this.renderer.controls.controls.addEventListener('change', () => this.moved())
-    }
-
-    moved() {
-        this.project.update_visible_tiles(this.renderer.controls.target);        
-        this.renderer.changed = true;
+    constructor(renderer: Renderer, project: Project) {
+        this.renderer = renderer;
+        this.project = project;
+        this.keymap = {};
     }
 
     select(oid: number) {
@@ -46,7 +29,7 @@ export class MetacityEngine {
             return;
 
         iaxios.post(apiurl.GETMETA, {
-            project: this.project_name,
+            project: this.project.name,
             layer: selected.layer,
             oid: selected.oid
         }).then(res => {
@@ -72,12 +55,6 @@ export class MetacityEngine {
     }
 
     actions() {
-        if (this.keymap['KeyA'])
-        {
-            this.renderer.controls.swap();
-            this.keymap['KeyA'] = false;
-        }
-
         if (this.keymap['KeyU'])
         {
             this.renderer.updateHelper();
@@ -85,8 +62,46 @@ export class MetacityEngine {
         }
     }
 
+    swapCamera() {
+        this.renderer.controls.swap();
+        this.renderer.changed = true;
+    }
+
     resize(x: number, y: number) {
         this.renderer.resize(x, y);
+    }
+}
+
+
+export class MetacityEngine {
+    project_name: string;
+    canvas: HTMLCanvasElement;
+    
+    renderer: Renderer;
+    selector: Selector;
+    project!: Project;
+
+    controls?: EngineControls;
+
+    constructor(project_name: string, canvas: HTMLCanvasElement) {
+        this.project_name = project_name;
+        this.canvas = canvas;
+        this.renderer = new Renderer(this.canvas,  () => {
+            if (this.controls)
+                this.controls.actions();
+        });
+        this.selector = new Selector(this.renderer);
+    }
+
+    init() {
+        this.project = new Project(this.project_name, this.renderer);
+        this.controls = new EngineControls(this.renderer, this.project);
+        this.renderer.controls.controls.addEventListener('change', () => this.moved())
+    }
+
+    moved() {
+        this.project.updateVisibleRadius(this.renderer.controls.target);        
+        this.renderer.changed = true;
     }
 
     exit() {

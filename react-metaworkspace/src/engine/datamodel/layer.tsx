@@ -14,23 +14,62 @@ abstract class LayerBase {
     renderer: Renderer;
     grid!: Grid; //undefined if the layer is not visible
     style?: LayerStyle;
+    visibility: boolean;
+
 
     constructor(renderer: Renderer, project: string, data: ILayerBaseData, style_names: string[]) {
         this.name = data.name;
         this.project = project;
         this.renderer = renderer;
+        this.visibility = true;
+    }
+
+    set visible(v: boolean) {
+        if (v === this.visibility)
+            return;
+
+        this.visibility = v;
+        if (this.visibility)
+            this.show();
+        else
+            this.hide();
+    }
+
+    get visible() {
+        return this.visibility;
     }
     
     init(data: ILayerBaseData) {
         this.grid = new Grid(data.layout, this.renderer, this as any);
         this.renderer.controls.focus(this.grid.center);
-        this.grid.update_visible_tiles(this.renderer.controls.target);
+        this.grid.updateVisibleTiles(this.renderer.controls.target);
         this.renderer.changed = true;
     }
 
-    update_visible_tiles(point: THREE.Vector3) {
+    updateVisibleRadius(point: THREE.Vector3) {
+        if (!this.visibility)
+            return;
+
         if (this.grid)
-            this.grid.update_visible_tiles(point);
+            this.grid.updateVisibleTiles(point);
+    }
+
+    hide() {
+        this.grid.hide();
+        this.renderer.changed = true;
+    }
+    
+    show() {
+        this.grid.reloadVisibility();
+        this.renderer.changed = true;
+    }
+
+    setVisibleRadius(radius: number) {
+        this.grid.visible_radius = radius;
+        if (this.visible) {
+            this.grid.reloadVisibility();
+            this.renderer.changed = true;
+        }
     }
 
     applyStyle(style: string) {
@@ -55,6 +94,25 @@ abstract class LayerBase {
     }
 
     abstract applyStyleToModels(models: Model[]): void;
+
+    clearStyle() {
+        this.style = undefined;
+        for (let [_, tile] of this.grid.tiles) {
+            this.applyStyleToModels(tile.models);
+        }
+    }
+
+    enableCache() {
+        for (let [_, tile] of this.grid.tiles) {
+            tile.enableCache();
+        }
+    }
+
+    disableCache() {
+        for (let [_, tile] of this.grid.tiles) {
+            tile.disableCache();
+        }
+    }
 }
 
 
@@ -70,10 +128,8 @@ export class Layer extends LayerBase {
 
     applyStyleToModels(models: Model[]) {
         const offset = this.renderer.picker.offsetForLayer(this.name);
-        
         for (let model of models) {
-            if (this.style)
-                model.applyStyle(offset, this.style);
+            model.applyStyle(offset, this.style);
         }
     }
 }
@@ -97,8 +153,7 @@ export class Overlay extends LayerBase {
         const offset = this.renderer.picker.offsetForLayer(this.source);
         
         for (let model of models) {
-            if (this.style)
-                model.applyStyle(offset, this.style);
+            model.applyStyle(offset, this.style);
         }
     }
 }

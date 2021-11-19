@@ -17,9 +17,9 @@ export class MapControls extends OrbitControls {
         this.touches.ONE = THREE.TOUCH.PAN;
         this.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
 
-        this.zoomSpeed = 0.5;
-        this.dampingFactor = 0.1;
-        this.enableDamping = true;
+        this.zoomSpeed = 1.0;
+        //this.dampingFactor = 0.1;
+        //this.enableDamping = true;
         this.minDistance = 400;
         this.minPolarAngle = 0.001;
         this.maxPolarAngle = Math.PI * 0.4;

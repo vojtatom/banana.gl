@@ -25,6 +25,9 @@ export class Model {
         if (this.mesh) {
             this.mesh.visible = v;
         }
+        if (this.pickingMesh) {
+            this.pickingMesh.visible = v;
+        }
     }
 
     remove() {

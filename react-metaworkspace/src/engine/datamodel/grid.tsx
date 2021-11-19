@@ -53,11 +53,9 @@ export class Grid {
     visible_radius: number;
     visible: Set<Tile>;
     visibleSwap: Set<Tile>;
-
     readonly zero2: Vector2;
-
     layer: Layer | Overlay;
-
+    
     constructor(data: ILayout, renderer: Renderer, layer: Layer | Overlay) {
         this.tileSize = data.tile_size;
         this.renderer = renderer;
@@ -81,6 +79,18 @@ export class Grid {
     get center() {
         return center(this.bbox);
     }
+
+    hide() {
+        for (const tile of this.visible.values()) {
+            tile.visible = false;
+        }
+    }
+
+    show() {
+        for (const tile of this.visible.values()) {
+            tile.visible = true;
+        }
+    }
     
     private createTiles(data: ILayout, renderer: Renderer, layer: Layer | Overlay) {
         for (const tiledata of data.tiles) {
@@ -91,16 +101,21 @@ export class Grid {
         }
     }
 
-    update_visible_tiles(fp: Vector3) {
+    updateVisibleTiles(fp: Vector3) {
         const visibleTile = this.focusPoint.clone().divideScalar(this.tileSize).floor()
         const nvisibleTile = new Vector2(fp.x, fp.y).divideScalar(this.tileSize).floor();
 
         if (!visibleTile.equals(nvisibleTile)) {
-            this.update_visibility(nvisibleTile)
+            this.focusPoint.set(fp.x, fp.y);
+            this.updateVisibility(nvisibleTile)
         } 
     }
 
-    update_visibility(visibleTile: Vector2) {
+    reloadVisibility() {
+        this.updateVisibility(this.focusPoint.clone().divideScalar(this.tileSize).floor());
+    }
+
+    updateVisibility(visibleTile: Vector2) {
         const tmpVisible = this.visible;
         this.visible = this.visibleSwap;
         this.visibleSwap = tmpVisible;

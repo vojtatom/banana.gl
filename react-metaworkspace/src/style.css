@@ -65,6 +65,10 @@
     --blueTint: #F3F6FF;
     --purpleTint: #E7E4F9;
     --tealTint: #D3F5F7;
+
+    --sliderBack: #FFF;
+    --sliderBorder: var(--gray400);
+    --sliderThumb: var(--gray800);
 }
 
 html, body {
@@ -415,7 +419,7 @@ ul.filelist li .fileName {
     background: var(--gray50);
 }
 
-.styles {
+.styleView {
     margin-top: 1rem;
     height: calc(100vh - 7.2rem);
     overflow: hidden;
@@ -450,15 +454,6 @@ pre.parsedMessage {
     line-height: 1.2em;
 }
 
-.viewControls {
-    position: absolute;
-    top: 20px;
-    right: 20px;
-    z-index: 3;
-    border-radius: 4px;
-    background: #FFF;
-}
-
 .canvasAnchor {
     position: relative;
     width: 100vw;
@@ -474,6 +469,7 @@ pre.parsedMessage {
     background: #FFF;
     color: var(--gray600);
     z-index: 2;
+    border-top: 1px solid #CCC;
     padding: 4px 5px;
     font-size: 0.8em;
 }
@@ -536,4 +532,193 @@ pre.parsedMessage {
     text-align: center;
 }
 
+.viewMenu .layers,
+.viewMenu .styles,
+.viewMenu .settings {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    margin: 1rem;
+}
+
+.viewMenu .layers .layer,
+.viewMenu .styles .style {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 7px 20px;
+    width: 100%;
+    margin-bottom: 4px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 0.8em;
+}
+
+.viewMenu .layers .layer:hover,
+.viewMenu .styles .style:hover {
+    background: var(--gray200);
+}
+
+.viewMenu .styles .style.selected {
+    background: var(--gray200);
+}
+
+.viewMenu .layers .layerName {
+    margin-left: 1rem;
+}
+
+.viewMenu .title {
+    margin: 1rem 0 0 1rem
+}
+
+.setting {
+    width: 100%;
+    margin: 1rem 0 0;
+}
+
+.setting .inlineControls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.viewControls {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    z-index: 3;
+    border-radius: 4px;
+    background: #FFF;
+    border: 1px solid #CCC;
+}
+
+.viewControls .active {
+    background: var(--gray200);;
+}
+
+.viewMenu {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    width: auto;
+    min-width: 20rem;
+    background: #FFF;
+    z-index: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: left;
+    justify-content: center;
+    /*box-shadow: rgba(67, 90, 111, 0.3) 0px 0px 1px 0px, rgba(67, 90, 111, 0.47) 0px 16px 24px -8px;*/
+    border: 1px solid #CCC; 
+    max-height: calc(100vh - 60px);
+    overflow: auto;
+    border-radius: 4px;
+}
+
+
+.viewMenu .closeViewMenu {
+    position: absolute;
+    right: 0;
+    top: 0;
+}
+
+#perspectiveControl {
+    padding: 0;
+    margin: 0;
+}
+
+
+/* custom range */
+
+input[type=range] {
+    height: 27px;
+    -webkit-appearance: none;
+    margin: 10px 0;
+    width: 100%;
+}
+
+input[type=range]:focus {
+    outline: none;
+}
+
+input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 22px;
+    cursor: pointer;
+    box-shadow: none;
+    background: var(--sliderBack);
+    border-radius: 4px;
+    border: 1px solid var(--sliderBorder);
+}
+
+input[type=range]::-webkit-slider-thumb {
+    box-shadow: none;
+    border: none;
+    height: 20px;
+    width: 10px;
+    border-radius: 4px;
+    background: var(--sliderThumb);
+    cursor: pointer;
+    -webkit-appearance: none;
+}
+
+input[type=range]:focus::-webkit-slider-runnable-track {
+    background: var(--sliderBack);
+}
+
+input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 22px;
+    cursor: pointer;
+    box-shadow: none;
+    background: var(--sliderBack);
+    border-radius: 4px;
+    border: 1px solid var(--sliderBorder);
+}
+
+input[type=range]::-moz-range-thumb {
+    box-shadow: none;
+    border: none;
+    height: 20px;
+    width: 10px;
+    border-radius: 4px;
+    background: var(--sliderThumb);
+    cursor: pointer;
+}
+input[type=range]::-ms-track {
+    width: 100%;
+    height: 22px;
+    cursor: pointer;
+    background: transparent;
+    border-color: transparent;
+    color: transparent;
+}
+input[type=range]::-ms-fill-lower {
+    background: var(--sliderBack);
+    border: 1px solid var(--sliderBorder);
+    border-radius: 4px;
+    box-shadow: none;
+}
+input[type=range]::-ms-fill-upper {
+    background: var(--sliderThumb);
+    border: none;
+    border-radius: 4px;
+    box-shadow: none;
+}
+input[type=range]::-ms-thumb {
+    box-shadow: none;
+    border: none;
+    height: 20px;
+    width: 10px;
+    border-radius: 4px;
+    background: #A1D0FF;
+    cursor: pointer;
+}
+input[type=range]:focus::-ms-fill-lower {
+    background: var(--sliderBack);
+}
+input[type=range]:focus::-ms-fill-upper {
+    background: var(--sliderBack);
+}
 

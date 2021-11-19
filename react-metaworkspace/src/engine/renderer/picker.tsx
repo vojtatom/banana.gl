@@ -28,7 +28,10 @@ export class GPUPickHelper {
         if (!this.offsets.has(name))
         {
             if (size === -1)
+            {
                 throw new Error(`Layer ${name} not registered.`);    
+                //return undefined;
+            }
 
             this.offsets.set(name, [this.maxOffest, this.maxOffest + size]);
             this.maxOffest += size;

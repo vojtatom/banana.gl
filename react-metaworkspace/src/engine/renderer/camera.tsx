@@ -43,7 +43,7 @@ class OrthographicControls {
             window.innerHeight / 2,
             -window.innerHeight / 2,
             1,
-            8000);
+            10000);
         this.csm = csm;
     }
 
@@ -67,7 +67,7 @@ class OrthographicControls {
         this.camera.position.copy( controls.object.position );
         controls.target.copy( this.camera.position );
         controls.target.z = 0;
-        controls.maxDistance = 3000;
+        controls.maxDistance = 10000;
         controls.enableRotate = false;
     }
 
@@ -133,6 +133,23 @@ export class CameraControls {
         return this.controls.target;
     }
 
+    useOrtho() {
+        if (!this.orthographic)
+            return;
+
+        if (this.current === this.orthographic)
+            return;
+        
+        this.swap();
+    }
+
+    usePerspective() {
+        if (this.current === this.perspective)
+            return;
+        
+        this.swap();
+    }
+
     swap() {
         if (!this.orthographic || !this.csm)
             return; 
@@ -146,10 +163,18 @@ export class CameraControls {
     }
 
     focus(focusPoint: THREE.Vector2) {
+        const usingOrtho = (this.current.camera as any).isOrthographicCamera;
+
+        if (usingOrtho)
+            this.swap();
+
         this.controls.target = new THREE.Vector3(focusPoint.x, focusPoint.y, 0);
-        this.current.camera.position.x = focusPoint.x;
-        this.current.camera.position.y = focusPoint.y;
-        this.current.camera.position.z = 1000;
+        this.perspective.camera.position.x = focusPoint.x;
+        this.perspective.camera.position.y = focusPoint.y;
+        this.perspective.camera.position.z = 1000;
+
+        if (usingOrtho)
+            this.swap();
     }
 
     screenToWorldOrthographic(x: number, y: number) {

@@ -1,5 +1,6 @@
 import { PolygonalModel, PolygonalProxyModel } from "../geometry/polygons"
 import { LineModel, LineProxyModel } from "../geometry/lines"
+import { PointModel, PointProxyModel } from "../geometry/points"
 import { Tile } from "../datamodel/tile";
 import { IModel } from "../types";
 import { Model } from "./base"
@@ -9,10 +10,12 @@ const registeredModels: {[name: string]: {[name: string]: new(data: IModel, tile
     model: {
         simplepolygon: PolygonalModel,
         simpleline: LineModel,
+        simplepoint: PointModel,
     },
     proxy: {
         simpleline: LineProxyModel,
         simplepolygon: PolygonalProxyModel,
+        simplepoint: PointProxyModel,
     }
 };
 
