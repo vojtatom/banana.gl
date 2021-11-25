@@ -1,4 +1,3 @@
-import React from 'react'
 import {
   BrowserRouter as Router,
   Switch,
@@ -15,7 +14,7 @@ import { UploadLayer } from './screens/upload'
 import { Jobs } from './screens/jobs'
 import { Mapping } from './screens/mapping'
 import { View } from './screens/view'
-import { ToastContainer, toast } from 'react-toastify';
+import { ToastContainer } from 'react-toastify';
 import { StyleEditor } from './screens/style';
 
 export function App() {

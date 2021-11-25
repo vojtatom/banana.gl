@@ -41,6 +41,7 @@ abstract class LayerBase {
     
     init(data: ILayerBaseData) {
         this.grid = new Grid(data.layout, this.renderer, this as any);
+        console.log(this.grid.center);
         this.renderer.controls.focus(this.grid.center);
         this.grid.updateVisibleTiles(this.renderer.controls.target);
         this.renderer.changed = true;

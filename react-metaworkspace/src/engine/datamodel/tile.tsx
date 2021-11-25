@@ -97,7 +97,8 @@ export class Tile {
             this.loader.get(this, (models: Array<any>) => {
 
                 if (!this.isVisible && !this.caching)
-                    return;
+                    return this.disposeCache();
+
 
                 for (let modeldata of models) {
 
@@ -107,16 +108,20 @@ export class Tile {
                         this.models.push(model);
 
                         if (!this.isVisible && !this.caching)
-                            return this.hide();
+                            return this.disposeCache();
 
                         this.layer.applyStyleToModels(this.models);
 
                         if (!this.isVisible && !this.caching)
-                            return this.hide();
+                        return this.disposeCache();
 
                     }, () => {
                         if (!this.isVisible)
+                        {
                             this.renderer.status.actions.parsingGeometry.stop();
+                            this.disposeCache();
+                        }
+                        
                         return !this.isVisible;}
                     );
                 }

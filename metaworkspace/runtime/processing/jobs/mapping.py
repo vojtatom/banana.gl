@@ -1,6 +1,7 @@
 from metaworkspace.runtime.processing.jobs import job
 from metaworkspace.runtime.workspace import mws
-
+from metacity.core.mapper import build_overlay
+from metacity.core.layout import build_layout
 
 class JobMapping(job.Job):
     TYPE = 'mappinglayer'
@@ -37,10 +38,10 @@ class JobMapping(job.Job):
         target = proj.get_layer(self.target)
         self.update_status('mapping')
         update = lambda it: self.update_status(f'mapping tile {it}')
-        overlay.setup(source, target, update)
+        build_overlay(overlay, source, target, update)
         overlay.persist()
         self.update_status('building layout')
-        proj.build_layout()
+        build_layout(proj)
         self.update_status('finished')
 
 

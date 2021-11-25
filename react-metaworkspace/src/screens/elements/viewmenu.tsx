@@ -1,5 +1,7 @@
-import { Button, EyeOffIcon, EyeOpenIcon, Heading, Icon, IconButton, LayersIcon, Pane, SettingsIcon, StyleIcon, Switch, Tooltip  } from "evergreen-ui";
+import { ENGINE_METHOD_ALL } from "constants";
+import { Button, CompassIcon, EyeOffIcon, EyeOpenIcon, Heading, Icon, IconButton, LayersIcon, MinusIcon, Pane, PlusIcon, SettingsIcon, StyleIcon, Switch, Tooltip  } from "evergreen-ui";
 import { useEffect, useState } from "react"
+import { Transform } from "stream";
 import { MetacityEngine } from "../../engine/engine"
 import { SideMenu } from "./sidemenu";
 
@@ -209,6 +211,34 @@ enum CameraType {
     D3
 }
 
+export function Compas(props: {engine: MetacityEngine | undefined}) {
+    const { engine } = props;
+    const [angle, setAngle] = useState<number>(0);
+
+    const rotate = (angleInRadians: number) => {
+        const angleInDegrees = - (angleInRadians * 180 / Math.PI);
+        setAngle(angleInDegrees);
+    }
+
+    useEffect(() => {
+        if (!engine || !engine.controls)
+            return;
+
+        engine.controls.updateCompasCallback = rotate;
+    }, [engine]);
+
+    const resetRotation = () => {
+        engine?.renderer.controls.topView();
+    }
+
+    return (
+        <Tooltip content="Reset view rotation">
+            <IconButton icon={<CompassIcon  style={{ transform: `rotate(${angle}deg)` }}/>} appearance="minimal" onClick={resetRotation} />
+        </Tooltip>
+    );
+}
+
+
 export function ViewMenu(props: { engine: MetacityEngine | undefined }) {
     const { engine } = props;
     const [menuShown, setMenuShown] = useState<boolean>(false);
@@ -250,6 +280,13 @@ export function ViewMenu(props: { engine: MetacityEngine | undefined }) {
                         {camera === CameraType.D2 ? "2D" : "3D"}
                     </Button>
                 </Tooltip>
+                <Tooltip content="Zoom in">
+                    <IconButton icon={PlusIcon} appearance="minimal" onClick={() => { engine?.controls?.zoomIn()}} />
+                </Tooltip>
+                <Tooltip content="Zoom out">
+                    <IconButton icon={MinusIcon} appearance="minimal" onClick={() => { engine?.controls?.zoomOut()}} />
+                </Tooltip>
+                <Compas engine={engine}/>
             </Pane>
             <SideMenu isShown={menuShown} onClose={() => toggleMenu(menu)}>
                 <LayerMenu engine={engine}    visible={menu === Menu.Layers}/>

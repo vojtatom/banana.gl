@@ -17,10 +17,18 @@ export function MetaDialog(props: {engine: MetacityEngine | undefined}) {
         setMetaIsShown(true);
     }
 
+    const closeMeta = () => {
+        engine?.controls?.select(-1);
+        setMetaIsShown(false);
+    }
+
 
     useEffect(() => {
         if (engine && engine.controls)
+        {
             engine.controls.showMetaCallback = showMeta;
+            engine.controls.closeMetaCallback = closeMeta;
+        }
     }, [engine]);
 
 
@@ -31,8 +39,8 @@ export function MetaDialog(props: {engine: MetacityEngine | undefined}) {
             hasFooter={false}
             width="auto"
             isShown={metaIsShown}
-            onCloseComplete={() => { engine?.controls?.select(-1); setMetaIsShown(false) }}
-            onCancel={() => { engine?.controls?.select(-1); setMetaIsShown(false) }}
+            onCloseComplete={closeMeta}
+            onCancel={closeMeta}
         >
             <Pane className="meta">
                 {

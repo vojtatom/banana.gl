@@ -56,19 +56,19 @@ export function UploadLayer() {
 
     useEffect(() => {
         authUser(history, () => { });
-    }, []);
+    });
 
     const submit = (layer_name: string, files: File[]) => {
         if (uploading)
             return;
 
-        if (layer_name === undefined || layer_name.length == 0)
+        if (layer_name === undefined || layer_name.length === 0)
         {
             toast('No name specified');
             return;
         }
 
-        if (files === undefined || files.length == 0)
+        if (files === undefined || files.length === 0)
         {
             toast('No files provided');
             return;

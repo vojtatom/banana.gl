@@ -1,7 +1,8 @@
 import os
 import shutil
 
-from metacity.datamodel.project import Project
+from metacity.core.grid.grid import build_grid
+from metacity.core.layout import build_layout
 from metacity.io.parse import parse
 from metaworkspace.runtime.processing.jobs import job
 from metaworkspace.runtime.workspace import mws
@@ -36,10 +37,9 @@ class JobLoadDataset(job.Job):
         layer, proj = self.parse_files() 
         layer.persist()
         self.update_status("building grid")
-        grid = layer.build_grid()
-        grid.persist()
+        build_grid(layer)
         self.update_status("building layout")
-        proj.build_layout()
+        build_layout(proj)
         self.update_status("finished")
 
     def setup_resources(self, job_dir, files):

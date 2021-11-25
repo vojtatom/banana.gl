@@ -10,21 +10,24 @@ export class EngineControls {
     project: Project;
     keymap: {[key: string]: boolean};
     showMetaCallback?: (meta: {[name: string]: any}) => void;
+    closeMetaCallback?: () => void;
+    updateCompasCallback?: (angle: number) => void;
+    clickTime: number;
 
     constructor(renderer: Renderer, project: Project) {
         this.renderer = renderer;
         this.project = project;
         this.keymap = {};
+        this.clickTime = 0;
     }
 
     select(oid: number) {
         this.renderer.select(oid);
     }
 
-    doubleclick(x: number, y: number) {
+    selectCoord(x: number, y: number) {
         const selected = this.renderer.click(x, y);
 
-        console.log('doubleclick', selected);
         if (!selected)
             return;
 
@@ -40,8 +43,27 @@ export class EngineControls {
 
             if (this.showMetaCallback)
                 this.showMetaCallback(res.data);
-
         });
+    }
+
+    mouseDown(x: number, y: number, time: number, button: number) {
+        this.clickTime = time;
+    }
+
+    mouseUp(x: number, y: number, time: number, button: number) {
+        const duration = time - this.clickTime;
+
+        if (duration < 200)
+        {
+            if (button === 0)
+                this.selectCoord(x, y);
+            else if (button === 2 && this.closeMetaCallback)
+                this.closeMetaCallback();
+        }
+
+        
+
+        this.clickTime = time;
     }
 
     keyDown(key: string) {
@@ -69,6 +91,16 @@ export class EngineControls {
 
     resize(x: number, y: number) {
         this.renderer.resize(x, y);
+    }
+
+    zoomIn() {
+        this.renderer.controls.zoomIn(10);
+        this.renderer.changed = true;
+    }
+
+    zoomOut() {
+        this.renderer.controls.zoomOut(10);
+        this.renderer.changed = true;
     }
 }
 
@@ -101,6 +133,7 @@ export class MetacityEngine {
 
     moved() {
         this.project.updateVisibleRadius(this.renderer.controls.target);        
+        this.renderer.compas.update(this.controls?.updateCompasCallback);
         this.renderer.changed = true;
     }
 

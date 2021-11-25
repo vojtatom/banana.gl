@@ -14,12 +14,12 @@ class PerspectiveControls {
         controls.update();
     }
 
-    topView(controls: MapControls) {
+    topView(controls: MapControls, distance: number = 3000) {
         this.camera.position.copy(controls.target);
-        this.camera.position.z = 3000;
+        this.camera.position.z = distance;
         this.camera.updateMatrixWorld();
     }
-
+        
     enable(controls: MapControls) {
         controls.enableRotate = true;
         controls.maxDistance = 5000;
@@ -71,12 +71,12 @@ class OrthographicControls {
         controls.enableRotate = false;
     }
 
-    topView(controls: MapControls) {
+    topView(controls: MapControls, distance: number = 3000) {
         this.camera.position.copy(controls.target);
-        this.camera.position.z = 3000;
+        this.camera.position.z = distance;
         this.camera.updateMatrixWorld()
     }
-
+    
     resize(width: number, height: number) {
         this.camera.left = -width / 2;
         this.camera.right = width / 2;
@@ -113,6 +113,34 @@ export class CameraControls {
             this.orthographic.resize(x, y);
     }
 
+
+    zoomIn(step: number) {
+
+        const pos = this.controls.object.position.clone();
+        const dir = new THREE.Vector3().subVectors(pos, this.controls.target);
+        dir.normalize();
+        dir.multiplyScalar(step * 10);
+    
+    
+        this.controls.object.position.sub(dir);
+        (this.controls.object as any).updateProjectionMatrix();
+
+        this.current.update(this.controls);
+    }
+
+    zoomOut(step: number) {
+
+        const pos = this.controls.object.position.clone();
+        const dir = new THREE.Vector3().subVectors(pos, this.controls.target);
+        dir.normalize();
+        dir.multiplyScalar(step * 10);
+    
+        this.controls.object.position.add(dir);
+        (this.controls.object as any).updateProjectionMatrix();
+
+        this.current.update(this.controls);
+    }
+
     update() {
         this.current.update(this.controls);
     }
@@ -122,7 +150,14 @@ export class CameraControls {
     }
 
     topView() {
-        this.current.topView(this.controls);
+        const usingOrtho = (this.current.camera as any).isOrthographicCamera;
+
+        if (usingOrtho)
+            this.current.topView(this.controls);
+        else {
+            const distance = this.controls.target.distanceTo(this.controls.object.position);
+            this.current.topView(this.controls, distance);
+        }
     }
 
     get camera() {

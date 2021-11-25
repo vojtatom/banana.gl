@@ -12,10 +12,12 @@ export class MapControls extends OrbitControls {
         this.screenSpacePanning = false; // pan orthogonal to world-space direction camera.up
 
         this.mouseButtons.LEFT = THREE.MOUSE.PAN;
-        this.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
+        this.mouseButtons.MIDDLE = THREE.MOUSE.ROTATE;
+        this.mouseButtons.RIGHT = THREE.MOUSE.DOLLY;
 
         this.touches.ONE = THREE.TOUCH.PAN;
         this.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
+
 
         this.zoomSpeed = 1.0;
         //this.dampingFactor = 0.1;

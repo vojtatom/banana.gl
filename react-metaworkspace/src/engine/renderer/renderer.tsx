@@ -6,10 +6,9 @@ import { GPUPickHelper } from './picker';
 import { MaterialLibrary } from './shaders';
 import { CameraControls } from './camera';
 import { StatusManager } from '../utils/status';
-
+import { Compas } from './compas';
 
 const SHOWSTATS = false;
-const SHADOWS = true;
 
 export class Renderer {
     canvas: HTMLCanvasElement;
@@ -22,6 +21,7 @@ export class Renderer {
     matlib: MaterialLibrary;
     csm!: CSM;
     helper!: CSMHelper;
+    compas: Compas;
 
     stats1!: Stats;
     stats2!: Stats;
@@ -48,6 +48,9 @@ export class Renderer {
         this.setupLightsAndShadows();
         this.controls.initOrthographic(this.canvas, this.csm);
         this.controls.useOrtho();
+
+        //compas
+        this.compas = new Compas(this);
         
         //materials
         this.matlib = new MaterialLibrary(this.csm);
@@ -55,6 +58,8 @@ export class Renderer {
         //picker
         this.picker = new GPUPickHelper(this.renderer);
         this.changed = true;
+
+
 
         //devstats
         if (SHOWSTATS) {
@@ -168,7 +173,7 @@ export class Renderer {
             this.picker.select(oid);
 
         const selected = this.picker.layerAndOidForId(oid);
-        console.log(selected);
+        console.log(selected, this.picker.selected);
 
         if (selected)
             this.matlib.setSelectedID(this.picker.selected);

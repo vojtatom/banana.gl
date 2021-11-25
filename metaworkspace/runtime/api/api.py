@@ -1,17 +1,18 @@
 import os
 from typing import List
-from time import sleep
-from fastapi import APIRouter, File, Form, UploadFile, Depends, HTTPException, status, Response
+
+from fastapi import (APIRouter, Depends, File, Form, HTTPException, Response,
+                     UploadFile, status)
 from fastapi.responses import JSONResponse
-from metacity.styles.styles import parse
-from metaworkspace.runtime.processing.jobs.loaddataset import JobLoadDataset
-from metaworkspace.runtime.processing.jobs.buildlayout import JobBuildLayout
+from metacity.core.styles.style import Style
+from metacity.core.styles.apply import parse
+from metaworkspace.runtime.api.auth import User, get_current_active_user
 from metaworkspace.runtime.processing.jobs.applystyle import JobApplyStyle
+from metaworkspace.runtime.processing.jobs.buildlayout import JobBuildLayout
+from metaworkspace.runtime.processing.jobs.loaddataset import JobLoadDataset
 from metaworkspace.runtime.processing.jobs.mapping import JobMapping
 from metaworkspace.runtime.workspace import mws
 from pydantic import BaseModel
-from metaworkspace.runtime.api.auth import User, get_current_active_user
-
 
 router = APIRouter(prefix="/api",
                    tags=["api"])
@@ -314,7 +315,7 @@ def get_styles(project: ProjectData, current_user: User = Depends(get_current_ac
             detail="Project not found"
         )
 
-    styles = prj.styles.list_styles()
+    styles = Style.list(prj)
     return JSONResponse(styles) 
 
 
@@ -327,7 +328,7 @@ def create_style(style: ActionStyleData, current_user: User = Depends(get_curren
             detail="Project not found"
         )
 
-    if prj.styles.create_style(style.name):
+    if Style.create(prj, style.name):
         return Response(status_code=status.HTTP_200_OK)
     else:
         raise HTTPException(
@@ -344,7 +345,15 @@ def get_style(style: ActionStyleData, current_user: User = Depends(get_current_a
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Project not found"
         )
-    style_data = proj.styles.get_style(style.name)
+
+    sstyle = Style(proj, style.name)
+    try:
+        style_data = sstyle.style_file
+    except:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Style not found"
+        )   
     return JSONResponse({'style': style_data, 'name': style.name }) 
 
 
@@ -356,7 +365,9 @@ def update_style(style: StyleData, current_user: User = Depends(get_current_acti
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Project not found"
         )
-    proj.styles.update_style(style.name, style.styles)
+
+    sstyle = Style(proj, style.name)
+    sstyle.update(style.styles)
     return Response(status_code=status.HTTP_200_OK)
 
 
@@ -368,7 +379,9 @@ def delete_style(style: ActionStyleData, current_user: User = Depends(get_curren
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Project not found"
         )
-    proj.styles.delete_style(style.name)
+
+    sstyle = Style(proj, style.name)
+    sstyle.delete()
     return Response(status_code=status.HTTP_200_OK)
 
 
@@ -380,9 +393,11 @@ def rename_style(style: RenameStyleData, current_user: User = Depends(get_curren
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Project not found"
         )
-    if proj.styles.rename_style(style.old, style.new):
+
+    sstyle = Style(proj, style.old)
+    if sstyle.rename(style.new):
         return Response(status_code=status.HTTP_200_OK)
     raise HTTPException(
             status_code=status.HTTP_409_CONFLICT,
-            detail=f"Style {style.name} already exists"
+            detail=f"Style {style.old} already exists"
         )

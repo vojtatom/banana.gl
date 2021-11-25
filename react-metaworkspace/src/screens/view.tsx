@@ -19,7 +19,6 @@ function useWindowSize() {
     return size;
 }
 
-
 export function View() {
     const { project_name } = useParams<{ project_name: string }>();
     const [width, height] = useWindowSize();
@@ -30,17 +29,16 @@ export function View() {
         if (canvas.current == null)
             return;
 
-        const engine = new MetacityEngine(project_name, canvas.current);
+        const engine = new MetacityEngine(project_name, canvas.current as HTMLCanvasElement);
         engine.init();
         setEngine(engine);
-
         engine.renderer.frame();
-
+        
         return () => {
-            engine.exit();
             window.location.reload();
         };
-
+        
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [project_name]);
 
 
@@ -49,7 +47,7 @@ export function View() {
             return;
 
         engine.controls?.resize(width, height);
-    }, [width, height]);
+    }, [width, height, engine]);
 
     return (
         <Pane className="canvasAnchor">
@@ -57,7 +55,8 @@ export function View() {
             <ViewMenu engine={engine} />
             <canvas
                 ref={canvas}
-                onDoubleClick={(event) => { if (!engine) return; engine.controls?.doubleclick(event.clientX, event.clientY) }}
+                onMouseDown={(event) => {if (!engine) return; engine.controls?.mouseDown(event.clientX, event.clientY, event.timeStamp, event.button); }}
+                onMouseUp={(event) => { if (!engine) return; engine.controls?.mouseUp(event.clientX, event.clientY, event.timeStamp, event.button); }}
                 onKeyDown={(event) => { if (event.repeat || !engine) return; engine.controls?.keyDown(event.code); }}
                 onKeyUp={(event) => { if (event.repeat || !engine) return; engine.controls?.keyUp(event.code); }}
                 tabIndex={0}
