@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 setup(
     name="metaworkspace",
     packages=find_packages("."),
-    version="0.1.1",
+    version="0.1.2",
     description="Python tool simplyfing work with Metacity Modules",
     long_description=README,
     long_description_content_type="text/markdown",
