@@ -1,9 +1,9 @@
-import { Pane, Heading, Button, Paragraph, Link } from 'evergreen-ui'
+import { Pane, Heading, Button, Paragraph, Link, Tooltip } from 'evergreen-ui'
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import iaxios from '../axios';
 import { apiurl, url } from '../url';
-import { EvergreenReactRouterLink } from './elements/header';
+import { EvergreenReactRouterLink, Header } from './elements/header';
 
 
 export function Home() {
@@ -12,7 +12,6 @@ export function Home() {
 
   const getProjects = () => {
     iaxios.get(apiurl.LISTPROJECT).then((response) => {
-      console.log(response.data);
       setProjects(response.data);
     });
   }
@@ -25,11 +24,12 @@ export function Home() {
   }, []);
 
   return (
+    <>
     <Pane className="home">
       <Heading className="homeHeading">Metacity</Heading>
       <Pane className="homeProjectList">
         {projects.map((project, index) => (
-          <Button height={48} key={index} onClick={() => history.push(url.VIEW + project)}>
+          <Button height={48} key={index} appearance="minimal" onClick={() => history.push(url.VIEW + project)}>
             {project}
           </Button>)
         )}
@@ -38,5 +38,6 @@ export function Home() {
         Go to Controls
       </EvergreenReactRouterLink>
     </Pane>
+    </>
   );
 }

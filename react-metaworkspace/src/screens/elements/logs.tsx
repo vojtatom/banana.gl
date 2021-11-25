@@ -16,7 +16,6 @@ export function LogList() {
 
     const loadLogs = () => {
         iaxios.get(apiurl.LISTLOGS).then((response) => {
-            console.log(response.data);
             setLogs(response.data);
             update = setTimeout(loadLogs, 2000);
         });

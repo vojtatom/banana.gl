@@ -1,5 +1,6 @@
 from metaworkspace.runtime.processing.jobs import job
 from metaworkspace.runtime.workspace import mws
+from metacity.core.layout import build_layout
 
 
 class JobBuildLayout(job.Job):
@@ -23,7 +24,7 @@ class JobBuildLayout(job.Job):
     def run(self):
         proj = mws.get_project(self.project)
         self.update_status("building layout")
-        proj.build_layout()
+        build_layout(proj)
         self.update_status("finished")
 
 

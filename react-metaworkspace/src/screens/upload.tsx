@@ -4,9 +4,6 @@ import { useHistory, useParams } from 'react-router-dom';
 import iaxios from '../axios';
 import { url, apiurl } from '../url';
 import { Header } from './elements/header'
-import { Project } from './elements/project'
-import { ProjectList } from './elements/projectlist'
-import { AddProjectDialog } from './elements/projectadd'
 import { authUser } from './login';
 import { useDropzone } from 'react-dropzone';
 import { toast } from 'react-toastify';
@@ -41,7 +38,7 @@ function Dropzone(props: IDropzone) {
                     <ul className="filelist">{files}</ul>
                 </div>
             </form>
-            <Button marginRight={16} appearance="primary" type="submit" form="layerUploadForm">
+            <Button appearance="primary" type="submit" form="layerUploadForm">
                 Upload
             </Button>
         </Pane>
@@ -59,19 +56,19 @@ export function UploadLayer() {
 
     useEffect(() => {
         authUser(history, () => { });
-    }, []);
+    });
 
     const submit = (layer_name: string, files: File[]) => {
         if (uploading)
             return;
 
-        if (layer_name === undefined || layer_name.length == 0)
+        if (layer_name === undefined || layer_name.length === 0)
         {
             toast('No name specified');
             return;
         }
 
-        if (files === undefined || files.length == 0)
+        if (files === undefined || files.length === 0)
         {
             toast('No files provided');
             return;
@@ -92,7 +89,6 @@ export function UploadLayer() {
             },
             onUploadProgress: progressEvent => setProgress(progressEvent.loaded / progressEvent.total * 100)
         }).then((response) => {
-            console.log(response);
             history.push(url.JOBS);
         })
     }

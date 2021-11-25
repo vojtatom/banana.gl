@@ -7,7 +7,6 @@ import { url, apiurl } from '../url';
 
 export function authUser(history: any, callback: CallableFunction) {
     iaxios.get(apiurl.AUTHUSER).then((response) => {
-        console.log('user auth', response.data);
         callback();
     }).catch((reject) => {
         history.push(url.LOGIN);
@@ -34,7 +33,6 @@ export function Login() {
         "Content-Type": "multipart/form-data"
       }
     }).then((response) => {
-      console.log(response);
       localStorage.setItem("JWT", response.data.access_token);
       iaxios.defaults.headers.common["Authorization"] = `Bearer ${response.data.access_token}`;
       history.push(url.PROJECTS);

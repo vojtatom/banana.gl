@@ -5,9 +5,6 @@ export type IBBox = [[number, number, number], [number, number, number]];
 export type IVecBBox = [Vector3, Vector3];
 export type IBRect = [[number, number], [number, number]];
 
-export type NumToStr = { [id: number]: string };
-export type StrToNum = { [ois: string]: number };
-
 export interface ITile {
     box: IBBox,
     x: number,
@@ -33,17 +30,7 @@ export interface ILayerData extends ILayerBaseData {
 export interface IOverlayData extends ILayerBaseData {
     source: string,
     target: string
-}
-
-export interface ILayer {
-    name: string,
-    project: string,
-    focus(point: Vector2): void,
-}
-
-export interface IOverlay extends ILayer{
-    source: string,
-    target: string
+    size: [number, number]
 }
 
 export interface IAttribute {
@@ -56,4 +43,12 @@ export interface IModel {
     tags: {[name: string]: any},
     type: string,
     vertices: string
+}
+
+export interface ILayerStyle {
+    pickable?: boolean;
+    visible?: boolean;
+    buffer?: string | Uint8Array; 
+    buffer_source?: string | Uint8Array;
+    buffer_target?: string | Uint8Array;
 }

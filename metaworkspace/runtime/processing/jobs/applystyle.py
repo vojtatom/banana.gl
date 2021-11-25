@@ -1,8 +1,10 @@
 from metaworkspace.runtime.processing.jobs import job
 from metaworkspace.runtime.workspace import mws
-from metacity.styles.styles import Style
+from metacity.core.styles.apply import apply_style
 
 class JobApplyStyle(job.Job):
+    TYPE = 'applystyle'
+
     def __init__(self):
         super().__init__()
 
@@ -25,8 +27,11 @@ class JobApplyStyle(job.Job):
         self.update_status("getting style")
         proj = mws.get_project(self.project)
         self.update_status("parsing style")
-        style = Style(proj, self.style_name)
-        style.parse()
-        self.update_status("applying style")
-        style.apply()
+       
+        try:
+            apply_style(proj, self.style_name)
+        except Exception:
+            self.update_status("parsing failed") 
+            return
+
         self.update_status("finished")

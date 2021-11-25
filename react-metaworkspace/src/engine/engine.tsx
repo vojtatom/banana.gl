@@ -1,53 +1,140 @@
-import { Vector2 } from "three";
+import { Renderer } from "./renderer/renderer";
+import { Selector } from "./renderer/selector";
+import { Project } from "./datamodel/project";
 import iaxios from "../axios";
-import { Layer, Overlay } from "./layer";
-import { Renderer } from "./renderer";
-import { ILayer } from "./types";
+import { apiurl } from "../url";
 
 
-export class MetacityEngine {
-    project: string;
-    canvas: HTMLCanvasElement;
-    
+export class EngineControls {
     renderer: Renderer;
-    layers: ILayer[];
+    project: Project;
+    keymap: {[key: string]: boolean};
+    showMetaCallback?: (meta: {[name: string]: any}) => void;
+    closeMetaCallback?: () => void;
+    updateCompasCallback?: (angle: number) => void;
+    clickTime: number;
 
-    constructor(project: string, canvas: HTMLCanvasElement) {
+    constructor(renderer: Renderer, project: Project) {
+        this.renderer = renderer;
         this.project = project;
-        this.canvas = canvas;
-        this.renderer = new Renderer(this.canvas);
-        this.layers = [];
+        this.keymap = {};
+        this.clickTime = 0;
     }
 
-    init() {
-        iaxios.get(`/api/data/${this.project}/layout.json`).then((response) => {
-            for (const layer of response.data)
-            {
-                if(!layer.init)
-                    continue;
-                
-                if (layer.type === "layer")
-                    this.layers.push(new Layer(this.renderer, this.project, layer));
-                if (layer.type === "overlay")
-                    this.layers.push(new Overlay(this.renderer, this.project, layer));
+    select(oid: number) {
+        this.renderer.select(oid);
+    }
 
-            }
+    selectCoord(x: number, y: number) {
+        const selected = this.renderer.click(x, y);
+
+        if (!selected)
+            return;
+
+        iaxios.post(apiurl.GETMETA, {
+            project: this.project.name,
+            layer: selected.layer,
+            oid: selected.oid
+        }).then(res => {
+            console.log(res.data);
+            const data = res.data;
+            data['oid'] = selected.oid;
+            data['layer'] = selected.layer;
+
+            if (this.showMetaCallback)
+                this.showMetaCallback(res.data);
         });
-
-        this.renderer.controls.addEventListener('change', () => this.moved())
     }
 
-    moved() {
-        const fp = this.renderer.focus_point
-        const fp2 = new Vector2(fp.x, fp.y);
-        for (let layer of this.layers) {
-            layer.focus(fp2);
+    mouseDown(x: number, y: number, time: number, button: number) {
+        this.clickTime = time;
+    }
+
+    mouseUp(x: number, y: number, time: number, button: number) {
+        const duration = time - this.clickTime;
+
+        if (duration < 200)
+        {
+            if (button === 0)
+                this.selectCoord(x, y);
+            else if (button === 2 && this.closeMetaCallback)
+                this.closeMetaCallback();
         }
+
+        
+
+        this.clickTime = time;
+    }
+
+    keyDown(key: string) {
+        console.log('key down', key);
+        this.keymap[key] = true;
+    }
+
+    keyUp(key: string) {
+        console.log('key up', key);
+        this.keymap[key] = false;
+    }
+
+    actions() {
+        if (this.keymap['KeyU'])
+        {
+            this.renderer.updateHelper();
+            this.keymap['KeyU'] = false;
+        }
+    }
+
+    swapCamera() {
+        this.renderer.controls.swap();
         this.renderer.changed = true;
     }
 
-    doubleclick(x: number, y: number) {
-        this.renderer.click(x, y);
+    resize(x: number, y: number) {
+        this.renderer.resize(x, y);
+    }
+
+    zoomIn() {
+        this.renderer.controls.zoomIn(10);
+        this.renderer.changed = true;
+    }
+
+    zoomOut() {
+        this.renderer.controls.zoomOut(10);
+        this.renderer.changed = true;
+    }
+}
+
+
+export class MetacityEngine {
+    project_name: string;
+    canvas: HTMLCanvasElement;
+    
+    renderer: Renderer;
+    selector: Selector;
+    project!: Project;
+
+    controls?: EngineControls;
+
+    constructor(project_name: string, canvas: HTMLCanvasElement) {
+        this.project_name = project_name;
+        this.canvas = canvas;
+        this.renderer = new Renderer(this.canvas,  () => {
+            if (this.controls)
+                this.controls.actions();
+        });
+        this.selector = new Selector(this.renderer);
+    }
+
+    init() {
+        this.project = new Project(this.project_name, this.renderer);
+        this.controls = new EngineControls(this.renderer, this.project);
+        this.renderer.controls.controls.addEventListener('change', () => this.moved())
+    }
+
+    moved() {
+        this.project.updateVisibleRadius(this.renderer.controls.target);        
+        this.renderer.compas.update(this.controls?.updateCompasCallback);
+        this.renderer.changed = true;
     }
 
     exit() {
