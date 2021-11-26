@@ -30,7 +30,8 @@ class JobApplyStyle(job.Job):
        
         try:
             apply_style(proj, self.style_name)
-        except Exception:
+        except Exception as e:
+            self.update_status(e)
             self.update_status("parsing failed") 
             return
 

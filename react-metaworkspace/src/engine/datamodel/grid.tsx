@@ -1,7 +1,7 @@
 import { Vector2, Vector3 } from "three";
 import { Renderer } from "../renderer/renderer";
 import { Tile } from "./tile";
-import { IVecBBox, ILayout } from "../types";
+import { IVecBBox, IGrid } from "../types";
 import { Layer, Overlay } from "./layer";
 import { LayerStyle } from "../renderer/style";
 
@@ -56,7 +56,7 @@ export class Grid {
     readonly zero2: Vector2;
     layer: Layer | Overlay;
     
-    constructor(data: ILayout, renderer: Renderer, layer: Layer | Overlay) {
+    constructor(data: IGrid, renderer: Renderer, layer: Layer | Overlay) {
         this.tileSize = data.tile_size;
         this.renderer = renderer;
         this.layer = layer;
@@ -92,7 +92,7 @@ export class Grid {
         }
     }
     
-    private createTiles(data: ILayout, renderer: Renderer, layer: Layer | Overlay) {
+    private createTiles(data: IGrid, renderer: Renderer, layer: Layer | Overlay) {
         for (const tiledata of data.tiles) {
             let idx = toSpiral(tiledata.x, tiledata.y);
             const tile = new Tile(tiledata, renderer, layer);

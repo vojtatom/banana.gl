@@ -12,7 +12,7 @@ abstract class LayerBase {
     name: string;
     project: string;
     renderer: Renderer;
-    grid!: Grid; //undefined if the layer is not visible
+    grid?: Grid; //undefined if the layer is not visible
     style?: LayerStyle;
     visibility: boolean;
 
@@ -40,11 +40,18 @@ abstract class LayerBase {
     }
     
     init(data: ILayerBaseData) {
-        this.grid = new Grid(data.layout, this.renderer, this as any);
-        console.log(this.grid.center);
-        this.renderer.controls.focus(this.grid.center);
-        this.grid.updateVisibleTiles(this.renderer.controls.target);
-        this.renderer.changed = true;
+        if (data.grid)
+        {
+            this.grid = new Grid(data.grid, this.renderer, this as any);
+            this.renderer.controls.focus(this.grid.center);
+            this.grid.updateVisibleTiles(this.renderer.controls.target);
+            this.renderer.changed = true;
+        }
+
+        if (data.timeline)
+        {
+
+        }
     }
 
     updateVisibleRadius(point: THREE.Vector3) {
@@ -56,21 +63,26 @@ abstract class LayerBase {
     }
 
     hide() {
-        this.grid.hide();
+        if (this.grid)
+            this.grid.hide();
         this.renderer.changed = true;
     }
     
     show() {
-        this.grid.reloadVisibility();
+        if (this.grid)
+            this.grid.reloadVisibility();
         this.renderer.changed = true;
     }
 
     setVisibleRadius(radius: number) {
-        this.grid.visible_radius = radius;
-        if (this.visible) {
-            this.grid.reloadVisibility();
-            this.renderer.changed = true;
+        if (this.grid)
+        {
+            this.grid.visible_radius = radius;
+            if (this.visible)
+                this.grid.reloadVisibility();
         }
+
+        this.renderer.changed = true;
     }
 
     applyStyle(style: string) {
@@ -83,14 +95,16 @@ abstract class LayerBase {
         }).then((response) => {
             const style = new LayerStyle(response.data, (lstyle: LayerStyle) => {
                 this.style = lstyle;
-                for (let [_, tile] of this.grid.tiles) {
-                    this.applyStyleToModels(tile.models);
+
+                if (this.grid)
+                {
+                    for (let [_, tile] of this.grid.tiles) {
+                        this.applyStyleToModels(tile.models);
+                    }
                 }
             });
         }).catch((_) => {
-            for (let [_, tile] of this.grid.tiles) {
-                this.applyStyleToModels(tile.models);
-            }
+            this.clearStyle();
         });
     }
 
@@ -98,21 +112,24 @@ abstract class LayerBase {
 
     clearStyle() {
         this.style = undefined;
-        for (let [_, tile] of this.grid.tiles) {
-            this.applyStyleToModels(tile.models);
-        }
+        if (this.grid)
+            for (let [_, tile] of this.grid.tiles) {
+                this.applyStyleToModels(tile.models);
+            }
     }
 
     enableCache() {
-        for (let [_, tile] of this.grid.tiles) {
-            tile.enableCache();
-        }
+        if (this.grid)
+            for (let [_, tile] of this.grid.tiles) {
+                tile.enableCache();
+            }
     }
 
     disableCache() {
-        for (let [_, tile] of this.grid.tiles) {
-            tile.disableCache();
-        }
+        if (this.grid)
+            for (let [_, tile] of this.grid.tiles) {
+                tile.disableCache();
+            }
     }
 }
 

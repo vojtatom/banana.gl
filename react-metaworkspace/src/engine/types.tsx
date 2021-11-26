@@ -12,13 +12,19 @@ export interface ITile {
     file: string
 }
 
-export interface ILayout {
+export interface IGrid {
+    tile_size: number,
+    tiles: ITile[]
+}
+
+export interface ITimeline {
     tile_size: number,
     tiles: ITile[]
 }
 
 export interface ILayerBaseData {
-    layout: ILayout,
+    grid?: IGrid,
+    timeline?: ITimeline,
     name: string,
     init: boolean,  
 }

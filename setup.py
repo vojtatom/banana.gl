@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 setup(
     name="metaworkspace",
     packages=find_packages("."),
-    version="0.1.2",
+    version="0.1.6",
     description="Python tool simplyfing work with Metacity Modules",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -25,7 +25,7 @@ setup(
     ],
     python_requires='>=3.8', # Minimum version requirement of the package
     install_requires=[
-        "metacity>=0.1.4",
+        "metacity>=0.1.6",
         "requests>=2.26.0",
         "twine>=3.4.2",
         "fastapi>=0.68.1",
