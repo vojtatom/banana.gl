@@ -1,5 +1,5 @@
 
-const STEP = 1000;
+const STEP = 10000;
 
 export class Decoder {
     static base64tofloat32(data: string,  abort: CallableFunction, callback: CallableFunction) {   
@@ -62,8 +62,8 @@ export class Decoder {
 
     static base64touint8(data: string, callback: CallableFunction) {
         let i = 0, j = 0;
-        const step = 16 * STEP;
-        const length = Math.floor((data.length / 16) * 3);
+        const step = 4 * STEP;
+        const length = Math.floor((data.length / 4) * 3);
         let buffer = new Uint8Array(length);
 
         const iter = () => {

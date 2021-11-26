@@ -2,6 +2,7 @@ import os
 import shutil
 
 from metacity.core.grid.grid import build_grid
+from metacity.core.timeline import build_timeline
 from metacity.core.layout import build_layout
 from metacity.io.parse import parse
 from metaworkspace.runtime.processing.jobs import job
@@ -38,6 +39,8 @@ class JobLoadDataset(job.Job):
         layer.persist()
         self.update_status("building grid")
         build_grid(layer)
+        self.update_status("building timeline")
+        build_timeline(layer)
         self.update_status("building layout")
         build_layout(proj)
         self.update_status("finished")

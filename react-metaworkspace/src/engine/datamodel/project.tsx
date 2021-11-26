@@ -26,9 +26,10 @@ export class Project {
         }).then((response) => {
             const styles = response.data.styles;
             this.styles = styles;
+            console.log(response.data);
             for (const layer of response.data.layers)
             {
-                if(!layer.init || layer.disabled)
+                if(layer.disabled || !(layer.grid || layer.timeline))
                     continue;
                 
                 if (layer.type === "layer")
@@ -37,7 +38,7 @@ export class Project {
 
             for (const overlay of response.data.layers)
             {
-                if(!overlay.init || overlay.disabled)
+                if(overlay.disabled || !(overlay.grid || overlay.timeline))
                     continue;
                 
                 if (overlay.type === "overlay")
