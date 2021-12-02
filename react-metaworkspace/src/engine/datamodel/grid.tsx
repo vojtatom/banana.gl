@@ -3,7 +3,6 @@ import { Renderer } from "../renderer/renderer";
 import { Tile } from "./tile";
 import { IVecBBox, IGrid } from "../types";
 import { Layer, Overlay } from "./layer";
-import { LayerStyle } from "../renderer/style";
 
 
 function getNthTriangularNumber(n: number) {

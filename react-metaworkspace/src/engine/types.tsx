@@ -12,14 +12,19 @@ export interface ITile {
     file: string
 }
 
+export interface IInterval {
+    start_time: number;
+    file: string;
+}
+
 export interface IGrid {
     tile_size: number,
     tiles: ITile[]
 }
 
 export interface ITimeline {
-    tile_size: number,
-    tiles: ITile[]
+    interval_length: number,
+    intervals: IInterval[]
 }
 
 export interface ILayerBaseData {
@@ -49,6 +54,26 @@ export interface IModel {
     tags: {[name: string]: any},
     type: string,
     vertices: string
+}
+
+export interface IMovement {
+    from: string[];
+    from_speed: string[];
+    to: string[];
+    to_speed: string[];
+    oid: string[];
+    start_time: number;
+    end_time: number;
+    length: number
+}
+
+export interface IMove {
+    from: string;
+    to: string;
+    oid: string;
+    time: number;
+    from_speed: string;
+    to_speed: string;
 }
 
 export interface ILayerStyle {

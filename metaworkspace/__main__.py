@@ -49,7 +49,7 @@ def run(mws: MetacityWorkspace, ip_adress, port):
     server_log = open(mws.server_log, 'w+')
     jobs_log = open(mws.jobs_log, 'w+')
     
-    proc = subprocess.Popen(["uvicorn", "metaworkspace.runtime.api.server:app", "--workers", "6", "--host", str(ip_adress), "--port", str(port)], 
+    proc = subprocess.Popen(["uvicorn", "metaworkspace.runtime.api.server:app", "--workers", "20", "--host", str(ip_adress), "--port", str(port)], 
                             stdout=server_log,
                             stderr=server_log)
 

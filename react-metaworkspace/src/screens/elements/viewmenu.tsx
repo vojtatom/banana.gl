@@ -98,13 +98,14 @@ function SettingsMenu(props: { engine: MetacityEngine | undefined, visible: bool
     const { engine, visible } = props;
     const [radius, setRadius] = useState<number>(2000);
     const [pointSize, setPointSize] = useState<number>(1);
+    const [lineWidth, setLineWidth] = useState<number>(5);
     const [shadows, setShadows] = useState<boolean>(false);
     const [cache, setCache] = useState<boolean>(false);
 
     useEffect(() => {
         if (!engine)
             return;
-        Promise.resolve(1).then(() => engine.project.setVisibleRadius(radius));
+        Promise.resolve(1).then(() => engine.controls?.setVisibleRadius(radius));
     }, [engine, radius]);
 
 
@@ -112,10 +113,7 @@ function SettingsMenu(props: { engine: MetacityEngine | undefined, visible: bool
         if (!engine)
             return;
         Promise.resolve(1).then(() => {
-            if (shadows)
-                engine.project.renderer.enableShadows();
-            else
-                engine.project.renderer.disableShadows();
+            engine.controls?.useShadows(shadows);
         });
     }, [engine, shadows]);
 
@@ -123,15 +121,21 @@ function SettingsMenu(props: { engine: MetacityEngine | undefined, visible: bool
         if (!engine)
             return;
         Promise.resolve(1).then(() => {
-            engine.project.useCache(cache);
+            engine.controls?.useCache(cache);
         });
     }, [engine, cache]);
 
     useEffect(() => {
         if (!engine)
             return;
-        Promise.resolve(1).then(() => engine.project.setPointSize(pointSize));
+        Promise.resolve(1).then(() => engine.controls?.setPointSize(pointSize));
     }, [engine, pointSize]);
+
+    useEffect(() => {
+        if (!engine)
+            return;
+        Promise.resolve(1).then(() => engine.controls?.setLineWidth(lineWidth));
+    }, [engine, lineWidth]);
 
     const updateRadius = (value: string) => {
         const v = parseInt(value);
@@ -144,6 +148,13 @@ function SettingsMenu(props: { engine: MetacityEngine | undefined, visible: bool
         const v = parseFloat(value);
         if (v !== pointSize) {
             setPointSize(v);
+        }
+    }
+
+    const updateLineWidth = (value: string) => {
+        const v = parseFloat(value);
+        if (v !== pointSize) {
+            setLineWidth(v);
         }
     }
 
@@ -171,13 +182,19 @@ function SettingsMenu(props: { engine: MetacityEngine | undefined, visible: bool
                         <Pane className="setting">
                             <Heading size={100}>Visible Radius: {radius}</Heading>
                             <Pane className="controls">
-                                <input type="range" className="visibleRange" min={0} max={20000} step={1000} defaultValue={radius} onChange={(e) => updateRadius(e.target.value)} />
+                                <input type="range" min={0} max={20000} step={1000} defaultValue={radius} onChange={(e) => updateRadius(e.target.value)} />
                             </Pane>
                         </Pane>
                         <Pane className="setting">
                             <Heading size={100}>Point Size: {pointSize}</Heading>
                             <Pane className="controls">
-                                <input type="range" className="visibleRange" min={0} max={5} step={0.1} defaultValue={pointSize} onChange={(e) => updatePointSize(e.target.value)} />
+                                <input type="range" min={0} max={5} step={0.1} defaultValue={pointSize} onChange={(e) => updatePointSize(e.target.value)} />
+                            </Pane>
+                        </Pane>
+                        <Pane className="setting">
+                            <Heading size={100}>Line width: {lineWidth}</Heading>
+                            <Pane className="controls">
+                                <input type="range" min={0} max={10} step={0.1} defaultValue={lineWidth} onChange={(e) => updateLineWidth(e.target.value)} />
                             </Pane>
                         </Pane>
                         <Pane className="setting">
@@ -264,8 +281,8 @@ export function ViewMenu(props: { engine: MetacityEngine | undefined }) {
 
 
     return (
-        <>
-            <Pane className="viewControls">
+        <Pane className="viewControls">
+            <Pane className="controlBar">
                 <Tooltip content="Layers" >
                     <IconButton icon={LayersIcon} className={menu === Menu.Layers && menuShown ? "active" : ""} appearance="minimal" onClick={() => toggleMenu(Menu.Layers)} />
                 </Tooltip>
@@ -293,6 +310,6 @@ export function ViewMenu(props: { engine: MetacityEngine | undefined }) {
                 <StyleMenu engine={engine}    visible={menu === Menu.Styles}/>
                 <SettingsMenu engine={engine} visible={menu === Menu.Settings}/>
             </SideMenu>
-        </>
+        </Pane>
     )
 }

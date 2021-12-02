@@ -1,6 +1,7 @@
 import { Renderer } from "./renderer/renderer";
 import { Selector } from "./renderer/selector";
 import { Project } from "./datamodel/project";
+import { MainTimeline } from "./datamodel/maintimeline";
 import iaxios from "../axios";
 import { apiurl } from "../url";
 
@@ -9,6 +10,8 @@ export class EngineControls {
     renderer: Renderer;
     project: Project;
     keymap: {[key: string]: boolean};
+
+
     showMetaCallback?: (meta: {[name: string]: any}) => void;
     closeMetaCallback?: () => void;
     updateCompasCallback?: (angle: number) => void;
@@ -102,6 +105,38 @@ export class EngineControls {
         this.renderer.controls.zoomOut(10);
         this.renderer.changed = true;
     }
+
+    setPointSize(size: number){
+        this.renderer.setPointSize(size);
+    }
+
+    setLineWidth(size: number){
+        console.log(size);
+        this.renderer.setLineWidth(size);
+    }
+
+    updateVisibleRadius(target: THREE.Vector3) {
+        this.project.updateVisibleRadius(target);
+    }
+
+    setVisibleRadius(radius: number) {
+        this.project.setVisibleRadius(radius);
+    }
+
+    useCache(enable: boolean){
+        this.project.useCache(enable);
+    }
+
+    applyStyle(style: string){
+        this.project.applyStyle(style);
+    }
+
+    useShadows(enable: boolean){
+        if (enable)
+            this.renderer.enableShadows();
+        else
+            this.renderer.disableShadows();
+    }
 }
 
 
@@ -118,10 +153,12 @@ export class MetacityEngine {
     constructor(project_name: string, canvas: HTMLCanvasElement) {
         this.project_name = project_name;
         this.canvas = canvas;
+        
         this.renderer = new Renderer(this.canvas,  () => {
             if (this.controls)
                 this.controls.actions();
         });
+
         this.selector = new Selector(this.renderer);
     }
 

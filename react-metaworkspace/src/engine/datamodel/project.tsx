@@ -26,7 +26,6 @@ export class Project {
         }).then((response) => {
             const styles = response.data.styles;
             this.styles = styles;
-            console.log(response.data);
             for (const layer of response.data.layers)
             {
                 if(layer.disabled || !(layer.grid || layer.timeline))
@@ -56,10 +55,6 @@ export class Project {
     setVisibleRadius(radius: number) {
         for(let layer of this.layers)
             layer.setVisibleRadius(radius);
-    }
-
-    setPointSize(size: number){
-        this.renderer.setPointSize(size);
     }
 
     useCache(enable: boolean){
