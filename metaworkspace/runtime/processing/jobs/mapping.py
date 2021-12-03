@@ -37,7 +37,7 @@ class JobMapping(job.Job):
         source = proj.get_layer(self.source)
         target = proj.get_layer(self.target)
         self.update_status('mapping')
-        update = lambda it: self.update_status(f'mapping tile {it}')
+        update = lambda it: self.update_status(it)
         build_overlay(overlay, source, target, update)
         overlay.persist()
         self.update_status('building layout')

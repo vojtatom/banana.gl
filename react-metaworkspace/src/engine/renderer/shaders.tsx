@@ -895,7 +895,7 @@ export class MaterialLibrary {
 	}
 
 	setSelectedID(id: number[]) {
-		this.lineMaterial.uniforms.selectedID = { value: id };
+		this.polygonMaterial.uniforms.selectedID = { value: id };
 		this.polygonMaterial.uniformsNeedUpdate = true;
 		this.lineMaterial.uniforms.selectedID = { value: id };
 		this.lineMaterial.uniformsNeedUpdate = true;

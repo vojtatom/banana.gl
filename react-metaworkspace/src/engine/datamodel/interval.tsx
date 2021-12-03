@@ -109,4 +109,11 @@ export class Interval {
 
         this.moves[this.acitve].visible = false;
     }
+
+    show() {
+        if (this.acitve === -1)
+            return;
+
+        this.moves[this.acitve].visible = true;
+    }
 }

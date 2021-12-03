@@ -155,5 +155,10 @@ export class Timeline {
 
     show() {
         this.visible = true;
+
+        if (this.active === -1)
+            return;
+
+        this.intervals[this.active].show();
     }
 }
