@@ -160,10 +160,6 @@ function TimelineMenu(props: { engine: MetacityEngine | undefined, visible: bool
         setPlay(engine.controls.getPlay());
         setSpeed(engine.controls.getSpeed());
     }, [engine]);
-
-   const setRangeTime = (e: any) => {
-        setTime(parseInt(e.target.value));
-   }
         
     const pad = (n: number) => {
         return n.toString().padStart(2, '0');
