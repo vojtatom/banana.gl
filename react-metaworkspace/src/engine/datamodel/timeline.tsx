@@ -4,13 +4,26 @@ import { Layer, Overlay } from "./layer";
 import { Interval } from "./interval"
 import { ge, le } from "binary-search-bounds"
 
-const LOADTIMEMARGIN = 2; //in seconds
+const MINPRELOAD = 2;
+const PRELOADI = 5;
+const LOADTIMEMARGIN = PRELOADI * 60; //in seconds
+
+enum LoadStatus {
+    loading,
+    wontload,
+    loaded
+};
 
 export class Timeline {
     intervals: Interval[];
     intervalLength: number;
     isVisible: boolean;
     active: number;
+    start: number;
+    end: number;
+    fillingBuffer: boolean;
+
+    loaded: Map<number, LoadStatus>;
 
     constructor(data: ITimeline, renderer: Renderer, layer: Layer | Overlay) {
         this.intervals = [];
@@ -18,10 +31,15 @@ export class Timeline {
         this.active = -1;
         this.isVisible = true;
 
+        this.fillingBuffer = true;
+        this.loaded = new Map();
+
         for (const idata of data.intervals)
             this.intervals.push(new Interval(idata, this.intervalLength, renderer, layer));
 
         this.intervals.sort((a, b) => a.start - b.start)
+        this.start = this.intervals[0].start;
+        this.end = this.intervals[this.intervals.length - 1].start + this.intervalLength;
 
         renderer.timeline.addTimeline(this);
     }
@@ -38,71 +56,92 @@ export class Timeline {
             this.hide();
     }
 
+    get countLoaded() {
+        let count = 0;
+        for (const status of this.loaded.values())
+            if (status !== LoadStatus.loading)
+                count++;
+        return count;
+    }
+
+    get ready() {
+        const cl = this.countLoaded;
+
+        if (this.fillingBuffer){
+            if (cl >= MINPRELOAD)
+            {
+                this.fillingBuffer = false;
+                return true;
+            }
+            return false;
+        }
+        return cl >= MINPRELOAD;
+    }
+
     render(time: number) {
         if (!this.isVisible)
             return;
 
-        //console.log(this.active, time);
-        if (this.active !== -1) {
-            //there is nothing to render in the active interval
-            if (!this.intervals[this.active].contains(time))
-                this.load(time);
+        this.updateLoaded(time);  
 
-            //be happy and render the interval you have in memory
-            if (this.isTimeToPreload(time))
-                this.preload(time);
+        if (!this.intervals[this.active] || !this.intervals[this.active].contains(time))
+            this.swapActive(time);
 
-            //render was succesfull
+        if (this.active !== -1)
             this.intervals[this.active].render(time);
-            return true;
-        } else {
-            //load the freaking interval, we need it rn
-            return this.load(time);
+    }
+
+
+    updateLoaded(time: number) {
+        const current = this.current(time);
+        for (let i = current; i < current + PRELOADI; i++)
+            this.loadInterval(i);
+        this.discard(current);
+    }
+
+    swapActive(time: number) {
+        const i = this.current(time);
+        this.active = -1;
+        if (this.intervals[i].init) {
+            this.active = i;
         }
     }
 
-    isTimeToPreload(time: number) {
-        if (this.active === -1)
-            return false;
-        return time > (this.intervals[this.active].start + this.intervalLength - LOADTIMEMARGIN);
-    }
-
-    next(time: number) {
-        const interval: number = ge(this.intervals, {start: time} as Interval, (a, b) => a.start - b.start);
-        return interval;
-    }
-
-    current(time: number) {
+    private current(time: number) {
         const interval: number = le(this.intervals, {start: time} as Interval, (a, b) => a.start - b.start);
         return interval;
     }
 
-    preload(time: number) {
-        const next = this.next(time);
-        //possibly preload more intervals
+    private loadInterval(index: number) {
+        const interval = this.intervals[index];
 
-        console.log("preloading", next);
-        this.intervals[next].load();
-    }
-    
-    load(time: number) {
-        const i = this.current(time);
-        if (i === -1)
+        if (!interval) {
+            this.loaded.set(index, LoadStatus.wontload);
             return;
-
-        if (this.intervals[i].contains(time))
-        {
-            if (this.active !== -1)
-                this.intervals[this.active].remove();
-                
-            if (this.intervals[i].init) {
-                this.active = i;
-            } else {
-                this.active = i;
-                console.log("hotloading", i);
-                this.intervals[i].load();
-            }
         }
+        
+        if (interval.init || interval.loading){
+            return;
+        }
+
+        this.loaded.set(index, LoadStatus.loading);
+        
+        const loading = interval.load(() => {
+            this.loaded.set(index, LoadStatus.loaded);
+        });
+    }
+
+    private discard(nowIndex: number) {        
+        for (const index of this.loaded.keys()) {
+            if (index < nowIndex || index >= nowIndex + PRELOADI)
+                this.unloadInterval(index);
+        }
+    }
+
+    private unloadInterval(index: number) {
+        if (this.loaded.get(index) !== LoadStatus.wontload)
+            this.intervals[index].remove();
+        this.loaded.delete(index);
     }
 
     hide() {

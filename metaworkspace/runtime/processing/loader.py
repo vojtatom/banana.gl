@@ -7,6 +7,7 @@ from metaworkspace.runtime.processing.jobs.mapping import JobMapping
 import json
 import os
 import uuid
+from time import sleep
 
 
 jobs: Dict[str, Type[Job]] = {
@@ -32,11 +33,20 @@ def job_object_hook(data):
      
 def load_job(job_dir):
     jobfile = os.path.join(job_dir, 'job.json')
-    with open(jobfile, 'r') as job_file:
-        job: Job = json.load(job_file, object_hook=job_object_hook)
-    job.job_dir = job_dir
-    job.setup_log(str(uuid.uuid1()))
-    return job
+
+    for _ in range(5):
+        try:
+            with open(jobfile, 'r') as f:
+                job: Job = json.load(f, object_hook=job_object_hook)
+            job.job_dir = job_dir
+            job.setup_log(str(uuid.uuid1()))
+            return job
+        except Exception as e:
+            print(f"Failed to load job: {e}")
+            print(f"Retrying in 5 seconds")
+            sleep(5)
+            return None
+
 
 
 

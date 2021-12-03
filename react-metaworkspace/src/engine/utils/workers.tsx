@@ -58,7 +58,7 @@ export const Decoder = () => {
     }
 }
 
-const POOLSIZE = 10;
+const POOLSIZE = 20;
 
 interface Job {
     data: any,

@@ -16,6 +16,7 @@ export class Interval {
     loading: boolean;
     init: boolean;
     acitve: number;
+    delayedCall?: NodeJS.Timeout;
 
     constructor(data: IInterval, length: number, renderer: Renderer, layer: Layer | Overlay) {
         this.start = data.start_time;
@@ -26,26 +27,39 @@ export class Interval {
         this.layer = layer;
         this.loading = false;
         this.init = false;
+        this.delayedCall = undefined;
         this.acitve = -1;
         this.moves = []
     }
 
-    load() {
+    load(callback: () => void) {
         if (this.loading || this.init)
-            return;
+            return false;
+            
         this.loading = true;
+        this.delayedCall = setTimeout(() => {
+            this.delayedCall = undefined;
+            this.renderer.status.actions.loadingGeometry.start();
+            iaxios.get(`/api/data/${this.layer.project}/${this.layer.name}/timeline/stream/${this.file}`).then(
+                (response) => {
+                    const data = response.data;
+                    this.renderer.status.actions.loadingGeometry.stop();
+                    this.renderer.status.actions.parsingGeometry.start();
+                    deserializeMovement(data, this, (move: Move) => {
+                        this.moves.push(move);
+                        move.visible = false;
+                        if (this.moves.length == this.length)
+                        {
+                            this.renderer.status.actions.parsingGeometry.stop();
+                            this.finalizeInit();
+                            callback();
+                        }
+                    }, () => false);
+                }
+            )    
+        }, 1000);
 
-        iaxios.get(`/api/data/${this.layer.project}/${this.layer.name}/timeline/stream/${this.file}`).then(
-            (response) => {
-                const data = response.data;
-                deserializeMovement(data, this, (move: Move) => {
-                    this.moves.push(move);
-                    move.visible = false;
-                    if (this.moves.length == this.length)
-                        this.finalizeInit();
-                }, () => false);
-            }
-        )    
+        return true;
     }
 
     finalizeInit() {
@@ -62,11 +76,13 @@ export class Interval {
         if (this.acitve === current)
             return;
 
-        console.log("rendering", current, this.acitve);
-
         //do swap
         if (this.acitve !== -1)
             this.moves[this.acitve].visible = false;
+
+        if (current >= this.moves.length)
+            return;
+            
         this.moves[current].visible = true;
         this.acitve = current;
     }
@@ -76,10 +92,13 @@ export class Interval {
     }
 
     remove() {
-        for(const move of this.moves) {
+        for(const move of this.moves)
             move.remove();
-        }
 
+        if (this.delayedCall)
+            clearTimeout(this.delayedCall);
+        
+        this.loading = false;
         this.init = false;
         this.moves = [];
     }

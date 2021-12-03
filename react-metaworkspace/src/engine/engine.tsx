@@ -1,7 +1,6 @@
 import { Renderer } from "./renderer/renderer";
 import { Selector } from "./renderer/selector";
 import { Project } from "./datamodel/project";
-import { MainTimeline } from "./datamodel/maintimeline";
 import iaxios from "../axios";
 import { apiurl } from "../url";
 
@@ -11,10 +10,11 @@ export class EngineControls {
     project: Project;
     keymap: {[key: string]: boolean};
 
-
     showMetaCallback?: (meta: {[name: string]: any}) => void;
     closeMetaCallback?: () => void;
     updateCompasCallback?: (angle: number) => void;
+    updateTimeCallback?: (time: number, start: number, end: number) => void;
+
     clickTime: number;
 
     constructor(renderer: Renderer, project: Project) {
@@ -85,6 +85,10 @@ export class EngineControls {
             this.renderer.updateHelper();
             this.keymap['KeyU'] = false;
         }
+    
+        if (this.updateTimeCallback){
+            this.updateTimeCallback(this.renderer.timeline.time, this.renderer.timeline.start, this.renderer.timeline.end);
+        }
     }
 
     swapCamera() {
@@ -111,7 +115,6 @@ export class EngineControls {
     }
 
     setLineWidth(size: number){
-        console.log(size);
         this.renderer.setLineWidth(size);
     }
 
@@ -136,6 +139,26 @@ export class EngineControls {
             this.renderer.enableShadows();
         else
             this.renderer.disableShadows();
+    }
+
+    setTime(time: number){
+        this.renderer.timeline.time = time;
+    }
+
+    setPlay(play: boolean){
+        this.renderer.timeline.play = play;
+    }
+
+    getPlay(){
+        return this.renderer.timeline.play;
+    }
+
+    setSpeed(speed: number){
+        this.renderer.timeline.speed = speed;
+    }
+    
+    getSpeed(){
+        return this.renderer.timeline.speed;
     }
 }
 

@@ -1,10 +1,20 @@
 import { ENGINE_METHOD_ALL } from "constants";
-import { Button, CompassIcon, EyeOffIcon, EyeOpenIcon, Heading, Icon, IconButton, LayersIcon, MinusIcon, Pane, PlusIcon, SettingsIcon, StyleIcon, Switch, Tooltip  } from "evergreen-ui";
-import { useEffect, useState } from "react"
+import { Button, CompassIcon, TaxiIcon, EyeOffIcon, EyeOpenIcon, Heading, Icon, IconButton, LayersIcon, MinusIcon, Pane, PlusIcon, SettingsIcon, StyleIcon, Switch, TimeIcon, Tooltip, CrossIcon, PlayIcon, PauseIcon, FastForwardIcon, FastBackwardIcon, SymbolCircleIcon, TreeIcon, WalkIcon, TractorIcon, SelectMenu  } from "evergreen-ui";
+import { useEffect, useRef, useState } from "react"
 import { Transform } from "stream";
 import { MetacityEngine } from "../../engine/engine"
-import { SideMenu } from "./sidemenu";
 
+
+function SideMenu(props: {children: any, isShown: boolean, onClose: () => void}) {
+    const { children, isShown, onClose } = props;
+
+    //<IconButton className="closeViewMenu" appearance="minimal" icon={CrossIcon} onClick={onClose}/>
+    return (
+        <Pane className="viewMenu" display={isShown? "block" : "none"}>
+            {children}
+        </Pane>
+    );
+}
 
 
 function StyleMenu(props: { engine: MetacityEngine | undefined, visible: boolean }) {
@@ -87,6 +97,120 @@ function LayerMenu(props: { engine: MetacityEngine | undefined, visible: boolean
                                 <Pane className="layerName">{layer.name}</Pane>
                             </Pane>
                         ))}
+                    </Pane>
+                </>
+            }
+        </>
+    )
+}
+
+
+function TimelineMenu(props: { engine: MetacityEngine | undefined, visible: boolean }) {
+    const { engine, visible } = props;
+    const [time, setTime] = useState<number>(0);
+    const [start, setStart] = useState<number>(0);
+    const [play, setPlay] = useState<boolean>(false);
+    const [end, setEnd] = useState<number>(0);
+    const [speed, setSpeed] = useState<number>(1);
+    const timeRef = useRef<HTMLInputElement>(null);
+
+    const speedOptions = [0.25, 0.5, 1, 2, 5, 10, 20, 30, 60];
+
+
+    const timing = (time: number, start: number, end: number) => {
+        setTime(Math.floor(time));
+
+        setStart(start);
+        setEnd(end);
+    }
+
+    const togglePlay = () => {
+        if (!engine || !engine.controls)
+            return;
+        
+        engine.controls.setPlay(!play);
+        setPlay(!play);
+    }
+
+    const setupTime = () => {
+        const time = timeRef.current?.value;
+        
+        if (!engine || !engine.controls || !time)
+            return;
+        
+        const t = parseFloat(time);
+        if (isNaN(t))
+            return;
+
+        engine.controls.setTime(t);
+    }
+
+    useEffect(() => {
+        if (!engine || !engine.controls)
+            return;
+
+        engine.controls.setSpeed(speed);
+    }, [speed]);
+
+    useEffect(() => {
+        if (!engine || !engine.controls)
+            return;
+
+        engine.controls.updateTimeCallback = timing;
+        setPlay(engine.controls.getPlay());
+        setSpeed(engine.controls.getSpeed());
+    }, [engine]);
+
+   const setRangeTime = (e: any) => {
+        setTime(parseInt(e.target.value));
+   }
+        
+    const pad = (n: number) => {
+        return n.toString().padStart(2, '0');
+    }
+
+    const formatedTime = () => {
+       return pad(Math.floor(time / 3600)) + ':' + pad(Math.floor((time % 3600) / 60)) + ':' + pad(Math.floor(time % 60));
+    }
+    
+    return (
+        <>
+            {visible &&
+                <>
+                    <Heading size={300} className="title">Timeline</Heading>
+                    <Pane className="timeline">
+                        <Pane className="setting">
+                            <Pane display="flex" flexDirection="row" justifyContent="center">
+                                <Pane flexGrow="1">
+                                    <Heading size={100}>Time</Heading>
+                                    <Heading size={400}>{formatedTime()}</Heading>
+                                </Pane>
+                                <Pane>
+                                    <IconButton icon={play ? PauseIcon : PlayIcon} appearance="minimal" onClick={togglePlay} /> 
+                                    <SelectMenu
+                                        title="Select speed"
+                                        options={speedOptions.map((value) => ({ label: `${value}\u00D7` , value: value }))}
+                                        selected={`${speed}\u00D7`}
+                                        hasFilter={false}
+                                        onSelect={(item) => setSpeed(item.value as number)}>
+                                        <Button appearance="minimal">{`Speed ${speed}\u00D7`}</Button>
+                                    </SelectMenu>
+                                </Pane>
+                            </Pane>
+                            <Pane className="controls">
+                                <Pane className="timescroll">
+                                    <input             
+                                        ref={timeRef} 
+                                        type="range" 
+                                        min={start} 
+                                        max={end} 
+                                        step={1} 
+                                        value={time} 
+                                        onChange={() => setupTime()}
+                                    />
+                                </Pane>
+                            </Pane>
+                        </Pane>
                     </Pane>
                 </>
             }
@@ -220,7 +344,8 @@ enum Menu {
     None,
     Layers,
     Styles,
-    Settings
+    Settings,
+    Timeline,
 }
 
 enum CameraType {
@@ -292,9 +417,12 @@ export function ViewMenu(props: { engine: MetacityEngine | undefined }) {
                 <Tooltip content="Settings">
                     <IconButton icon={SettingsIcon} className={menu === Menu.Settings && menuShown ? "active" : ""} appearance="minimal" onClick={() => toggleMenu(Menu.Settings)} />
                 </Tooltip>
+                <Tooltip content="Timeline">
+                    <IconButton icon={TimeIcon} className={menu === Menu.Timeline && menuShown ? "active" : ""} appearance="minimal" onClick={() => toggleMenu(Menu.Timeline)}  />
+                </Tooltip>
                 <Tooltip content="Switch between 2D/3D view">
                     <Button appearance="minimal" id="perspectiveControl" onClick={swapCamera}>
-                        {camera === CameraType.D2 ? "2D" : "3D"}
+                        {camera === CameraType.D2 ? "3D" : "2D"}
                     </Button>
                 </Tooltip>
                 <Tooltip content="Zoom in">
@@ -309,6 +437,7 @@ export function ViewMenu(props: { engine: MetacityEngine | undefined }) {
                 <LayerMenu engine={engine}    visible={menu === Menu.Layers}/>
                 <StyleMenu engine={engine}    visible={menu === Menu.Styles}/>
                 <SettingsMenu engine={engine} visible={menu === Menu.Settings}/>
+                <TimelineMenu engine={engine} visible={menu === Menu.Timeline}/>
             </SideMenu>
         </Pane>
     )

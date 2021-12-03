@@ -533,6 +533,7 @@ pre.parsedMessage {
 }
 
 .viewMenu .layers,
+.viewMenu .timeline,
 .viewMenu .styles,
 .viewMenu .settings {
     display: flex;
@@ -624,6 +625,27 @@ pre.parsedMessage {
     margin: 0;
 }
 
+
+.timescroll {
+    position: relative;
+}
+
+.timescroll .real {
+    z-index: 0;
+    display: inline-block;
+}
+
+.timescroll .user {
+    display: none;
+}
+
+.timescroll:hover .user {
+    display: inline-block;
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 2;  
+}
 
 /* custom range */
 
