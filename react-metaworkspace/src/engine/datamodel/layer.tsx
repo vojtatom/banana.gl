@@ -115,6 +115,7 @@ abstract class LayerBase {
     }
 
     abstract applyStyleToModels(models: Model[]): void;
+    abstract getOffset(): number;
 
     clearStyle() {
         this.style = undefined;
@@ -156,6 +157,10 @@ export class Layer extends LayerBase {
             model.applyStyle(offset, this.style);
         }
     }
+
+    getOffset() {
+        return this.renderer.picker.offsetForLayer(this.name);
+    }
 }
 
 export class Overlay extends LayerBase {
@@ -179,6 +184,10 @@ export class Overlay extends LayerBase {
         for (let model of models) {
             model.applyStyle(offset, this.style);
         }
+    }
+
+    getOffset() {
+        return this.renderer.picker.offsetForLayer(this.source);
     }
 }
 

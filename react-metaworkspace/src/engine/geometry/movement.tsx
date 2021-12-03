@@ -3,6 +3,7 @@ import * as THREE from "three";
 import { Decoders, DecoderQueryType } from "../utils/workers";
 import { Interval } from "../datamodel/interval";
 import { Model } from "./base";
+import { Overlay } from "../datamodel/layer";
 
 
 export class Move extends Model {
@@ -11,8 +12,7 @@ export class Move extends Model {
     constructor(data: IMove, interval: Interval, callback: CallableFunction, abort: CallableFunction) {
         super(interval.renderer);
         this.time = data.time;
-        
-        const offset = interval.renderer.picker.offsetForLayer(interval.layer.name);
+        const offset = interval.layer.getOffset();
 
         Decoders.Instance.process([
             {
@@ -33,6 +33,7 @@ export class Move extends Model {
                 buffer: data.to_speed,
             }], 
             (from: Float32Array, to: Float32Array, objectid: Uint8Array, from_speed: Float32Array, to_speed: Float32Array) => {
+                    console.log(interval.layer.name, from);
                     this.init(from, to, objectid, from_speed, to_speed);
                     callback(this);
             });
