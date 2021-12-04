@@ -6,6 +6,12 @@ See running live:
 
 http://metacity.cc
 
+## Branches
+| Branch | Description |
+| ------ | ----------- |
+| main   | protected, merged PRs auto tested and deployed to PyPI and to live server if tag present |
+| dev    | merged PRs auto tested and version bumped if tag present |
+
 
 ## PR Merge Commit message conventions
 Use any of the following tags in the merge commit message title to indicate the type of PR:
