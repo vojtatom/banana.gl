@@ -1,6 +1,7 @@
 import axios from "axios";
 
 let config = {};
+
 if (process.env.NODE_ENV !== 'production') {
   config = {
     baseURL: "http://localhost:5000" // leave unset if you are using the production server

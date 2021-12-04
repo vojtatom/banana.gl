@@ -6,6 +6,7 @@ import iaxios from "../../axios";
 import axios from "axios";
 import { Model } from "../geometry/base"
 import { deserializeModel } from "../geometry/deserialize"
+import { host } from "../engine"
 
 class TileLoader {
     //axios stop request
@@ -25,7 +26,7 @@ class TileLoader {
         iaxios.get(
             `/api/data/${tile.layer.project}/${tile.layer.name}/grid/stream/${tile.sourceFile}`, {
             cancelToken: this.stopFlag.token,
-            baseURL: `http://static${prefix}.localhost:5000`,
+            baseURL: `http://static${prefix}.${host}`,
         }).then(
             (response) => {
                 tile.renderer.status.actions.loadingGeometry.stop();
