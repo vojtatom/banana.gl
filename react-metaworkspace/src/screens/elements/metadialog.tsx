@@ -1,8 +1,6 @@
 import { CornerDialog, Pane, Text } from "evergreen-ui";
-import { useEffect, useState } from "react"
+import { useEffect, useState, useCallback } from "react"
 import { MetacityEngine } from "../../engine/engine"
-
-
 
 
 export function MetaDialog(props: {engine: MetacityEngine | undefined}) {
@@ -17,10 +15,10 @@ export function MetaDialog(props: {engine: MetacityEngine | undefined}) {
         setMetaIsShown(true);
     }
 
-    const closeMeta = () => {
+    const closeMeta = useCallback(() => {
         engine?.controls?.select(-1);
         setMetaIsShown(false);
-    }
+    }, [engine?.controls]);
 
 
     useEffect(() => {
@@ -29,7 +27,7 @@ export function MetaDialog(props: {engine: MetacityEngine | undefined}) {
             engine.controls.showMetaCallback = showMeta;
             engine.controls.closeMetaCallback = closeMeta;
         }
-    }, [engine]);
+    }, [engine, engine?.controls, closeMeta]);
 
 
     return (

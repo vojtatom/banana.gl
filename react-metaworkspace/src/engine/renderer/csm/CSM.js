@@ -154,7 +154,8 @@ export class CSM {
 				if ( this.customSplitsCallback === undefined ) console.error( 'CSM: Custom split scheme callback not defined.' );
 				this.customSplitsCallback( this.cascades, camera.near, far, this.breaks );
 				break;
-
+			default:
+				break;
 		}
 
 		function uniformSplit( amount, near, far, target ) {

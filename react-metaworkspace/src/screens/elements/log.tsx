@@ -11,18 +11,18 @@ interface ILogProps {
 export function Log(props: ILogProps) {
     const [contents, setContents] = useState("");
 
-    let update: NodeJS.Timeout;
-
-    const loadLog = () => {
-        iaxios.post(apiurl.LOG, {
-            name: props.name
-        }).then((response) => {
-            setContents(response.data);
-            update = setTimeout(loadLog, 2000);
-        })
-    }
-
     useEffect(() => {
+        let update: NodeJS.Timeout;
+
+        const loadLog = () => {
+            iaxios.post(apiurl.LOG, {
+                name: props.name
+            }).then((response) => {
+                setContents(response.data);
+                update = setTimeout(loadLog, 2000);
+            })
+        }
+
         loadLog();
         return () => {
             setContents("");

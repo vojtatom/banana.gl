@@ -1,12 +1,11 @@
 import { Renderer } from "../renderer/renderer";
-import { ITimeline, IInterval } from "../types";
+import { ITimeline } from "../types";
 import { Layer, Overlay } from "./layer";
 import { Interval } from "./interval"
-import { ge, le } from "binary-search-bounds"
+import { le } from "binary-search-bounds"
 
 const MINPRELOAD = 2;
 const PRELOADI = 5;
-const LOADTIMEMARGIN = PRELOADI * 60; //in seconds
 
 enum LoadStatus {
     loading,
@@ -126,7 +125,7 @@ export class Timeline {
 
         this.loaded.set(index, LoadStatus.loading);
         
-        const loading = interval.load(() => {
+        interval.load(() => {
             this.loaded.set(index, LoadStatus.loaded);
         });
     }

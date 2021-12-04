@@ -1,8 +1,8 @@
-import { Pane, Heading, LayersIcon, Icon, TextInput, Button, Spinner, Text, SelectMenu, MergeColumnsIcon, Tooltip, Paragraph, ArrowRightIcon, Code } from 'evergreen-ui'
+import { Pane, Heading, Icon, TextInput, Button, SelectMenu, MergeColumnsIcon, Tooltip, Paragraph, ArrowRightIcon, Code } from 'evergreen-ui'
 import { useEffect, useState, createRef, FormEvent } from 'react'
 import { useHistory, useParams } from 'react-router-dom';
 import iaxios from '../axios';
-import { url, apiurl } from '../url';
+import { apiurl } from '../url';
 import { Header } from './elements/header'
 import { authUser } from './login';
 import { toast } from 'react-toastify';
@@ -19,28 +19,24 @@ export function Mapping() {
     const history = useHistory();
 
 
-    const loadLayers = () => {
-        iaxios.post(apiurl.LISTLAYER, { name: project_name }).then((response) => {
-            setLayers(response.data.filter((x: ILayer) => x.type === 'layer'));
-        });
-    }
-
     useEffect(() => {
         authUser(history, () => {
-            loadLayers();
+            iaxios.post(apiurl.LISTLAYER, { name: project_name }).then((response) => {
+                setLayers(response.data.filter((x: ILayer) => x.type === 'layer'));
+            });
         })
 
         return () => {
             setLayers([]);
         };
-    }, [project_name]);
+    }, [project_name, history]);
 
 
     const submit = (event: FormEvent) => {
         event.preventDefault();
 
         const overlay_name = name.current!.value;
-        if (overlay_name === undefined || overlay_name.length == 0)
+        if (overlay_name === undefined || overlay_name.length === 0)
         {
             toast.error('No name specified.');
             return;

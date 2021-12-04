@@ -1,5 +1,4 @@
-import { Pane, Button, CubeIcon, AddToArtifactIcon, MergeColumnsIcon, Text, StyleIcon, PresentationIcon, EditIcon, TrashIcon } from 'evergreen-ui'
-import { useEffect, useState } from 'react'
+import { Pane, Button, CubeIcon, AddToArtifactIcon, MergeColumnsIcon, StyleIcon, PresentationIcon, EditIcon, TrashIcon } from 'evergreen-ui'
 import { useHistory } from 'react-router-dom'
 import { InputDialog, TextDialog } from '../dialog'
 import { url, apiurl } from '../../../url'

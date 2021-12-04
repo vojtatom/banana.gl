@@ -1,4 +1,4 @@
-import { Pane, Table, TrashIcon, EditIcon, IconButton, EmptyState, LayersIcon, Heading, Button, AddToArtifactIcon, Icon, Switch, EyeOpenIcon, EyeOffIcon, CrossIcon, TickIcon, Tooltip } from 'evergreen-ui'
+import { Pane, Table, TrashIcon, EditIcon, IconButton, EmptyState, LayersIcon, Heading, CrossIcon, TickIcon } from 'evergreen-ui'
 import { useEffect, useState } from 'react'
 import { useHistory } from 'react-router-dom'
 import iaxios from '../../axios'
@@ -30,14 +30,18 @@ export function Layers(props: ILayersProps) {
     }
 
     useEffect(() => {
+
         authUser(history, () => {
-            loadLayers();
+            iaxios.post(apiurl.LISTLAYER, { name: props.name }).then((response) => {
+                setLayers(response.data);
+            });
         })
 
         return () => {
             setLayers([]);
         };
-    }, [props.name]);
+    }, [props.name, history]);
+
 
     const changeDisabled = (layer: ILayer) => {
         if (layer.disabled) {

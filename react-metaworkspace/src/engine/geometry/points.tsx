@@ -75,7 +75,7 @@ export class PointProxyModel extends ModelProxy {
     constructor(data: IModel, tile: Tile, callback: CallableFunction, abort: CallableFunction) {
         super(tile.renderer);
         const offset_source = tile.renderer.picker.offsetForLayer((tile.layer as Overlay).source);
-        const offset_target = tile.renderer.picker.offsetForLayer((tile.layer as Overlay).target);
+        //const offset_target = tile.renderer.picker.offsetForLayer((tile.layer as Overlay).target);
 
         Decoders.Instance.process(
             [{

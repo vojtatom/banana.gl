@@ -1,27 +1,26 @@
 import { Pane, Tablist, Tab, EmptyState, ApplicationIcon } from 'evergreen-ui'
 import { useEffect, useState } from 'react'
-import { useHistory, useParams } from 'react-router-dom'
 import { Log } from './log'
 import iaxios from '../../axios'
-import { url, apiurl } from '../../url'
-import { EvergreenReactRouterLink } from './header'
-import ReactJson from 'react-json-view'
+import { apiurl } from '../../url'
 
 
 export function LogList() {
     const [logs, setLogs] = useState<string[]>([]);
     const [selectedLog, setSelectedLog] = useState<string | undefined>(undefined);
 
-    let update: NodeJS.Timeout;
-
-    const loadLogs = () => {
-        iaxios.get(apiurl.LISTLOGS).then((response) => {
-            setLogs(response.data);
-            update = setTimeout(loadLogs, 2000);
-        });
-    }
-
+    
+    
     useEffect(() => {
+        let update: NodeJS.Timeout;
+
+        const loadLogs = () => {
+            iaxios.get(apiurl.LISTLOGS).then((response) => {
+                setLogs(response.data);
+                update = setTimeout(loadLogs, 2000);
+            });
+        }
+
         loadLogs();
         return () => {
             setLogs([]);

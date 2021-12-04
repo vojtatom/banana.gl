@@ -99,17 +99,17 @@ abstract class LayerBase {
                 'Expires': '0'
             }
         }).then((response) => {
-            const style = new LayerStyle(response.data, (lstyle: LayerStyle) => {
+            new LayerStyle(response.data, (lstyle: LayerStyle) => {
                 this.style = lstyle;
 
                 if (this.grid)
                 {
-                    for (let [_, tile] of this.grid.tiles) {
+                    for (let tile of this.grid.tiles.values()) {
                         this.applyStyleToModels(tile.models);
                     }
                 }
             });
-        }).catch((_) => {
+        }).catch(() => {
             this.clearStyle();
         });
     }
@@ -120,21 +120,21 @@ abstract class LayerBase {
     clearStyle() {
         this.style = undefined;
         if (this.grid)
-            for (let [_, tile] of this.grid.tiles) {
+            for (let tile of this.grid.tiles.values()) {
                 this.applyStyleToModels(tile.models);
             }
     }
 
     enableCache() {
         if (this.grid)
-            for (let [_, tile] of this.grid.tiles) {
+            for (let tile of this.grid.tiles.values()) {
                 tile.enableCache();
             }
     }
 
     disableCache() {
         if (this.grid)
-            for (let [_, tile] of this.grid.tiles) {
+            for (let tile of this.grid.tiles.values()) {
                 tile.disableCache();
             }
     }

@@ -38,9 +38,43 @@ jobs:
         esac
         echo "::set-output name=deploy::$deploy"
 
-  bump:
+  test-build:
     runs-on: ubuntu-latest
     needs: run-settings
+    if: github.event_name == 'push' && contains(github.ref, 'dev') 
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '16'
+
+    - name: Install npm dependencies
+      run: |
+        cd react-metaworkspace
+        npm install
+        cd ..
+
+    - name: Build React
+      run: |
+        cd react-metaworkspace
+        npm run build
+        cd ..
+        rm -r metaworkspace/client/
+        mkdir metaworkspace/client/
+        cp -a react-metaworkspace/build/. metaworkspace/client/
+
+
+  bump:
+    runs-on: ubuntu-latest
+    needs: test-build
     if: needs.run-settings.outputs.out-bump == 1 && github.event_name == 'push' && contains(github.ref, 'dev')
     steps:
     - uses: actions/checkout@v2
@@ -88,7 +122,7 @@ jobs:
 
     - uses: actions/setup-node@v2
       with:
-        node-version: '14'
+        node-version: '16'
         cache: 'npm'
 
     - name: Install npm dependencies
@@ -119,8 +153,11 @@ jobs:
   server-deploy:
     runs-on: ubuntu-latest
     needs: package-deploy
-    if: always() && needs.run-settings.outputs.out-deploy == 1 && github.event_name == 'push' && contains(github.ref, 'main')
+    if: needs.run-settings.outputs.out-deploy == 1 && github.event_name == 'push' && contains(github.ref, 'main')
     steps:
+    - name: Passive wait for PyPI to update after deploy
+      run: sleep 60
+
     - name: SSH Deploy
       uses: appleboy/ssh-action@master
       with:
@@ -136,3 +173,4 @@ jobs:
           pip install --upgrade --no-deps --force-reinstall metaworkspace
           python -m metaworkspace --migrate workspace
           python -m metaworkspace --run workspace --ip ${{ secrets.SERVERIP }} --port ${{ secrets.SERVERPORT }} &
+          echo "Done"

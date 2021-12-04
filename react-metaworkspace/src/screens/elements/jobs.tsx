@@ -17,17 +17,19 @@ export function JobList() {
     const [selectedJob, setSelectedJob] = useState<IJob | undefined>(undefined);
     const [detailIsShown, setDetailIsShown] = useState(false)
 
-    let update: NodeJS.Timeout;
-
-    const loadJobs = () => {
-        iaxios.get(apiurl.LISTJOBS).then((response) => {
-            setJobs(response.data);
-            update = setTimeout(loadJobs, 2000);
-        });
-    }
-
+    
     useEffect(() => {
+        let update: NodeJS.Timeout;
+
+        const loadJobs = () => {
+            iaxios.get(apiurl.LISTJOBS).then((response) => {
+                setJobs(response.data);
+                update = setTimeout(loadJobs, 2000);
+            });
+        }
+
         loadJobs();
+        
         return () => {
             clearTimeout(update);
             setJobs([]);

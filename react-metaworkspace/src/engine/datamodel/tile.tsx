@@ -6,7 +6,6 @@ import iaxios from "../../axios";
 import axios from "axios";
 import { Model } from "../geometry/base"
 import { deserializeModel } from "../geometry/deserialize"
-import { LayerStyle } from "../renderer/style";
 
 class TileLoader {
     //axios stop request

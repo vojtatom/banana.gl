@@ -43,6 +43,7 @@ export const languageDef = {
     ],
 
     // we include these common regular expressions
+    //eslint-disable-next-line
 	symbols: /[=><!~?:&|+\-*\/\^%]+/,
 	escapes: /\\(?:[abfnrtv\\"']|x[0-9A-Fa-f]{1,4}|u[0-9A-Fa-f]{4}|U[0-9A-Fa-f]{8})/,
 	digits: /\d+(_+\d+)*/,
@@ -50,7 +51,9 @@ export const languageDef = {
 	binarydigits: /[0-1]+(_+[0-1]+)*/,
 	hexdigits: /[[0-9a-fA-F]+(_+[0-9a-fA-F]+)*/,
 
+    //eslint-disable-next-line
 	regexpctl: /[(){}\[\]\$\^|\-*+?\.]/,
+    //eslint-disable-next-line
 	regexpesc: /\\(?:[bBdDfnrstvwWn0\\\/]|@regexpctl|c[A-Z]|x[0-9a-fA-F]{2}|u[0-9a-fA-F]{4})/,
 
 
@@ -76,9 +79,11 @@ export const languageDef = {
 			{ include: '@whitespace' },
 
 			// regular expression: ensure it is terminated before beginning (otherwise it is an opeator)
-			[/\/(?=([^\\\/]|\\.)+\/([gimsuy]*)(\s*)(\.|;|\/|,|\)|\]|\}|$))/, { token: 'regexp', bracket: '@open', next: '@regexp' }],
+			//eslint-disable-next-line
+            [/\/(?=([^\\\/]|\\.)+\/([gimsuy]*)(\s*)(\.|;|\/|,|\)|\]|\}|$))/, { token: 'regexp', bracket: '@open', next: '@regexp' }],
 
 			// delimiters and operators
+            //eslint-disable-next-line
 			[/[()\[\]]/, '@brackets'],
 			[/[<>](?!@symbols)/, '@brackets'],
 			[/@symbols/, {
@@ -88,7 +93,9 @@ export const languageDef = {
 			}],
 
 			// numbers
+            //eslint-disable-next-line
 			[/(@digits)[eE]([\-+]?(@digits))?/, 'number.float'],
+            //eslint-disable-next-line
 			[/(@digits)\.(@digits)([eE][\-+]?(@digits))?/, 'number.float'],
 			[/0[xX](@hexdigits)/, 'number.hex'],
 			[/#(@hexdigits)/, 'number.hex'],
@@ -114,12 +121,15 @@ export const languageDef = {
 
 		// We match regular expression quite precisely
 		regexp: [
+            //eslint-disable-next-line
 			[/(\{)(\d+(?:,\d*)?)(\})/, ['regexp.escape.control', 'regexp.escape.control', 'regexp.escape.control']],
-			[/(\[)(\^?)(?=(?:[^\]\\\/]|\\.)+)/, ['regexp.escape.control', { token: 'regexp.escape.control', next: '@regexrange' }]],
+			//eslint-disable-next-line
+            [/(\[)(\^?)(?=(?:[^\]\\\/]|\\.)+)/, ['regexp.escape.control', { token: 'regexp.escape.control', next: '@regexrange' }]],
 			[/(\()(\?:|\?=|\?!)/, ['regexp.escape.control', 'regexp.escape.control']],
 			[/[()]/, 'regexp.escape.control'],
 			[/@regexpctl/, 'regexp.escape.control'],
-			[/[^\\\/]/, 'regexp'],
+			//eslint-disable-next-line
+            [/[^\\\/]/, 'regexp'],
 			[/@regexpesc/, 'regexp.escape'],
 			[/\\\./, 'regexp.invalid'],
 			[/(\/)([gimsuy]*)/, [{ token: 'regexp', bracket: '@close', next: '@pop' }, 'keyword.other']],
@@ -184,6 +194,7 @@ function createDependencyProposals(range: any) {
             kind: monaco.languages.CompletionItemKind.Class,
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             documentation: "Layer style class",
+            //eslint-disable-next-line
             insertText: 'layer (${1:layer-key}) {\n    ${2:@properties}\n}',
             range: range
         },
@@ -192,6 +203,7 @@ function createDependencyProposals(range: any) {
             kind: monaco.languages.CompletionItemKind.Class,
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             documentation: "Styles based on metadata of the overlay source layer",
+            //eslint-disable-next-line
             insertText: 'target {\n    ${1:value}\n}',
             range: range
         },
@@ -200,6 +212,7 @@ function createDependencyProposals(range: any) {
             kind: monaco.languages.CompletionItemKind.Class,
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             documentation: "Styles based on metadata of the overlay target layer",
+            //eslint-disable-next-line
             insertText: 'source {\n    ${1:value}\n}',
             range: range
         },
@@ -208,6 +221,7 @@ function createDependencyProposals(range: any) {
             kind: monaco.languages.CompletionItemKind.Class,
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             documentation: "Styles based on metadata of the layer",
+            //eslint-disable-next-line
             insertText: 'meta (${1:identifier}) {\n    ${2:value}\n}',
             range: range
         },
@@ -216,6 +230,7 @@ function createDependencyProposals(range: any) {
             kind: monaco.languages.CompletionItemKind.Value,
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             documentation: "Color style class",
+            //eslint-disable-next-line
             insertText: 'color: #${1:color};',
             range: range
         },
@@ -224,6 +239,7 @@ function createDependencyProposals(range: any) {
             kind: monaco.languages.CompletionItemKind.Value,
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             documentation: "Visibility style class",
+            //eslint-disable-next-line
             insertText: 'visible: ${1:boolean};',
             range: range
         },
@@ -232,6 +248,7 @@ function createDependencyProposals(range: any) {
             kind: monaco.languages.CompletionItemKind.Value,
             insertTextRules: monaco.languages.CompletionItemInsertTextRule.InsertAsSnippet,
             documentation: "Default style class",
+            //eslint-disable-next-line
             insertText: 'default: ${1:value};',
             range: range
         },
@@ -240,7 +257,9 @@ function createDependencyProposals(range: any) {
 
 const headingSpace = /^(\s*)/;
 const trailingSpace = /(\s*)$/;
+//eslint-disable-next-line
 const nothing = /(\s*|$)/;
+//eslint-disable-next-line
 const key = /\(([^)]+)\)/;
 const proptag = /@[a-zA-Z]+/;
 
@@ -302,7 +321,7 @@ export function StyleEditor() {
             console.error(reject);
         });
 
-    }, [editor]);
+    }, [editor, project_name, style_name]);
 
     const [isParsedShown, setParsedIsShown] = useState(false);
     const [parsed, setParsed] = useState("");

@@ -28,7 +28,7 @@ export function Projects() {
         return () => {
             setProjects([]);
         };
-    }, []);
+    }, [history]);
 
     const showProject = (name?: string) => {
         getProjects();

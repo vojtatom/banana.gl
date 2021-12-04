@@ -48,7 +48,7 @@ export class Interval {
                     deserializeMovement(data, this, (move: Move) => {
                         this.moves.push(move);
                         move.visible = false;
-                        if (this.moves.length == this.length)
+                        if (this.moves.length === this.length)
                         {
                             this.renderer.status.actions.parsingGeometry.stop();
                             this.finalizeInit();

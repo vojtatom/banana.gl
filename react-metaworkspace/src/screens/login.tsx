@@ -1,6 +1,6 @@
-import { Pane, Tablist, Tab, Heading, EmptyState, ProjectsIcon, AddIcon, Dialog, TextInput, Text } from 'evergreen-ui'
+import { Pane, Heading, TextInput } from 'evergreen-ui'
 import { useEffect, useState, FormEvent, createRef } from 'react'
-import { useHistory, useParams } from 'react-router-dom';
+import { useHistory } from 'react-router-dom';
 import iaxios from '../axios';
 import { url, apiurl } from '../url';
 
@@ -8,7 +8,7 @@ import { url, apiurl } from '../url';
 export function authUser(history: any, callback: CallableFunction) {
     iaxios.get(apiurl.AUTHUSER).then((response) => {
         callback();
-    }).catch((reject) => {
+    }).catch(() => {
         history.push(url.LOGIN);
     });
 }
@@ -48,7 +48,7 @@ export function Login() {
     }).catch((reject) => {
         //silently pass
     });
-  }, []);
+  }, [history]);
 
 
   return (
