@@ -171,7 +171,7 @@ export class Renderer {
     }
 
     select(oid: number) {
-        if (this.picker.id != oid)
+        if (this.picker.id !== oid)
             this.picker.select(oid);
 
         const selected = this.picker.layerAndOidForId(oid);

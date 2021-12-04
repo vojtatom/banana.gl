@@ -1,12 +1,10 @@
-import { ENGINE_METHOD_ALL } from "constants";
-import { Button, CompassIcon, TaxiIcon, EyeOffIcon, EyeOpenIcon, Heading, Icon, IconButton, LayersIcon, MinusIcon, Pane, PlusIcon, SettingsIcon, StyleIcon, Switch, TimeIcon, Tooltip, CrossIcon, PlayIcon, PauseIcon, FastForwardIcon, FastBackwardIcon, SymbolCircleIcon, TreeIcon, WalkIcon, TractorIcon, SelectMenu  } from "evergreen-ui";
+import { Button, CompassIcon, EyeOffIcon, EyeOpenIcon, Heading, Icon, IconButton, LayersIcon, MinusIcon, Pane, PlusIcon, SettingsIcon, StyleIcon, Switch, TimeIcon, Tooltip, PlayIcon, PauseIcon, SelectMenu  } from "evergreen-ui";
 import { useEffect, useRef, useState } from "react"
-import { Transform } from "stream";
 import { MetacityEngine } from "../../engine/engine"
 
 
 function SideMenu(props: {children: any, isShown: boolean, onClose: () => void}) {
-    const { children, isShown, onClose } = props;
+    const { children, isShown } = props;
 
     //<IconButton className="closeViewMenu" appearance="minimal" icon={CrossIcon} onClick={onClose}/>
     return (
@@ -73,7 +71,6 @@ function LayerMenu(props: { engine: MetacityEngine | undefined, visible: boolean
     useEffect(() => {
         if (!engine)
             return;
-        console.log(visibility);
         setVisibility(engine.project.layers.map((layer) => layer.visible));
     }, [engine, visible]);
 
@@ -150,7 +147,7 @@ function TimelineMenu(props: { engine: MetacityEngine | undefined, visible: bool
             return;
 
         engine.controls.setSpeed(speed);
-    }, [speed]);
+    }, [speed, engine]);
 
     useEffect(() => {
         if (!engine || !engine.controls)

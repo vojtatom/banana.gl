@@ -96,6 +96,12 @@ def get_projects(workspace_path):
         if project[0] != '.':
             yield os.path.join(projects, project)
 
+def get_project_names(workspace_path):
+    projects = projects_dir(workspace_path)
+    for project in os.listdir(projects):
+        if project[0] != '.':
+            yield project
+
 def current_jobs(workspace_path):
     jobs = jobs_dir(workspace_path)
     return [job for job in os.listdir(jobs)]

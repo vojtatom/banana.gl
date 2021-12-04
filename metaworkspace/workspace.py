@@ -70,6 +70,7 @@ class ProcessManager:
             raise Exception(f"Workspace is already running as process {pid} or the process was killed before, stop the process:\n    python -m metaworkspace --stop <workspace name>")
         
         pid = os.getpid()
+        print(f"Running as process with PID {pid}")
         with open(self.config, "w") as f:
             f.write(str(pid))
 
@@ -89,7 +90,9 @@ class ProcessManager:
                 raise Exception("Cannot stop process since the PID is unknown, please stop process manually")
             print(f"Trying to kill running workspace with pid {pid}...")
             subprocess.run(["kill", "-9", str(-pid)])
-        os.remove(self.config)
+
+        if os.path.exists(self.config):
+            os.remove(self.config)
 
 
 class MetacityWorkspace:
@@ -111,7 +114,7 @@ class MetacityWorkspace:
 
     @property
     def project_names(self):
-        return fs.get_projects(self.path)
+        return fs.get_project_names(self.path)
 
     @property
     def projects(self):

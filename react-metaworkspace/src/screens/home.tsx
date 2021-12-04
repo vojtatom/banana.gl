@@ -1,9 +1,9 @@
-import { Pane, Heading, Button, Paragraph, Link, Tooltip } from 'evergreen-ui'
+import { Pane, Heading, Button } from 'evergreen-ui'
 import { useEffect, useState } from 'react';
 import { useHistory } from 'react-router-dom';
 import iaxios from '../axios';
 import { apiurl, url } from '../url';
-import { EvergreenReactRouterLink, Header } from './elements/header';
+import { EvergreenReactRouterLink } from './elements/header';
 
 
 export function Home() {

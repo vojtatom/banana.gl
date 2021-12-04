@@ -71,7 +71,7 @@ export class LineProxyModel extends Model {
         super(tile.renderer);
 
         const offset_source = tile.renderer.picker.offsetForLayer((tile.layer as Overlay).source);
-        const offset_target = tile.renderer.picker.offsetForLayer((tile.layer as Overlay).target);
+        //const offset_target = tile.renderer.picker.offsetForLayer((tile.layer as Overlay).target);
 
         Decoders.Instance.process(
             [{

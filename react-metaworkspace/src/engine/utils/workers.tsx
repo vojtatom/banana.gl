@@ -133,7 +133,7 @@ export class Decoders {
     {
         const jobID = this.jobIDs++;
         this.resultMap.set(jobID, {
-            data: Array.apply(null, Array(data.length)).map(function () {}),
+            data: Array.apply(null, Array(data.length)).map(function () { return undefined; }),
             recieved: 0,
             expected: data.length,
             callback: callback

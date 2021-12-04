@@ -156,6 +156,9 @@ jobs:
     needs: package-deploy
     if: needs.run-settings.outputs.out-deploy == 1 && github.event_name == 'push' && contains(github.ref, 'main')
     steps:
+    - name: Passive wait for PyPI to update after deploy
+      run: sleep 60
+
     - name: SSH Deploy
       uses: appleboy/ssh-action@master
       with:

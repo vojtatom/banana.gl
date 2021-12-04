@@ -12,7 +12,7 @@ export function Jobs() {
 
     useEffect(() => {
         authUser(history, () => { });
-    }, []);
+    }, [history]);
 
     return (
         <Pane>

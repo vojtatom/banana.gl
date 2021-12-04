@@ -3,7 +3,6 @@ import * as THREE from "three";
 import { Decoders, DecoderQueryType } from "../utils/workers";
 import { Interval } from "../datamodel/interval";
 import { Model } from "./base";
-import { Overlay } from "../datamodel/layer";
 
 
 export class Move extends Model {

@@ -23,7 +23,7 @@ export class Compas {
         this.camDirection3.normalize();
         this.camDirection2.set(this.camDirection3.x, this.camDirection3.y);
 
-        if (this.renderer.controls.camera.up.y == 1) {
+        if (this.renderer.controls.camera.up.y === 1) {
             this.angle = 0;
         } else {
             this.camDirection2.normalize();

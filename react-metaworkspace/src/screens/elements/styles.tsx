@@ -1,5 +1,5 @@
 import { Pane, Heading, Button, StyleIcon, EmptyState, TrashIcon, EditIcon } from 'evergreen-ui'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import iaxios from '../../axios'
 import { url, apiurl } from '../../url'
 import { authUser } from '../login'
@@ -14,17 +14,17 @@ export function Styles(props: IStyleListProps) {
     const [styles, setStyles] = useState<any[]>([]);
     const history = useHistory();
 
-    const getStyles = () => {
+    const getStyles = useCallback(() => {
         iaxios.post(apiurl.LISTSTYLES, { name: props.project }).then((response) => {
             setStyles(response.data);
         });
-    };
+    }, [props.project]);
 
     useEffect(() => {
         authUser(history, () => {
             getStyles();
         })
-    }, [props.project]);
+    }, [props.project, history, getStyles]);
 
     return (
         <Pane className="styles">

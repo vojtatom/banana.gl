@@ -12,7 +12,7 @@ setup(
     name="metaworkspace",
     packages=find_packages("."),
     version="0.2.0",
-    description="Python tool simplyfing work with Metacity Modules",
+    description="Python-React application for visualization of urban data",
     long_description=README,
     long_description_content_type="text/markdown",
     url="https://github.com/MetacitySuite/Metacity-Workspace",
