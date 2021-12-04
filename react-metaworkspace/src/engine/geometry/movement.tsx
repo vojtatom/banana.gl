@@ -32,7 +32,6 @@ export class Move extends Model {
                 buffer: data.to_speed,
             }], 
             (from: Float32Array, to: Float32Array, objectid: Uint8Array, from_speed: Float32Array, to_speed: Float32Array) => {
-                    console.log(interval.layer.name, from);
                     this.init(from, to, objectid, from_speed, to_speed);
                     callback(this);
             });
