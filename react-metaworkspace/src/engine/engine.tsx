@@ -4,6 +4,12 @@ import { Project } from "./datamodel/project";
 import iaxios from "../axios";
 import { apiurl } from "../url";
 
+export let host = window.location.host;
+
+if (process.env.NODE_ENV !== 'production') {
+    host = "localhost:5000"
+}
+
 
 export class EngineControls {
     renderer: Renderer;
