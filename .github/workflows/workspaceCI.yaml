@@ -163,6 +163,8 @@ jobs:
         host: ${{ secrets.DEPHOST }}
         username: ${{ secrets.DEPUSERNAME }}
         key: ${{ secrets.DEPKEY }}
+        timeout: 300s
+        command_timeout: 300m
         script: |
           whoami
           cd /home/monika/metaworkspace
