@@ -119,7 +119,7 @@ jobs:
   server-deploy:
     runs-on: ubuntu-latest
     needs: package-deploy
-    if: always() && needs.run-settings.outputs.out-deploy == 1 && github.event_name == 'push' && contains(github.ref, 'main')
+    if: needs.run-settings.outputs.out-deploy == 1 && github.event_name == 'push' && contains(github.ref, 'main')
     steps:
     - name: SSH Deploy
       uses: appleboy/ssh-action@master
@@ -136,3 +136,4 @@ jobs:
           pip install --upgrade --no-deps --force-reinstall metaworkspace
           python -m metaworkspace --migrate workspace
           python -m metaworkspace --run workspace --ip ${{ secrets.SERVERIP }} --port ${{ secrets.SERVERPORT }} &
+          echo "Done"
