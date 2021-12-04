@@ -82,6 +82,10 @@ def log_contents(workspace_path, log_name: str):
     return None
 
 
+def process_file(workspace_path):
+    return os.path.join(workspace_path, "pid")
+
+
 def project_dir(workspace_path, project_name):
     return os.path.join(projects_dir(workspace_path), project_name)
 
@@ -90,7 +94,7 @@ def get_projects(workspace_path):
     projects = projects_dir(workspace_path)
     for project in os.listdir(projects):
         if project[0] != '.':
-            yield project
+            yield os.path.join(projects, project)
 
 def current_jobs(workspace_path):
     jobs = jobs_dir(workspace_path)

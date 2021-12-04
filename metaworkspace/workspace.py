@@ -3,8 +3,8 @@ from metaworkspace import filesystem as fs
 from metacity.datamodel.project import Project
 from passlib.context import CryptContext
 from secrets import token_bytes
-from base64 import b64encode
 import binascii
+import subprocess
 
 class UserAuthenticator:
     def __init__(self, workspace_path: str):
@@ -56,7 +56,41 @@ class UserAuthenticator:
             return None
         return user
 
-    
+
+class ProcessManager:
+    def __init__(self, workspace_path: str):
+        self.config = fs.process_file(workspace_path)
+
+    def export_pid(self):
+        pid = os.getpid()
+        if os.path.exists(self.config):
+            pid = self.pid
+            if pid is None:
+                raise Exception("Workspace is in invalid state, pid file is present in workspace dir, however it does not contain valid PID")
+            raise Exception(f"Workspace is already running as process {pid} or the process was killed before, stop the process:\n    python -m metaworkspace --stop <workspace name>")
+        
+        pid = os.getpid()
+        with open(self.config, "w") as f:
+            f.write(str(pid))
+
+    @property
+    def pid(self):
+        try:
+            with open(self.config, "r") as f:
+                pid = f.read()
+            return int(pid)
+        except:
+            return None
+
+    def stop(self, stop_in_background=True):
+        if stop_in_background:
+            pid = self.pid
+            if pid is None:
+                raise Exception("Cannot stop process since the PID is unknown, please stop process manually")
+            print(f"Trying to kill running workspace with pid {pid}...")
+            subprocess.run(["kill", "-9", str(-pid)])
+        os.remove(self.config)
+
 
 class MetacityWorkspace:
     def __init__(self, workspace_path: str):
