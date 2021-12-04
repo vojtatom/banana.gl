@@ -13,7 +13,8 @@ export enum DecoderQueryType {
     uint8 = 2
 }
 
-let self: any;
+//eslint-disable-next-line
+//let self: Worker;
 
 export const Decoder = () => {
     const base64tofloat32 = (data: string) => {
@@ -35,12 +36,13 @@ export const Decoder = () => {
         return buffer;
     }
 
+    //eslint-disable-next-line no-restricted-globals
     self.onmessage = (message: MessageEvent) => {
         const data = message.data;
         const response: any = {
             jobID: data.jobID,
             resID: data.resID
-        }
+        };
 
         switch (data.data.datatype) {
             case 0:
