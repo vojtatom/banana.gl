@@ -1,0 +1,138 @@
+name: Metacity Workspace CI
+
+on:
+  push:
+    branches: [ main, dev ]
+
+jobs:
+  run-settings:
+    runs-on: ubuntu-latest
+    outputs:
+      out-bump: ${{ steps.run.outputs.bump }}
+      out-package: ${{ steps.run.outputs.package }}
+      out-deploy: ${{ steps.run.outputs.deploy }}
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Check for commit tags
+      id: run
+      run: |
+        log=$(git log --pretty=oneline --max-count=1)
+        case "$log" in
+            *action::bump* ) bump=1;;
+            * ) bump=0;;
+        esac
+        echo "::set-output name=bump::$bump"
+
+        case "$log" in
+            *action::package* ) package=1;;
+            * ) package=0;;
+        esac
+        echo "::set-output name=package::$package"
+
+        case "$log" in
+            *action::deploy* ) deploy=1;;
+            * ) deploy=0;;
+        esac
+        echo "::set-output name=deploy::$deploy"
+
+  bump:
+    runs-on: ubuntu-latest
+    needs: run-settings
+    if: needs.run-settings.outputs.out-bump == 1 && github.event_name == 'push' && contains(github.ref, 'dev')
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip
+        pip install bump
+
+    - name: Get version
+      run: |
+        log=$(git log --pretty=oneline --max-count=1)
+        case "$log" in
+            *version::major* ) cmd='bump --major --reset';;
+            *version::minor* ) cmd='bump --minor --reset';;
+            * ) cmd='bump --patch';;
+        esac
+        eval $cmd
+
+    - uses: EndBug/add-and-commit@v7
+      with:
+        default_author: github_actions
+        message: "Bumped package version"
+
+  package-deploy:
+    runs-on: ubuntu-latest
+    needs: run-settings
+    if: needs.run-settings.outputs.out-package == 1 && github.event_name == 'push' && contains(github.ref, 'main')
+    steps:
+    - uses: actions/checkout@v2
+      with:
+        submodules: 'recursive'
+
+    - name: Set up Python 3.9
+      uses: actions/setup-python@v2
+      with:
+        python-version: 3.9
+
+    - uses: actions/setup-node@v2
+      with:
+        node-version: '14'
+        cache: 'npm'
+
+    - name: Install npm dependencies
+      run: |
+        cd react-metaworkspace
+        npm install
+        cd ..
+
+    - name: Build React
+      run: |
+        cd react-metaworkspace
+        npm run build
+        cd ..
+        rm -r metaworkspace/client/
+        mkdir metaworkspace/client/
+        cp -a react-metaworkspace/build/. metaworkspace/client/
+      
+    - name: Prepare for dist
+      run: |
+        python setup.py sdist
+
+    - name: Publish package
+      uses: pypa/gh-action-pypi-publish@release/v1
+      with:
+        user: __token__
+        password: ${{ secrets.PYPI_API_TOKEN }}
+
+  server-deploy:
+    runs-on: ubuntu-latest
+    needs: package-deploy
+    if: always() && needs.run-settings.outputs.out-deploy == 1 && github.event_name == 'push' && contains(github.ref, 'main')
+    steps:
+    - name: SSH Deploy
+      uses: appleboy/ssh-action@master
+      with:
+        host: ${{ secrets.DEPHOST }}
+        username: ${{ secrets.DEPUSERNAME }}
+        key: ${{ secrets.DEPKEY }}
+        script: |
+          whoami
+          cd /home/monika/metaworkspace
+          . ./env/bin/activate
+          python -m metaworkspace --stop workspace
+          pip install --upgrade --no-deps --force-reinstall metacity
+          pip install --upgrade --no-deps --force-reinstall metaworkspace
+          python -m metaworkspace --migrate workspace
+          python -m metaworkspace --run workspace --ip ${{ secrets.SERVERIP }} --port ${{ secrets.SERVERPORT }} &

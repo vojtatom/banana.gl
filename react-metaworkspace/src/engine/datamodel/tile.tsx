@@ -21,8 +21,12 @@ class TileLoader {
         this.stopFlag = axios.CancelToken.source();
         tile.renderer.status.actions.loadingGeometry.start();
 
-        iaxios.get(`/api/data/${tile.layer.project}/${tile.layer.name}/grid/stream/${tile.sourceFile}`, {
-            cancelToken: this.stopFlag.token
+        const prefix = (Math.abs(tile.x) + Math.abs(tile.y)) % 6;
+
+        iaxios.get(
+            `/api/data/${tile.layer.project}/${tile.layer.name}/grid/stream/${tile.sourceFile}`, {
+            cancelToken: this.stopFlag.token,
+            baseURL: `http://static${prefix}.localhost:5000`,
         }).then(
             (response) => {
                 tile.renderer.status.actions.loadingGeometry.stop();

@@ -3,8 +3,9 @@ import subprocess
 from argparse import ArgumentParser
 from getpass import getpass
 
+from metacity.core.migrate import migrate
 import metaworkspace.filesystem as fs
-from metaworkspace.workspace import MetacityWorkspace, UserAuthenticator
+from metaworkspace.workspace import MetacityWorkspace, UserAuthenticator, ProcessManager
 
 
 def install(workspace_path: str):
@@ -23,6 +24,7 @@ def regen(workspace_path: str):
     UserAuthenticator.generate(workspace_path)
     print(f"Done.")
 
+
 def createuser(mws: MetacityWorkspace):
     print(f"Generating new user...")
     username =    input("username:              ")
@@ -39,7 +41,20 @@ def createuser(mws: MetacityWorkspace):
     print(f"Created user {username}. GLHF! =^.^=")
 
 
+def migrate_workspace(mws: MetacityWorkspace):
+    for project in mws.projects:
+        migrate(project)
+
+
+def stop(mws: MetacityWorkspace):
+    p = ProcessManager(mws.path)
+    p.stop()
+
+
 def run(mws: MetacityWorkspace, ip_adress, port):
+    p = ProcessManager(mws.path)
+    p.export_pid()
+
     print(f"The server runs on {ip_adress}:{port}")
     print(f"For more information, see logs located in directory {mws.logs_dir}.")
     print(f"Running server...")
@@ -49,7 +64,7 @@ def run(mws: MetacityWorkspace, ip_adress, port):
     server_log = open(mws.server_log, 'w+')
     jobs_log = open(mws.jobs_log, 'w+')
     
-    proc = subprocess.Popen(["uvicorn", "metaworkspace.runtime.api.server:app", "--workers", "6", "--host", str(ip_adress), "--port", str(port)], 
+    proc = subprocess.Popen(["uvicorn", "metaworkspace.runtime.api.server:app", "--workers", "20", "--host", str(ip_adress), "--port", str(port)], 
                             stdout=server_log,
                             stderr=server_log)
 
@@ -59,6 +74,7 @@ def run(mws: MetacityWorkspace, ip_adress, port):
                  
     return_code = proc.wait()
     return_code = jobs.wait()
+    p.stop(stop_in_background=False)
 
 
 usage = ("Sets up Metacity Workspace."
@@ -74,6 +90,8 @@ if __name__ == "__main__":
     parser.add_argument('--createuser', help='Create new user', action="store_true")
     parser.add_argument('--ip', nargs=1, help='IP adress to run on', default=['127.0.0.1'])
     parser.add_argument('--port', nargs=1, help='Port to run on', default=['5000'])
+    parser.add_argument('--migrate', help='Migrate existing projects after installation of newer version', action="store_true")
+    parser.add_argument('--stop', help='Will try to stop the running workspace if pid file is in working directory', action="store_true")
     parser.add_argument('workspace_dir', type=str, help='Path to newly created Metacity workspace')
     args = parser.parse_args()    
     path = args.workspace_dir
@@ -91,8 +109,14 @@ if __name__ == "__main__":
         print("Could not open the environemnt, please check if the name is right and the secret key is present.")
         quit()
 
+    if args.stop:
+        stop(mws)
+
     if args.createuser:
         createuser(mws)
+
+    if args.migrate:
+        migrate_workspace(mws)
 
     if args.run:
         run(mws, args.ip[0], args.port[0])

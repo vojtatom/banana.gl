@@ -1,5 +1,6 @@
 import { Renderer } from "../renderer/renderer";
 import { Grid } from "./grid";
+import { Timeline } from "./timeline";
 import { ILayerData, IOverlayData, ILayerBaseData } from "../types";
 import * as THREE from "three";
 import { LayerStyle } from "../renderer/style";
@@ -7,12 +8,12 @@ import iaxios from "../../axios";
 import { Model } from "../geometry/base";
 
 
-
 abstract class LayerBase {
     name: string;
     project: string;
     renderer: Renderer;
     grid?: Grid; //undefined if the layer is not visible
+    timeline?: Timeline; 
     style?: LayerStyle;
     visibility: boolean;
 
@@ -49,8 +50,9 @@ abstract class LayerBase {
         }
 
         if (data.timeline)
-        {
-
+        {  
+            this.timeline = new Timeline(data.timeline, this.renderer, this as any);
+            this.renderer.changed = true;
         }
     }
 
@@ -65,12 +67,16 @@ abstract class LayerBase {
     hide() {
         if (this.grid)
             this.grid.hide();
+        if (this.timeline)
+            this.timeline.hide();
         this.renderer.changed = true;
     }
     
     show() {
         if (this.grid)
             this.grid.reloadVisibility();
+        if (this.timeline)
+            this.timeline.show();
         this.renderer.changed = true;
     }
 
@@ -109,6 +115,7 @@ abstract class LayerBase {
     }
 
     abstract applyStyleToModels(models: Model[]): void;
+    abstract getOffset(): number;
 
     clearStyle() {
         this.style = undefined;
@@ -150,6 +157,10 @@ export class Layer extends LayerBase {
             model.applyStyle(offset, this.style);
         }
     }
+
+    getOffset() {
+        return this.renderer.picker.offsetForLayer(this.name);
+    }
 }
 
 export class Overlay extends LayerBase {
@@ -173,6 +184,10 @@ export class Overlay extends LayerBase {
         for (let model of models) {
             model.applyStyle(offset, this.style);
         }
+    }
+
+    getOffset() {
+        return this.renderer.picker.offsetForLayer(this.source);
     }
 }
 

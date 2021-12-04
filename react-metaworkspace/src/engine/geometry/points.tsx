@@ -1,6 +1,7 @@
 import { IModel } from "../types";
 import * as THREE from "three";
-import { Decoder } from "../utils/decoder";
+//import { Decoder } from "../utils/decoder";
+import { Decoders, DecoderQueryType } from "../utils/workers";
 import { Tile } from "../datamodel/tile";
 import { Model, ModelProxy } from "./base";
 import { Overlay } from "../datamodel/layer";
@@ -10,13 +11,21 @@ export class PointModel extends Model {
     constructor(data: IModel, tile: Tile, callback: CallableFunction, abort: CallableFunction) {
         super(tile.renderer);
         const offset = tile.renderer.picker.offsetForLayer(tile.layer.name);
-        console.log(tile.layer.name, offset);
-        Decoder.base64tofloat32(data.vertices, abort, (vertices: Float32Array) => {
-            Decoder.base64toint32(data.attributes.oid.data, offset, abort, (objectid: Uint8Array) => {    
+
+        Decoders.Instance.process(
+            [{
+                datatype: DecoderQueryType.float32,
+                buffer: data.vertices
+            }, {
+                datatype: DecoderQueryType.int32,
+                buffer: data.attributes.oid.data,
+                offset: offset
+            }],
+            (vertices: Float32Array, objectid: Uint8Array) => {
                 this.init(vertices, objectid, tile);
                 callback(this);
             });
-        });
+
     }
 
     private init(vertices: Float32Array, objectid: Uint8Array, tile: Tile) {
@@ -24,7 +33,7 @@ export class PointModel extends Model {
         this.createMesh(geometry);
         this.createPickingMesh(geometry);
         this.visible = tile.visible;
-        this.renderer.changed = true;  
+        this.renderer.changed = true;
     }
 
 
@@ -67,13 +76,21 @@ export class PointProxyModel extends ModelProxy {
         super(tile.renderer);
         const offset_source = tile.renderer.picker.offsetForLayer((tile.layer as Overlay).source);
         const offset_target = tile.renderer.picker.offsetForLayer((tile.layer as Overlay).target);
-        
-        Decoder.base64tofloat32(data.vertices, abort, (vertices: Float32Array) => {
-            Decoder.base64toint32(data.attributes.source_oid.data, offset_source, abort, (objectid: Uint8Array) => {    
+
+        Decoders.Instance.process(
+            [{
+                datatype: DecoderQueryType.float32,
+                buffer: data.vertices
+            }, {
+                datatype: DecoderQueryType.int32,
+                buffer: data.attributes.source_oid.data,
+                offset: offset_source
+            }], 
+            (vertices: Float32Array, objectid: Uint8Array) => {
                 this.init(vertices, objectid, tile);
                 callback(this);
             });
-        });
+
     }
 
     private init(vertices: Float32Array, objectid: Uint8Array, tile: Tile) {
@@ -81,7 +98,7 @@ export class PointProxyModel extends ModelProxy {
         this.createMesh(geometry);
         this.createPickingMesh(geometry);
         this.visible = tile.visible;
-        this.renderer.changed = true;  
+        this.renderer.changed = true;
     }
 
 

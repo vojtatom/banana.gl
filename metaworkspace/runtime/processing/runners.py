@@ -18,9 +18,14 @@ def JobWorker(queue: Queue, id: str):
     log = logging.getLogger(logid)
 
     while True:
+
         job_dir = queue.get(block=True, timeout=None)
         log.info(f"Worker {id} started: {job_dir}")
         job = load_job(job_dir)
+        if job is None:
+            log.info(f"Worker {id} skipped: {job_dir}")
+            continue
+        
         try:
             job.run() 
             job.cleanup()

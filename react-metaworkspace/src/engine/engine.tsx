@@ -9,9 +9,12 @@ export class EngineControls {
     renderer: Renderer;
     project: Project;
     keymap: {[key: string]: boolean};
+
     showMetaCallback?: (meta: {[name: string]: any}) => void;
     closeMetaCallback?: () => void;
     updateCompasCallback?: (angle: number) => void;
+    updateTimeCallback?: (time: number, start: number, end: number) => void;
+
     clickTime: number;
 
     constructor(renderer: Renderer, project: Project) {
@@ -82,6 +85,10 @@ export class EngineControls {
             this.renderer.updateHelper();
             this.keymap['KeyU'] = false;
         }
+    
+        if (this.updateTimeCallback){
+            this.updateTimeCallback(this.renderer.timeline.time, this.renderer.timeline.start, this.renderer.timeline.end);
+        }
     }
 
     swapCamera() {
@@ -102,6 +109,57 @@ export class EngineControls {
         this.renderer.controls.zoomOut(10);
         this.renderer.changed = true;
     }
+
+    setPointSize(size: number){
+        this.renderer.setPointSize(size);
+    }
+
+    setLineWidth(size: number){
+        this.renderer.setLineWidth(size);
+    }
+
+    updateVisibleRadius(target: THREE.Vector3) {
+        this.project.updateVisibleRadius(target);
+    }
+
+    setVisibleRadius(radius: number) {
+        this.project.setVisibleRadius(radius);
+    }
+
+    useCache(enable: boolean){
+        this.project.useCache(enable);
+    }
+
+    applyStyle(style: string){
+        this.project.applyStyle(style);
+    }
+
+    useShadows(enable: boolean){
+        if (enable)
+            this.renderer.enableShadows();
+        else
+            this.renderer.disableShadows();
+    }
+
+    setTime(time: number){
+        this.renderer.timeline.time = time;
+    }
+
+    setPlay(play: boolean){
+        this.renderer.timeline.play = play;
+    }
+
+    getPlay(){
+        return this.renderer.timeline.play;
+    }
+
+    setSpeed(speed: number){
+        this.renderer.timeline.speed = speed;
+    }
+    
+    getSpeed(){
+        return this.renderer.timeline.speed;
+    }
 }
 
 
@@ -118,10 +176,12 @@ export class MetacityEngine {
     constructor(project_name: string, canvas: HTMLCanvasElement) {
         this.project_name = project_name;
         this.canvas = canvas;
+        
         this.renderer = new Renderer(this.canvas,  () => {
             if (this.controls)
                 this.controls.actions();
         });
+
         this.selector = new Selector(this.renderer);
     }
 

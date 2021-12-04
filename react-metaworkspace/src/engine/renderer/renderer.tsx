@@ -7,6 +7,7 @@ import { MaterialLibrary } from './shaders';
 import { CameraControls } from './camera';
 import { StatusManager } from '../utils/status';
 import { Compas } from './compas';
+import { MainTimeline } from '../datamodel/maintimeline';
 
 const SHOWSTATS = false;
 
@@ -29,10 +30,9 @@ export class Renderer {
 
     updateShadows = false;
     actionCall: CallableFunction;
-
     status: StatusManager;
 
-    trim = 0;
+    timeline: MainTimeline;
 
     constructor(canvas: HTMLCanvasElement, actionCall: CallableFunction) {
         this.canvas = canvas;
@@ -59,7 +59,8 @@ export class Renderer {
         this.picker = new GPUPickHelper(this.renderer);
         this.changed = true;
 
-
+        //timeline
+        this.timeline = new MainTimeline(this);
 
         //devstats
         if (SHOWSTATS) {
@@ -144,6 +145,7 @@ export class Renderer {
 
     frame() {
         this.actionCall();
+        this.timeline.tick();
         this.controls.update();
         
         if (this.changed) {
@@ -186,6 +188,11 @@ export class Renderer {
 
     setPointSize(size: number) {
         this.matlib.setPointSize(size);
+        this.changed = true;
+    }
+
+    setLineWidth(size: number) {
+        this.matlib.setLineWidth(size);
         this.changed = true;
     }
 

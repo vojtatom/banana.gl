@@ -192,6 +192,7 @@ attribute vec4 objectID;
 
 uniform float zoffset;
 uniform vec4 selectedID;
+uniform float thickness;
 
 varying float varyingObjectID;
 varying vec3 colorFrag;
@@ -257,7 +258,6 @@ void main() {
     float dist = length(dir);
     mat4 rot = getRotationMat(dir);
 
-	const float thickness = 1.0;
 	float end = float(transformed.x >= 0.9);
 	transformed.x = end * (dist + (transformed.x - 1.0) * thickness) + (1.0 - end) * transformed.x * thickness; //subtract one because its the original length of the template line
 	transformed.y *= thickness;
@@ -376,6 +376,7 @@ export function lineMaterial() {
 	const customUniforms = THREE.UniformsUtils.merge([
 		//THREE.ShaderLib.phong.uniforms,
 		{ zoffset: { value: 1 } },
+		{ thickness: { value: 1 } },
 		{ selectedID: { value: [-1, -1, -1, -1] } }
 	]);
 
@@ -605,7 +606,9 @@ export const PICK_LINE_VERT = `
 attribute vec4 objectID;
 attribute vec3 lineStart;
 attribute vec3 lineEnd;
+
 uniform float zoffset;
+uniform float thickness;
 
 varying vec4 objectIDColor;
 
@@ -640,7 +643,6 @@ void main() {
     float dist = length(dir);
     mat4 rot = getRotationMat(dir);
 
-	const float thickness = 5.0;
 	float end = float(transformed.x >= 0.9);
 	transformed.x = end * (dist + (transformed.x - 1.0) * thickness) + (1.0 - end) * transformed.x * thickness; //subtract one because its the original length of the template line
 	transformed.y *= thickness;
@@ -665,7 +667,8 @@ void main() {
 export function pickingLineMaterial() {
 
 	const customUniforms = THREE.UniformsUtils.merge([
-		{ zoffset: { value: 1 } }
+		{ zoffset: { value: 1 } },
+		{ thickness: { value: 5 } },
 	]);
 
 	return new THREE.ShaderMaterial({
@@ -681,7 +684,9 @@ export const PICK_POINT_VERT = `
 attribute vec4 objectID;
 attribute vec3 location;
 varying vec4 objectIDColor;
+
 uniform float pointSize;
+uniform vec4 selectedID;
 
 void main() {
     objectIDColor = objectID;
@@ -715,24 +720,160 @@ export function pickingPointMaterial() {
 }
 
 
+export const PICK_AGENT_VERT = `
+attribute vec4 objectID;
+attribute vec3 from;
+attribute vec3 to;
+varying vec4 objectIDColor;
+uniform float pointSize;
+uniform float time;
+
+void main() {
+	objectIDColor = objectID;
+    gl_Position = projectionMatrix * (modelViewMatrix * vec4( (pointSize * position) + from * (1.0 - time) + to * time, 1.0 ));
+}
+`;
+
+
+export const PICK_AGNET_FRAG = `
+varying vec4 objectIDColor;
+
+void main() {
+	gl_FragColor = vec4(objectIDColor);
+}
+`;
+
+
+export function pickingAgentMaterial() {
+
+	const customUniforms = THREE.UniformsUtils.merge([
+		{ pointSize: { value: 1 } },
+		{ time: { value: 0 }}
+	]);
+
+	return new THREE.ShaderMaterial({
+		uniforms: customUniforms,
+		vertexShader: PICK_AGENT_VERT,
+		fragmentShader: PICK_AGNET_FRAG,
+		side: THREE.DoubleSide,
+		name: 'custom-agent-picking-material'
+	});
+}
+
+
+export const AGENT_VERT = `
+attribute vec4 objectID;
+attribute vec3 from;
+attribute float from_speed;
+attribute vec3 to;
+attribute float to_speed;
+
+varying float varyingObjectID;
+varying float speed;
+uniform float pointSize;
+uniform vec4 selectedID;
+uniform float time;
+
+
+/**
+ * Create rotation matrix from field vector.
+ * The returned matrix can rotate vector (1, 0, 0)
+ * into the desired setup.
+ */
+mat4 getRotationMat(vec3 vector)
+{
+	vec3 unit = vec3(1, 0, 0);
+	vec3 f = normalize(vector);
+	vec3 cross = cross(f, unit);
+	vec3 a = normalize(cross);
+	float s = length(cross);
+	float c = dot(f, unit);
+	float oc = 1.0 - c;
+	return mat4(oc * a.x * a.x + c,        oc * a.x * a.y - a.z * s,  oc * a.z * a.x + a.y * s,  0.0,
+                oc * a.x * a.y + a.z * s,  oc * a.y * a.y + c,        oc * a.y * a.z - a.x * s,  0.0,
+                oc * a.z * a.x - a.y * s,  oc * a.y * a.z + a.x * s,  oc * a.z * a.z + c,        0.0,
+                0.0,                       0.0,                       0.0,                       1.0);
+
+}
+
+void main() {
+	int marked = 1;
+
+    for(int i = 0; i < 4; ++i)
+        marked *= int(floor(selectedID[i] * 255.0 + 0.5) == floor(objectID[i] * 255.0 + 0.5));
+
+    varyingObjectID = float(marked);
+
+
+	vec3 transformed = position;
+	//vec3 dir = from - to;
+    //float dist = length(dir);
+    //if (dist > 0.01)
+	//{
+	//	mat4 rot = getRotationMat(dir);
+	//	transformed = (rot * vec4(transformed, 1.0)).xyz;
+	//}
+
+
+    gl_Position = projectionMatrix * (modelViewMatrix * vec4( (pointSize * transformed) + from * (1.0 - time) + to * time, 1.0 ));
+	speed = clamp((from_speed * (1.0 - time) + to_speed * time) / 20.0, 0.0, 1.0);
+}
+`;
+
+
+export const AGENT_FRAG = `
+varying float varyingObjectID;
+varying float speed;
+
+void main() {
+	vec3 color = vec3(1.0 - speed, speed, 0.0) * 0.7 + vec3(0.3, 0.3, 0.3);
+	if (varyingObjectID > 0.5) 
+		color -= vec3(0.0, 0.6, 0.6); 
+
+	gl_FragColor = vec4(color, 1.0);
+}
+`;
+
+
+export function agentSelectMaterial() {
+
+	const customUniforms = THREE.UniformsUtils.merge([
+		{ pointSize: { value: 1 } },
+		{ time: { value: 0 }},
+		{ time: { value: 0 }}
+	]);
+
+	return new THREE.ShaderMaterial({
+		uniforms: customUniforms,
+		vertexShader: AGENT_VERT,
+		fragmentShader: AGENT_FRAG,
+		side: THREE.DoubleSide,
+		name: 'custom-agent-picking-material'
+	});
+}
+
 export class MaterialLibrary {
     polygonMaterial: THREE.ShaderMaterial;
     pointMaterial: THREE.ShaderMaterial;
     lineMaterial: THREE.ShaderMaterial;
+    agentMaterial: THREE.ShaderMaterial;
 	
     pickingPolygonMaterial: THREE.ShaderMaterial;
     pickingLineMaterial: THREE.ShaderMaterial;
     pickingPointMaterial: THREE.ShaderMaterial;
+    pickingAgentMaterial: THREE.ShaderMaterial;
 
 	constructor(csm: CSM) {        
 		this.polygonMaterial = polygonSelectMaterial();
         csm.setupMaterial(this.polygonMaterial);
         this.lineMaterial = lineMaterial();
 		this.pointMaterial = pointSelectMaterial();
+		this.agentMaterial = agentSelectMaterial();
 
         this.pickingPolygonMaterial = pickingMaterial();
 		this.pickingLineMaterial = pickingLineMaterial();
         this.pickingPointMaterial = pickingPointMaterial();
+		this.pickingAgentMaterial = pickingAgentMaterial();
 	}
 
 	setPointSize(size: number) {
@@ -740,6 +881,17 @@ export class MaterialLibrary {
 		this.pointMaterial.uniformsNeedUpdate = true;
 		this.pickingPointMaterial.uniforms.pointSize.value = size;
 		this.pickingPointMaterial.uniformsNeedUpdate = true;
+		this.agentMaterial.uniforms.pointSize.value = size;
+		this.agentMaterial.uniformsNeedUpdate = true;
+		this.pickingAgentMaterial.uniforms.pointSize.value = size;
+		this.pickingAgentMaterial.uniformsNeedUpdate = true;
+	}
+
+	setLineWidth(size: number) {
+		this.lineMaterial.uniforms.thickness = { value: size };
+		this.lineMaterial.uniformsNeedUpdate = true;
+		this.pickingLineMaterial.uniforms.thickness = { value: Math.max(size, 5) };
+		this.pickingLineMaterial.uniformsNeedUpdate = true;
 	}
 
 	setSelectedID(id: number[]) {
@@ -749,5 +901,14 @@ export class MaterialLibrary {
 		this.lineMaterial.uniformsNeedUpdate = true;
 		this.pointMaterial.uniforms.selectedID = { value: id };
 		this.pointMaterial.uniformsNeedUpdate = true;
+		this.pointMaterial.uniforms.selectedID = { value: id };
+		this.pointMaterial.uniformsNeedUpdate = true;
+	}
+
+	setTime(time: number) {
+		this.pickingAgentMaterial.uniforms.time = { value: time - Math.floor(time) };
+		this.pickingAgentMaterial.uniformsNeedUpdate = true;	
+		this.agentMaterial.uniforms.time = { value: time - Math.floor(time) };
+		this.agentMaterial.uniformsNeedUpdate = true;	
 	}
 }
