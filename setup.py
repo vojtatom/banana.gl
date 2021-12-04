@@ -25,7 +25,7 @@ setup(
     ],
     python_requires='>=3.8', # Minimum version requirement of the package
     install_requires=[
-        "metacity>=0.2.0",
+        "metacity>=0.2.1",
         "requests>=2.26.0",
         "twine>=3.4.2",
         "fastapi>=0.68.1",
