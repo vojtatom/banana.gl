@@ -51,28 +51,30 @@ def stop(mws: MetacityWorkspace):
     p.stop()
 
 
-def run(mws: MetacityWorkspace, ip_adress, port):
+def run(mws: MetacityWorkspace, serve, ip_adress, port):
     p = ProcessManager(mws.path)
     p.export_pid()
 
-    print(f"The server runs on {ip_adress}:{port}")
     print(f"For more information, see logs located in directory {mws.logs_dir}.")
-    print(f"Running server...")
     os.environ["METACITYWS"] = mws.path
+    print(f"export METACITYWS={mws.path}")
+    print(f"Running workers...")
     mws.clear_logs()
 
     server_log = open(mws.server_log, 'w+')
     jobs_log = open(mws.jobs_log, 'w+')
     
-    proc = subprocess.Popen(["uvicorn", "metaworkspace.runtime.api.server:app", "--workers", "20", "--host", str(ip_adress), "--port", str(port)], 
-                            stdout=server_log,
-                            stderr=server_log)
+    if serve:
+        print(f"The server runs on {ip_adress}:{port}")
+        proc = subprocess.Popen(["uvicorn", "metaworkspace.runtime.api.server:app", "--workers", "10", "--host", str(ip_adress), "--port", str(port)], 
+                                stdout=server_log,
+                                stderr=server_log)
 
     jobs = subprocess.Popen(["python", "-m", "metaworkspace.runtime.processing"], 
                             stdout=jobs_log,
                             stderr=jobs_log)
-                 
-    return_code = proc.wait()
+    if serve:            
+        return_code = proc.wait()
     return_code = jobs.wait()
     p.stop(stop_in_background=False)
 
@@ -85,7 +87,8 @@ usage = ("Sets up Metacity Workspace."
 if __name__ == "__main__":
     parser = ArgumentParser(description=usage)
     parser.add_argument('--install', help='Run the installation process', action="store_true")
-    parser.add_argument('--run', help='Run the application', action="store_true")
+    parser.add_argument('--run', help='Run the application workers', action="store_true")
+    parser.add_argument('--serve', help='Run the application server', action="store_true")
     parser.add_argument('--regen', help='Re-generate the secret of the app, it will disable access to all existing users', action="store_true")
     parser.add_argument('--createuser', help='Create new user', action="store_true")
     parser.add_argument('--ip', nargs=1, help='IP adress to run on', default=['127.0.0.1'])
@@ -119,6 +122,6 @@ if __name__ == "__main__":
         migrate_workspace(mws)
 
     if args.run:
-        run(mws, args.ip[0], args.port[0])
+        run(mws, args.serve, args.ip[0], args.port[0])
 
 

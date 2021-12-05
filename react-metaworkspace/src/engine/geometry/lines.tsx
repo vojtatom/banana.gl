@@ -4,7 +4,7 @@ import * as THREE from "three";
 import { Decoders, DecoderQueryType } from "../utils/workers";
 import { segment } from "./geometry";
 import { Tile } from "../datamodel/tile";
-import { Model } from "./base";
+import { Model, ModelProxy } from "./base";
 import { Overlay } from "../datamodel/layer";
 
 
@@ -66,7 +66,7 @@ export class LineModel extends Model {
     }
 }
 
-export class LineProxyModel extends Model {
+export class LineProxyModel extends ModelProxy {
     constructor(data: IModel, tile: Tile, callback: CallableFunction, abort: CallableFunction) {
         super(tile.renderer);
 

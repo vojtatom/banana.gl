@@ -131,7 +131,10 @@ def current_job_configs(workspace_path):
     for job in os.listdir(jobdir):
         conf = os.path.join(jobdir, job, "job.json")
         if file_exists(conf):
-            configs.append(read_json(conf))
+            try:
+                configs.append(read_json(conf))
+            except:
+                pass
     return configs
 
 
