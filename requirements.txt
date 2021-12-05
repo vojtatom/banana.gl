@@ -1,4 +1,4 @@
-metacity>=0.2.2
+metacity>=0.2.3
 requests>=2.26.0
 twine>=3.4.2
 fastapi>=0.68.1
