@@ -11,7 +11,11 @@ from metaworkspace.runtime.processing.jobs.applystyle import JobApplyStyle
 from metaworkspace.runtime.processing.jobs.buildlayout import JobBuildLayout
 from metaworkspace.runtime.processing.jobs.loaddataset import JobLoadDataset
 from metaworkspace.runtime.processing.jobs.mapping import JobMapping
+from metaworkspace.runtime.processing.jobs.exportlego import JobExportLego
+from metaworkspace.runtime.processing.jobs.exportobj import JobExportObj
 from metaworkspace.runtime.workspace import mws
+import metaworkspace.filesystem as fs
+
 from pydantic import BaseModel
 
 router = APIRouter(prefix="/api",
@@ -69,6 +73,12 @@ class MetaData(BaseModel):
     project: str
     layer: str
     oid: int
+
+
+class ExportSelectedArea(BaseModel):
+    start: List[float]
+    end: List[float]
+    project: str
 
 
 #### PROJECT
@@ -303,6 +313,28 @@ def parse_style(style: StyleData, current_user: User = Depends(get_current_activ
     return Response(status_code=status.HTTP_200_OK)
 
 
+@router.post("/export/obj")
+def export_obj(area: ExportSelectedArea):
+    job = JobExportObj()
+    job_dir = mws.generate_job_dir()
+    export_dir = mws.generate_export_dir()
+
+    job.setup(job_dir, export_dir, area.project, area.start, area.end)
+    job.submit()
+
+    return JSONResponse({ 'exportID': fs.filename(export_dir) })
+
+
+@router.post("/export/lego")
+def export_lego(area: ExportSelectedArea):
+    job = JobExportLego()
+    job_dir = mws.generate_job_dir()
+    export_dir = mws.generate_export_dir()
+
+    job.setup(job_dir, export_dir, area.project, area.start, area.end)
+    job.submit()
+    
+    return JSONResponse({ 'exportID': fs.filename(export_dir) })
 
 
 #### STYLES
@@ -401,3 +433,39 @@ def rename_style(style: RenameStyleData, current_user: User = Depends(get_curren
             status_code=status.HTTP_409_CONFLICT,
             detail=f"Style {style.old} already exists"
         )
+
+
+#### EXPORTS
+@router.get("/exports", response_class=JSONResponse)
+def get_exports():
+    return JSONResponse(mws.get_exports())
+
+
+@router.get("/export/{exportID}")
+def get_export(exportID: str):
+    if mws.export_exists(exportID) is False:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Export not found"
+        )
+
+    export_dir = fs.export_dir(mws.path, exportID)
+    export_json = fs.export_dir_json(export_dir)
+    if os.path.exists(export_json):
+        data = fs.read_json(export_json)
+        return JSONResponse(data)
+    
+    return Response(status_code=status.HTTP_204_NO_CONTENT)
+
+
+@router.delete("/export/{exportID}")
+def delete_export(exportID: str):
+    if mws.export_exists(exportID) is False:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Export not found"
+        )
+
+    export_dir = fs.export_dir(mws.path, exportID)
+    fs.remove_dirtree(export_dir)
+    return Response(status_code=status.HTTP_200_OK)

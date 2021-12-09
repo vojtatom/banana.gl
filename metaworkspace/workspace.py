@@ -99,10 +99,15 @@ class MetacityWorkspace:
     def __init__(self, workspace_path: str):
         self.path = os.path.abspath(workspace_path)
         self.security = UserAuthenticator(self.path)
+        fs.recreate_workspace(self.path)
 
     @property
     def projects_dir(self):
         return fs.projects_dir(self.path)
+
+    @property
+    def exports_dir(self):
+        return fs.exports_dir(self.path)
 
     @property
     def jobs_dir(self):
@@ -153,11 +158,20 @@ class MetacityWorkspace:
     def generate_job_dir(self):
         return fs.generate_job_dir(self.path)
 
+    def generate_export_dir(self):
+        return fs.generate_export_dir(self.path)
+
     def clear_logs(self):
         fs.archive_logs(self.path)
 
     def get_current_job_configs(self):
         return fs.current_job_configs(self.path)
+
+    def get_exports(self):
+        return [ export_dir for export_dir in fs.current_exports(self.path)]
+
+    def export_exists(self, export_id):
+        return os.path.exists(fs.export_dir(self.path, export_id))
 
     def get_log(self, log_name):
         return fs.log_contents(self.path, log_name)

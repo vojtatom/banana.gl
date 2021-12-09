@@ -4,6 +4,7 @@ import os
 if "METACITYWS" in os.environ:
     MWSPATH = os.environ["METACITYWS"]
 else:
+    #TODO solve this asap
     raise Exception("Trying to import or execute api.py without environment properly set.")
 
 #This should be done better, but it's the only option how to avoid creatign the instance upon every request

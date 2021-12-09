@@ -21,7 +21,7 @@ def JobWorker(queue: Queue, id: str):
 
         job_dir = queue.get(block=True, timeout=None)
         log.info(f"Worker {id} started: {job_dir}")
-        job = load_job(job_dir)
+        job = load_job(job_dir, log)
         if job is None:
             log.info(f"Worker {id} skipped: {job_dir}")
             continue

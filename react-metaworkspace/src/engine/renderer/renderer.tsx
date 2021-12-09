@@ -1,13 +1,15 @@
 import * as THREE from 'three';
+import Stats from 'three/examples/jsm/libs/stats.module';
+import { MainTimeline } from '../datamodel/maintimeline';
+import { StatusManager } from '../utils/status';
+import { CameraControls } from './camera';
+import { Compas } from './compas';
 import { CSM } from './csm/CSM';
 import { CSMHelper } from './csm/CSMHelper';
-import Stats from 'three/examples/jsm/libs/stats.module';
 import { GPUPickHelper } from './picker';
+import { GridPlaceholders } from './placeholders';
+import { Selector } from './selector';
 import { MaterialLibrary } from './shaders';
-import { CameraControls } from './camera';
-import { StatusManager } from '../utils/status';
-import { Compas } from './compas';
-import { MainTimeline } from '../datamodel/maintimeline';
 
 const SHOWSTATS = false;
 
@@ -32,13 +34,16 @@ export class Renderer {
     actionCall: CallableFunction;
     status: StatusManager;
 
+
     timeline: MainTimeline;
+    selector: Selector;
+    placeholders: GridPlaceholders;
 
     constructor(canvas: HTMLCanvasElement, actionCall: CallableFunction) {
         this.canvas = canvas;
         this.actionCall = actionCall;
         this.status = new StatusManager();
-
+        
         //basic threejs
         this.scene = new THREE.Scene();
         this.pickingScene = new THREE.Scene();
@@ -48,7 +53,7 @@ export class Renderer {
         this.setupLightsAndShadows();
         this.controls.initOrthographic(this.canvas, this.csm);
         this.controls.useOrtho();
-
+        
         //compas
         this.compas = new Compas(this);
         
@@ -58,10 +63,15 @@ export class Renderer {
         //picker
         this.picker = new GPUPickHelper(this.renderer);
         this.changed = true;
-
+        
         //timeline
         this.timeline = new MainTimeline(this);
+        
+        //selector
+        this.selector = new Selector(this);
 
+        this.placeholders = new GridPlaceholders(this);
+        
         //devstats
         if (SHOWSTATS) {
             this.stats1 = Stats();

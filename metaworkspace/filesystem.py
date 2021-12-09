@@ -2,7 +2,12 @@ import os
 import shutil
 import uuid
 import json
+import ntpath
 from datetime import datetime
+
+# basics
+def filename(file_path):
+    return ntpath.basename(file_path)
 
 
 def write_json(filename, data):
@@ -52,6 +57,18 @@ def logs_dir(workspace_path):
 
 def user_dir(workspace_path):
     return os.path.join(workspace_path, "users")
+
+
+def exports_dir(workspace_path):
+    return os.path.join(workspace_path, "exports")
+
+
+def export_dir(workspace_path, export_id):
+    return os.path.join(exports_dir(workspace_path), export_id)
+
+
+def export_file(workspace_path, export_id):
+    return os.path.join(export_dir(workspace_path, export_id), "export.json")
 
 
 def user_file(user_dir, username):
@@ -106,6 +123,10 @@ def current_jobs(workspace_path):
     jobs = jobs_dir(workspace_path)
     return [job for job in os.listdir(jobs)]
 
+def current_exports(workspace_path):
+    exports = exports_dir(workspace_path)
+    return [export for export in os.listdir(exports) if export[0] != '.']
+
 def current_logs(workspace_path):
     logs = logs_dir(workspace_path)
     return [logs for logs in os.listdir(logs)]
@@ -120,6 +141,16 @@ def generate_job_dir(workspace_path):
     create_dir_if_not_exists(job_dir)
     return job_dir
 
+def generate_export_dir(workspace_path):
+    exports = exports_dir(workspace_path)
+    names = current_exports(workspace_path)
+    eid = str(uuid.uuid4())
+    while eid in names:
+        eid = str(uuid.uuid4())
+    export_dir = os.path.join(exports, eid)
+    create_dir_if_not_exists(export_dir)
+    return export_dir
+
 
 def id_from_jobdir(jobdir):
     return os.path.basename(jobdir)
@@ -131,16 +162,23 @@ def current_job_configs(workspace_path):
     for job in os.listdir(jobdir):
         conf = os.path.join(jobdir, job, "job.json")
         if file_exists(conf):
-            configs.append(read_json(conf))
+            try:
+                configs.append(read_json(conf))
+            except:
+                pass
     return configs
 
 
 def recreate_workspace(workspace_path):
-    recreate_dir(workspace_path)
+    #if os.path.exists(workspace_path):
+    #    print(f"Workspace {workspace_path} already exists. If you wish to recreate it, please remove it first.")
+
+    create_dir_if_not_exists(workspace_path)
     create_dir_if_not_exists(projects_dir(workspace_path))
     create_dir_if_not_exists(jobs_dir(workspace_path))
     create_dir_if_not_exists(logs_dir(workspace_path))
     create_dir_if_not_exists(user_dir(workspace_path))
+    create_dir_if_not_exists(exports_dir(workspace_path))
     
 
 def archive_logs(workspace_path):
@@ -157,3 +195,11 @@ def rename(old, new):
         os.rename(old, new)
         return True
     return False
+
+
+def export_obj_file(export_dir: str):
+    return os.path.join(export_dir, "export.obj")
+
+
+def export_dir_json(export_dir: str):
+    return os.path.join(export_dir, "export.json")

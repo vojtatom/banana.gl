@@ -15,11 +15,15 @@ export class MainTimeline {
     constructor(renderer: Renderer) {
         this.renderer = renderer;
         this.timelines = [];
-        this.time = 31740;
+        this.time = 0;
         this.start = Infinity;
         this.end = -Infinity;
         this.play = false;
         this.speed = 1;
+    }
+
+    get isEmpty() {
+        return this.timelines.length === 0;
     }
 
     addTimeline(timeline: Timeline) {

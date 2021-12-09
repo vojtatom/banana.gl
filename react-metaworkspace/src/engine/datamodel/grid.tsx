@@ -1,35 +1,10 @@
 import { Vector2, Vector3 } from "three";
 import { Renderer } from "../renderer/renderer";
-import { Tile } from "./tile";
-import { IVecBBox, IGrid } from "../types";
+import { IGrid, IVecBBox } from "../types";
+import { toSpiral } from "../utils/indexing";
 import { Layer, Overlay } from "./layer";
+import { Tile } from "./tile";
 
-
-function getNthTriangularNumber(n: number) {
-    return (n * (n + 1)) / 2;
-}
-
-
-function toSpiral(x: number, y: number) {
-    let level = Math.max(Math.abs(x), Math.abs(y))
-
-    if (x === 0 && y === 0) {
-        return 0
-    }
-
-    let base = getNthTriangularNumber(level - 1) * 8;
-
-    if ((x > Math.abs(y)) || (x === y && x > 0)) {
-        return base + level + y;
-    } else if (((y > Math.abs(x)) || (y === -x)) && (y > 0)) {
-        return base + (level * 4) - (level) - x;
-    } else if ((x < y) || ((x === y) && (x < 0))) {
-        return base + (level * 5) - y;
-    } else if ((y < x) || ((-y === x) && (y < 0))) {
-        return base + (level * 7) + x;
-    }
-    throw new Error("Cannot covert to 1D");
-}
 
 function extend(a: IVecBBox, b: IVecBBox) {
     a[0].min(b[0]);

@@ -79,10 +79,11 @@ html, body {
 }
 
 .header {
-    border-bottom: 1px solid var(--border);
     display: flex;
     flex-direction: row;
+    justify-content: flex-end;
     height: 3.2rem;
+    margin: 10px;
 }
 
 .header .headerLink {
@@ -315,13 +316,6 @@ ul.filelist li .fileName {
     font-size: 1em;
 }
 
-.jobs,
-.logs,
-.home {
-    max-width: 70rem;
-    margin: 1rem auto
-}
-
 .jobs .jobsHeading,
 .logs .logsHeading {
     font-size: 1.5em;
@@ -361,15 +355,15 @@ ul.filelist li .fileName {
     background: var(--gray400);
 }
 
-.logs .logContents {
-    padding: 1rem;
+.logContents {
     background: var(--gray100);
-    border-radius: 4px;
+    width: 100%;
+    box-sizing: border-box;
+    padding: 1rem;
     overflow: auto;
-    max-height: 30rem;
 }
 
-.logs .logLines {
+.logLines {
     display: flex;
     flex-direction: column-reverse;
     font-family: monospace;
@@ -384,15 +378,24 @@ ul.filelist li .fileName {
 .home {
     display: flex;
     flex-flow: column;
-    justify-content: center;
-    height: 100vh;
-    padding: 0;
-    margin: 0rem auto
 }
 
 .home .homeNav {
     margin-top: 5rem;
     color: var(--blue500);
+}
+
+.home .homeLists {
+    display: flex;
+    flex-flow: row;
+    flex-wrap: wrap;
+}
+
+.home .homeLists .homeList {
+    display: flex;
+    flex-flow: column;
+    margin-right: 5rem;
+    margin-bottom: 2rem;
 }
 
 .styleList {
@@ -446,6 +449,56 @@ ul.filelist li .fileName {
     font-weight: inherit;
     font-size: inherit;
     color: var(--gray600);
+}
+
+.legend {
+    margin: 1rem;
+}
+
+.legend .legend-item {
+    font-size: 0.8em;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    padding: 7px 20px
+}
+
+.legend .legend-item.vertical {
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.legend .legend-name {
+    margin-right: 1rem;
+    flex-grow: 1;
+}
+
+.legend .legend-item.vertical .legend-name {
+    margin-bottom: 0.5rem;
+}
+
+.legend .legend-color {
+    height: 1rem;
+    width: 1rem;
+    margin-right: 1rem;
+    border-radius: 4px;
+}
+
+.legend .legend-colormap-cont {
+    width: 100%; 
+}
+
+.legend .legend-colormap {
+    height: 1rem;
+    width: 100%;
+}
+
+.legend .legend-range {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    width: 100%;
+    margin-top: 0.5rem;
 }
 
 pre.parsedMessage {
@@ -535,11 +588,32 @@ pre.parsedMessage {
 .viewMenu .layers,
 .viewMenu .timeline,
 .viewMenu .styles,
+.viewMenu .selector,
 .viewMenu .settings {
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     margin: 1rem;
+}
+
+.viewMenu .selector .field,
+.export-description .field {
+    margin-bottom: 1rem;
+}
+
+.viewMenu .selector .field:last-child,
+.export-description .field:last-child {
+    margin-bottom: 0;
+}
+
+
+.viewMenu .selector .field .values,
+.export-description .field .values {
+    margin-top: 4px;
+}
+
+.viewMenu .selector .field.buttons {
+    margin-top: 2rem;
 }
 
 .viewMenu .layers .layer,
@@ -645,6 +719,68 @@ pre.parsedMessage {
     left: 0;
     top: 0;
     z-index: 2;  
+}
+
+.selector {
+    color: #555;
+    max-width: 20rem;
+    margin: 1rem;
+}
+
+
+.export-description {
+    max-width: 30rem;
+}
+
+.lego-page canvas {
+    width: 100vw;
+    height: calc(100vh - 100px);
+    border-top: 1px solid #CCC;
+}
+
+.lego-page .lego-controls {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+}
+
+.lego-page .lego-controls .lego-slider {
+    min-width: 15rem;
+    display: flex;
+    flex-direction: row;
+}
+
+.page {
+    max-width: 50rem;
+    margin: 4rem auto;
+}
+
+@media screen and (max-width: 50rem) {
+    .page {
+        width: calc(100vw - 2rem);
+        margin: 1rem 1rem 3rem;
+        box-sizing: border-box;
+    }
+}
+
+
+.logos {
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+}
+
+.logos a {
+    width: 6rem;
+    margin-right: 2rem;
+}
+
+.logos .logo {
+    filter: grayscale(100%);
+    width: 100%;
+    height: auto;
 }
 
 /* custom range */

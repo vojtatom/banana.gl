@@ -1,7 +1,8 @@
 
-import { Renderer } from '../renderer/renderer'
-import iaxios from '../../axios'
-import { Layer, Overlay } from './layer'
+import iaxios from '../../axios';
+import { apiurl } from '../../url';
+import { Renderer } from '../renderer/renderer';
+import { Layer, Overlay } from './layer';
 
 
 export class Project {
@@ -17,7 +18,7 @@ export class Project {
         this.layers = [];
         this.styles = [];
 
-        iaxios.get(`/api/data/${this.name}/layout.json`, {
+        iaxios.get(`${apiurl.PROJECTDATA}${this.name}/layout.json`, {
             headers: {
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache',
@@ -71,6 +72,8 @@ export class Project {
         for(const layer of this.layers){
             layer.applyStyle(style);
         }
+
+        
     }
 
     clearStyle(){
