@@ -3,18 +3,18 @@
 
 export const url = {
     HOME: '/app',
-    LOGIN: '/app/login',
     VIEWTEMPLATE: '/app/view/:project_name',
     VIEW: '/app/view/',
     PROJECTSTEMPLATE: '/app/projects/:project_name?',
     PROJECTS: '/app/projects/',
-    JOBS: '/app/jobs',
     UPLOADLAYERTEMPLATE: '/app/upload/:project_name',
     UPLOADLAYER: '/app/upload/',
     STYLETEMPLATE: '/app/style/:project_name/:style_name',
     STYLE: '/app/style/',
     MAPPINGTEMPLATE: '/app/mapping/:project_name',
-    MAPPING: '/app/mapping/'
+    MAPPING: '/app/mapping/',
+    EXPORTTEMPLATE: '/app/exports/:export_name',
+    EXPORT: '/app/exports/',
 };
 
 export const apiurl = {
@@ -48,5 +48,13 @@ export const apiurl = {
     DELETESTYLE: '/api/style',
     RENAMESTYLE: '/api/style/rename',
     APPLYSTYLE: '/api/style/apply',
-    PARSESTYLE: '/api/style/parse'
+    PARSESTYLE: '/api/style/parse',
+
+    PROJECTDATA: '/api/data/',
+    EXPORTDATA: '/api/exports/',
+
+    LISTEXPORTS: '/api/exports',
+    EXPORT: '/api/export/',
+    EXPORTOBJ: '/api/export/obj',
+    EXPORTLEGO: '/api/export/lego',
 };

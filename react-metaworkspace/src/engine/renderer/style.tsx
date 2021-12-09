@@ -1,5 +1,5 @@
 import { ILayerStyle } from "../types";
-import { Decoder } from "../utils/decoder";
+import { DecoderQueryType, Decoders } from "../utils/workers";
 
 
 export class LayerStyle {
@@ -9,20 +9,29 @@ export class LayerStyle {
         this.styles = styles || {};
 
         if (this.styles.buffer) {
-            Decoder.base64touint8(this.styles.buffer as string, (buffer: Uint8Array) => {
-                this.styles.buffer = buffer;
-                callback(this);
-            });
+            Decoders.Instance.process(
+                [{
+                    datatype: DecoderQueryType.uint8,
+                    buffer: this.styles.buffer
+                }], (buffer: Uint8Array) => {
+                    this.styles.buffer = buffer;
+                    callback(this);
+                });
         }
 
         if (this.styles.buffer_source && this.styles.buffer_target) {
-            Decoder.base64touint8(this.styles.buffer_source as string, (buffer: Uint8Array) => {
-                this.styles.buffer_source = buffer;
-                Decoder.base64touint8(this.styles.buffer_target as string, (buffer: Uint8Array) => {
-                    this.styles.buffer_target = buffer;
+            Decoders.Instance.process(
+                [{
+                    datatype: DecoderQueryType.uint8,
+                    buffer: this.styles.buffer_source
+                }, {
+                    datatype: DecoderQueryType.uint8,
+                    buffer: this.styles.buffer_target
+                }], (sbuffer: Uint8Array, tbuffer: Uint8Array) => {
+                    this.styles.buffer_source = sbuffer;
+                    this.styles.buffer_target = tbuffer;
                     callback(this);
                 });
-            });
         }
     }
 

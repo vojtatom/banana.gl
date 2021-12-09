@@ -10,6 +10,7 @@ from metaworkspace.workspace import MetacityWorkspace, UserAuthenticator, Proces
 
 def install(workspace_path: str):
     print(f"Creating workspace directory...")
+    fs.remove_dirtree(workspace_path)
     fs.recreate_workspace(workspace_path)
     print(f"Generating secrets...")
     UserAuthenticator.generate(workspace_path)

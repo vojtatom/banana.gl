@@ -16,6 +16,7 @@ DIR = os.path.realpath(os.path.dirname(__file__))
 STATIC = os.path.join(DIR, "../../client", "static")
 ASSETS = os.path.join(DIR, "../../client", "assets")
 PROJECTS = mws.projects_dir
+EXPORTS = mws.exports_dir
 TEMPLATES = os.path.join(DIR, "../../client")
 
 
@@ -29,6 +30,7 @@ def create_app():
     app.mount("/static", StaticFiles(directory=STATIC), name="static")
     app.mount("/assets", StaticFiles(directory=ASSETS), name="assets")
     app.mount("/api/data", StaticFiles(directory=PROJECTS), name="data")
+    app.mount("/api/exports", StaticFiles(directory=EXPORTS), name="exports")
 
     origins = [
         "http://localhost:3000",

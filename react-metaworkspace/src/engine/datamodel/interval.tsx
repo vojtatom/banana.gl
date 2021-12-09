@@ -4,6 +4,7 @@ import { IInterval } from "../types";
 import { Layer, Overlay } from "./layer";
 import { Move } from "../geometry/movement"
 import { deserializeMovement } from "../geometry/deserialize";
+import { apiurl } from "../../url";
 
 export class Interval {
     start: number;
@@ -40,7 +41,7 @@ export class Interval {
         this.delayedCall = setTimeout(() => {
             this.delayedCall = undefined;
             this.renderer.status.actions.loadingGeometry.start();
-            iaxios.get(`/api/data/${this.layer.project}/${this.layer.name}/timeline/stream/${this.file}`).then(
+            iaxios.get(`${apiurl.PROJECTDATA}${this.layer.project}/${this.layer.name}/timeline/stream/${this.file}`).then(
                 (response) => {
                     const data = response.data;
                     this.renderer.status.actions.loadingGeometry.stop();

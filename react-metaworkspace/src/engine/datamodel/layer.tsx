@@ -1,11 +1,12 @@
+import * as THREE from "three";
+import iaxios from "../../axios";
+import { apiurl } from "../../url";
+import { Model } from "../geometry/base";
 import { Renderer } from "../renderer/renderer";
+import { LayerStyle } from "../renderer/style";
+import { ILayerBaseData, ILayerData, IOverlayData } from "../types";
 import { Grid } from "./grid";
 import { Timeline } from "./timeline";
-import { ILayerData, IOverlayData, ILayerBaseData } from "../types";
-import * as THREE from "three";
-import { LayerStyle } from "../renderer/style";
-import iaxios from "../../axios";
-import { Model } from "../geometry/base";
 
 
 abstract class LayerBase {
@@ -92,13 +93,16 @@ abstract class LayerBase {
     }
 
     applyStyle(style: string) {
-        iaxios.get(`/api/data/${this.project}/styles/${style}/${this.name}.json`, {
+        this.renderer.status.actions.loadingStyles.start();
+        iaxios.get(`${apiurl.PROJECTDATA}${this.project}/styles/${style}/${this.name}.json`, {
             headers: {
                 'Cache-Control': 'no-cache',
                 'Pragma': 'no-cache',
                 'Expires': '0'
             }
         }).then((response) => {
+            this.renderer.status.actions.loadingStyles.stop();
+            this.renderer.status.actions.applyingStyles.start();
             new LayerStyle(response.data, (lstyle: LayerStyle) => {
                 this.style = lstyle;
 
@@ -108,6 +112,8 @@ abstract class LayerBase {
                         this.applyStyleToModels(tile.models);
                     }
                 }
+
+                this.renderer.status.actions.applyingStyles.stop();
             });
         }).catch(() => {
             this.clearStyle();

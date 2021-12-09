@@ -1,12 +1,13 @@
-import { ITile } from "../types";
-import { Layer, Overlay } from "./layer";
-import { Renderer } from "../renderer/renderer"
+import axios from "axios";
 import { Vector2, Vector3 } from "three";
 import iaxios from "../../axios";
-import axios from "axios";
-import { Model } from "../geometry/base"
-import { deserializeModel } from "../geometry/deserialize"
-import { host } from "../engine"
+import { apiurl } from "../../url";
+import { host } from "../engine";
+import { Model } from "../geometry/base";
+import { deserializeModel } from "../geometry/deserialize";
+import { Renderer } from "../renderer/renderer";
+import { ITile } from "../types";
+import { Layer, Overlay } from "./layer";
 
 class TileLoader {
     //axios stop request
@@ -23,8 +24,7 @@ class TileLoader {
 
         const prefix = (Math.abs(tile.x) + Math.abs(tile.y)) % 6;
 
-        iaxios.get(
-            `/api/data/${tile.layer.project}/${tile.layer.name}/grid/stream/${tile.sourceFile}`, {
+        iaxios.get(`${apiurl.PROJECTDATA}${tile.layer.project}/${tile.layer.name}/grid/stream/${tile.sourceFile}`, {
             cancelToken: this.stopFlag.token,
             baseURL: `http://static${prefix}.${host}`,
         }).then(
@@ -65,7 +65,6 @@ export class Tile {
     private loader: TileLoader;
     private caching: boolean; 
 
-
     constructor(data: ITile, renderer: Renderer, layer: Layer | Overlay) {
         this.bbox = [new Vector3(...data.box[0]), new Vector3(...data.box[1])];
         this.brect = [new Vector2(this.bbox[0].x, this.bbox[0].y), new Vector2(this.bbox[1].x, this.bbox[1].y)];
@@ -78,6 +77,7 @@ export class Tile {
         this.models = [];
         this.loader = new TileLoader();
         this.caching = false;
+        this.renderer.placeholders.addPlaceholder(this.x, this.y);
     }
 
     set visible(isVisible: boolean) {
@@ -97,6 +97,8 @@ export class Tile {
     }
 
     show() {
+        this.renderer.placeholders.hidePlaceholder(this.x, this.y);
+
         if (!this.loader.loaded) {
             this.loader.get(this, (models: Array<any>) => {
 
@@ -139,6 +141,8 @@ export class Tile {
     }
 
     hide() {
+        this.renderer.placeholders.showPlaceholder(this.x, this.y);
+
         if (!this.loader.loaded) {
             this.loader.abort();
         }

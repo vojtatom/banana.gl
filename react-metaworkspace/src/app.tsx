@@ -1,21 +1,18 @@
 import {
-  BrowserRouter as Router,
-  Switch,
-  Route,
-  Redirect
-} from "react-router-dom"
-import './style.css'
-import 'react-toastify/dist/ReactToastify.css';
-import { url } from './url'
-import { Home } from './screens/home'
-import { Projects } from './screens/projects'
-import { Login } from './screens/login'
-import { UploadLayer } from './screens/upload'
-import { Jobs } from './screens/jobs'
-import { Mapping } from './screens/mapping'
-import { View } from './screens/view'
+  BrowserRouter as Router, Redirect, Route, Switch
+} from "react-router-dom";
 import { ToastContainer } from 'react-toastify';
-import { StyleEditor } from './screens/style';
+import 'react-toastify/dist/ReactToastify.css';
+import { Export } from './screens/exports/export';
+import { Home } from './screens/home/home';
+import { LoginGate } from './screens/login/gate';
+import { Mapping } from './screens/mapping/mapping';
+import { Projects } from './screens/projects/projects';
+import { StyleEditor } from './screens/style/style';
+import { UploadLayer } from './screens/upload/upload';
+import { View } from './screens/view/view';
+import './style.css';
+import { url } from './url';
 
 export function App() {
   return (
@@ -35,23 +32,28 @@ export function App() {
         <Route exact path={["/"]}>
           <Redirect to="/app" />
         </Route>
-        <Route path={url.LOGIN}>
-          <Login />
+        <Route path={url.EXPORTTEMPLATE}>
+          <Export />
         </Route>
         <Route path={url.MAPPINGTEMPLATE}>
-          <Mapping />
+          <LoginGate>
+            <Mapping />
+          </LoginGate>
         </Route>
         <Route path={url.UPLOADLAYERTEMPLATE}>
-          <UploadLayer />
+          <LoginGate>
+            <UploadLayer />
+          </LoginGate>
         </Route>
         <Route path={url.PROJECTSTEMPLATE}>
-          <Projects />
+          <LoginGate>
+            <Projects />
+          </LoginGate>
         </Route>
         <Route path={url.STYLETEMPLATE}>
-          <StyleEditor />
-        </Route>
-        <Route path={url.JOBS}>
-          <Jobs />
+          <LoginGate>
+            <StyleEditor />
+          </LoginGate>
         </Route>
         <Route path={url.VIEWTEMPLATE}>
           <View />

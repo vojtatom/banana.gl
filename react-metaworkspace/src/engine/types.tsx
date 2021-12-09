@@ -83,3 +83,9 @@ export interface ILayerStyle {
     buffer_source?: string | Uint8Array;
     buffer_target?: string | Uint8Array;
 }
+
+export interface AreaSelection {
+    start: [number, number];
+    end: [number, number];
+    size: [number, number];
+} 
