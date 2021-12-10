@@ -30,7 +30,7 @@ class JobMapping(job.Job):
         self.target = data['target']
         self.overlay = data['overlay']
 
-    def run(self):
+    def run(self, log):
         self.update_status('loading resources')
         proj = mws.get_project(self.project)
         overlay = proj.create_overlay(self.overlay)

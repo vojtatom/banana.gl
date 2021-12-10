@@ -21,11 +21,11 @@ class JobBuildLayout(job.Job):
     def deserialize(self, data):
         self.project = data['project']
 
-    def run(self):
+    def run(self, log):
         proj = mws.get_project(self.project)
-        self.update_status("building layout")
+        self.update_status("building layout", log)
         build_layout(proj)
-        self.update_status("finished")
+        self.update_status("finished", log)
 
 
 

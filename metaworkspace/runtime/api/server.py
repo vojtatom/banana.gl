@@ -29,8 +29,11 @@ def create_app():
     #app.include_router(auth.router)
     app.mount("/static", StaticFiles(directory=STATIC), name="static")
     app.mount("/assets", StaticFiles(directory=ASSETS), name="assets")
-    app.mount("/api/data", StaticFiles(directory=PROJECTS), name="data")
-    app.mount("/api/exports", StaticFiles(directory=EXPORTS), name="exports")
+
+
+    if "METACITYWSENV" in os.environ and os.environ["METACITYWSENV"] == "LOCAL":
+        app.mount("/api/data", StaticFiles(directory=PROJECTS), name="data")
+        app.mount("/api/exports", StaticFiles(directory=EXPORTS), name="exports")
 
     origins = [
         "http://localhost:3000",

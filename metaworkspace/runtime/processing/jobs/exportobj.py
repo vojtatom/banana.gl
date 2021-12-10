@@ -32,14 +32,14 @@ class JobExportObj(job.Job):
         self.start = data['start']
         self.end = data['end']
 
-    def run(self):
-        self.update_status('loading resources')
+    def run(self, log):
+        self.update_status('loading resources', log)
         proj = mws.get_project(self.project)
         fs.create_dir_if_not_exists(self.export)
-        self.update_status('exporting')
+        self.update_status('exporting', log)
         export_obj(proj, fs.export_obj_file(self.export), self.start, self.end)
         write_json(fs.export_dir_json(self.export), { "type": "obj", "start": self.start, "end": self.end, "project": self.project })
-        self.update_status("finished")
+        self.update_status("finished", log)
         
 
 

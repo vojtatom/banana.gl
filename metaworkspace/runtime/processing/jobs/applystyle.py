@@ -23,16 +23,9 @@ class JobApplyStyle(job.Job):
         self.project = data['project']
         self.style_name = data['style_name']
 
-    def run(self):
-        self.update_status("getting style")
+    def run(self, log):
+        self.update_status("getting style", log)
         proj = mws.get_project(self.project)
-        self.update_status("parsing style")
-       
-        try:
-            apply_style(proj, self.style_name)
-        except Exception as e:
-            self.update_status(e)
-            self.update_status("parsing failed") 
-            return
-
-        self.update_status("finished")
+        self.update_status("parsing style", log)
+        apply_style(proj, self.style_name)
+        self.update_status("finished", log)

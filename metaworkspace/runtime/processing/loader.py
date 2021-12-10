@@ -8,7 +8,6 @@ from metaworkspace.runtime.processing.jobs.exportobj import JobExportObj
 from metaworkspace.runtime.processing.jobs.exportlego import JobExportLego
 import json
 import os
-import uuid
 from time import sleep
 
 
@@ -44,7 +43,6 @@ def load_job(job_dir, log):
             with open(jobfile, 'r') as f:
                 job: Job = json.load(f, object_hook=job_object_hook)
             job.job_dir = job_dir
-            job.setup_log(str(uuid.uuid1()))
             return job
         except Exception as e:
             if i == 5:

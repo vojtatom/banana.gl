@@ -9,7 +9,6 @@ interface IJob {
     status: number;
     project?: string;
     job_id: string;
-    log_id?: string;
 }
 
 export function JobList() {
@@ -91,7 +90,7 @@ export function JobList() {
                                     <Table.TextCell className="wide">{job.type}</Table.TextCell>
                                     <Table.TextCell className="wide">{job.status}</Table.TextCell>
                                     <Table.TextCell className="wide">{job.project ? job.project : "--"}</Table.TextCell>
-                                    <Table.TextCell className="narrow" onClick={() => setLogName(job.log_id)}>Log</Table.TextCell>
+                                    <Table.TextCell className="narrow"><Button onClick={() => setLogName("worker0")}>Log</Button></Table.TextCell>
                                 </Table.Row>
                             )) :
                                 <EmptyState
@@ -105,7 +104,7 @@ export function JobList() {
                             }
                         </Table.Body>
                     </Table>
-                    <SearchInput placeholder='server_log.txt' width="calc(100% - 30px)" margin={15} onChange={(e: any) => setLogName(e.target.value)} value={logName} />
+                    <SearchInput placeholder='Type worker0 to see processing logs' width="calc(100% - 30px)" margin={15} onChange={(e: any) => setLogName(e.target.value)} value={logName} />
                     <Pane className="logContents">
                         { logContents && logContents.length > 0 ?
                             <Pre className="logLines">{logContents.split(/[\r\n]+/).map((line, index) => <span key={index}>{line}</span>)}</Pre>

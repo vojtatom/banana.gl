@@ -18,7 +18,6 @@ def JobWorker(queue: Queue, id: str):
     log = logging.getLogger(logid)
 
     while True:
-
         job_dir = queue.get(block=True, timeout=None)
         log.info(f"Worker {id} started: {job_dir}")
         job = load_job(job_dir, log)
@@ -27,12 +26,13 @@ def JobWorker(queue: Queue, id: str):
             continue
         
         try:
-            job.run() 
+            job.run(log) 
             job.cleanup()
             log.info(f"Worker {id} done: {job_dir}")
         except Exception as e:
             log.error(f"Worker {id}: {job_dir}")
             log.error(e)
+            job.cleanup() #maybe not?
 
 
 class JobQueue:
@@ -60,6 +60,10 @@ class JobQueue:
             status += f"[ worker {i} with pid {w.pid} is alive: {w.is_alive()} ], "
         status += f"queue [ full: {self.queue.full()} ] [empty: {self.queue.empty()} ]"
         return status
+
+    @property
+    def all_running(self):
+        return all([w.is_alive() for w in self.workers])
 
 
 class EventManager:
@@ -121,6 +125,14 @@ class JobManager:
                 time.sleep(15)
                 sys.stdout.flush()
                 sys.stderr.flush()
+
+                if not self.queue.all_running:
+                    log.info("Some workers are dead, stopping observer, exiting")
+                    observer.stop()
+                    observer.join()
+                    self.queue.stop_workers()
+                    break
+
         except KeyboardInterrupt:
             observer.stop()
             observer.join()

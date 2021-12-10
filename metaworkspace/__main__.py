@@ -52,13 +52,19 @@ def stop(mws: MetacityWorkspace):
     p.stop()
 
 
-def run(mws: MetacityWorkspace, serve, ip_adress, port):
+def run(mws: MetacityWorkspace, serve, ip_adress, port, python="python"):
     p = ProcessManager(mws.path)
     p.export_pid()
 
     print(f"For more information, see logs located in directory {mws.logs_dir}.")
     os.environ["METACITYWS"] = mws.path
-    print(f"export METACITYWS={mws.path}")
+    if serve:
+        os.environ["METACITYWSENV"] = "LOCAL"
+    else:
+        os.environ["METACITYWSENV"] = "PRODUCTION"
+
+    print(f"export METACITYWS={os.environ['METACITYWS']}")
+    print(f"export METACITYWSENV={os.environ['METACITYWSENV']}")
     print(f"Running workers...")
     mws.clear_logs()
 
@@ -71,7 +77,7 @@ def run(mws: MetacityWorkspace, serve, ip_adress, port):
                                 stdout=server_log,
                                 stderr=server_log)
 
-    jobs = subprocess.Popen(["python", "-m", "metaworkspace.runtime.processing"], 
+    jobs = subprocess.Popen([python, "-m", "metaworkspace.runtime.processing"], 
                             stdout=jobs_log,
                             stderr=jobs_log)
     if serve:            
@@ -94,6 +100,7 @@ if __name__ == "__main__":
     parser.add_argument('--createuser', help='Create new user', action="store_true")
     parser.add_argument('--ip', nargs=1, help='IP adress to run on', default=['127.0.0.1'])
     parser.add_argument('--port', nargs=1, help='Port to run on', default=['5000'])
+    parser.add_argument('--python', nargs=1, help='Port to run on', default=['python'])
     parser.add_argument('--migrate', help='Migrate existing projects after installation of newer version', action="store_true")
     parser.add_argument('--stop', help='Will try to stop the running workspace if pid file is in working directory', action="store_true")
     parser.add_argument('workspace_dir', type=str, help='Path to newly created Metacity workspace')
@@ -123,6 +130,6 @@ if __name__ == "__main__":
         migrate_workspace(mws)
 
     if args.run:
-        run(mws, args.serve, args.ip[0], args.port[0])
+        run(mws, args.serve, args.ip[0], args.port[0], args.python[0])
 
 

@@ -32,17 +32,17 @@ class JobExportLego(job.Job):
         self.start = data['start']
         self.end = data['end']
 
-    def run(self):
-        self.update_status('loading resources')
+    def run(self, log):
+        self.update_status('loading resources', log)
         proj = mws.get_project(self.project)
         fs.create_dir_if_not_exists(self.export)
-        self.update_status('exporting')
+        self.update_status('exporting', log)
         cdp=2
-        bfsr=(15, 45)
+        bfsr=(10, 45)
         bfs=5
         legofy(proj, self.export, self.start, self.end, coordinates_decimal_precision=cdp, box_filter_size_range=bfsr, box_filter_step=bfs)
         write_json(fs.export_dir_json(self.export), { "type": "lego", "start": self.start, "end": self.end, "unit_precision": cdp, "box_filter_size_range": bfsr, "box_filter_step": bfs, "project": self.project })
-        self.update_status("finished")
+        self.update_status("finished", log)
         
 
 
