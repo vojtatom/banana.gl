@@ -69,7 +69,8 @@ export function TimelineMenu(props: { engine: MetacityEngine | undefined, visibl
 
     return (
         <>
-            {visible &&
+            {visible && (
+                engine?.controls?.hasTimeData ?
                 <>
                     <Heading size={300} className="title">Timeline</Heading>
                     <Pane className="timeline">
@@ -107,6 +108,11 @@ export function TimelineMenu(props: { engine: MetacityEngine | undefined, visibl
                         </Pane>
                     </Pane>
                 </>
+                :
+                <>
+                    <Heading size={300} paddingBottom={32} className="title">No dynamic data</Heading>
+                </>
+                )
             }
         </>
     )

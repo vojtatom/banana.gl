@@ -39,11 +39,17 @@ export class MainTimeline {
         return true;
     }
 
+    get hasData() {
+        return this.timelines.length > 0;
+    }
+
     tick() {
         const delta = (1 / 60) * this.speed;
-
+        
         if (this.play && this.ready) {
             this.time += delta;
+            this.time = this.time % this.end;
+            this.time = Math.max(this.time, this.start);
             this.renderer.matlib.setTime(this.time);
             this.renderer.changed = true;
         }

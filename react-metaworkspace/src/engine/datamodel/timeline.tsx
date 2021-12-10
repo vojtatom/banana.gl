@@ -1,8 +1,8 @@
+import { le } from "binary-search-bounds";
 import { Renderer } from "../renderer/renderer";
 import { ITimeline } from "../types";
+import { Interval } from "./interval";
 import { Layer, Overlay } from "./layer";
-import { Interval } from "./interval"
-import { le } from "binary-search-bounds"
 
 const MINPRELOAD = 2;
 const PRELOADI = 5;
@@ -101,7 +101,8 @@ export class Timeline {
     swapActive(time: number) {
         const i = this.current(time);
         this.active = -1;
-        if (this.intervals[i].init) {
+
+        if (this.intervals[i] && this.intervals[i].init) {
             this.active = i;
         }
     }

@@ -105,6 +105,10 @@ export class EngineControls {
         this.clickTime = time;
     }
 
+    get hasTimeData() {
+        return this.renderer.timeline.hasData;
+    }
+
     keyDown(key: string) {
         console.log('key down', key);
         this.keymap[key] = true;
