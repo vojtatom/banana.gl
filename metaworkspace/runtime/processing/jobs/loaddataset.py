@@ -34,16 +34,16 @@ class JobLoadDataset(job.Job):
         self.layer = data['layer']
         self.files = data['files']
 
-    def run(self):
-        layer, proj = self.parse_files() 
+    def run(self, log):
+        layer, proj = self.parse_files(log) 
         layer.persist()
-        self.update_status("building grid")
+        self.update_status("building grid", log)
         build_grid(layer)
-        self.update_status("building timeline")
+        self.update_status("building timeline", log)
         build_timeline(layer)
-        self.update_status("building layout")
+        self.update_status("building layout", log)
         build_layout(proj)
-        self.update_status("finished")
+        self.update_status("finished", log)
 
     def setup_resources(self, job_dir, files):
         lfiles = []
@@ -54,7 +54,7 @@ class JobLoadDataset(job.Job):
             lfiles.append(local_file_path)
         return lfiles
 
-    def parse_files(self):
+    def parse_files(self, log):
         proj = mws.get_project(self.project)
         layer = proj.create_layer(self.layer)
         for i, file in enumerate(self.files):
@@ -65,7 +65,7 @@ class JobLoadDataset(job.Job):
                 for o in objects:
                     layer.add(o)
             except Exception as e:
-                self.log(e)
+                log.warning(e)
         return layer, proj
         
 

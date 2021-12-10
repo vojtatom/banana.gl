@@ -17,7 +17,7 @@ def setup_logging(name, scrnlog=False, txtlog=True, loglevel=logging.DEBUG):
     log_formatter = logging.Formatter("%(asctime)s - %(levelname)s :: %(message)s")
 
     if txtlog:
-        txt_handler = RotatingFileHandler(os.path.join(logdir, f"{name}.log"))
+        txt_handler = RotatingFileHandler(os.path.join(logdir, f"{name}.log"), backupCount=5, maxBytes=10000000)
         txt_handler.doRollover()
         txt_handler.setFormatter(log_formatter)
         log.addHandler(txt_handler)

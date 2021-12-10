@@ -58,7 +58,13 @@ def run(mws: MetacityWorkspace, serve, ip_adress, port):
 
     print(f"For more information, see logs located in directory {mws.logs_dir}.")
     os.environ["METACITYWS"] = mws.path
-    print(f"export METACITYWS={mws.path}")
+    if serve:
+        os.environ["METACITYWSENV"] = "LOCAL"
+    else:
+        os.environ["METACITYWSENV"] = "PRODUCTION"
+
+    print(f"export METACITYWS={os.environ['METACITYWS']}")
+    print(f"export METACITYWSENV={os.environ['METACITYWSENV']}")
     print(f"Running workers...")
     mws.clear_logs()
 

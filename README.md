@@ -1,10 +1,20 @@
 # Metacity Workspace
 
-Metacity Workspace is a Python package, which is also the main Metacity application. For easy installation, follow the instructions described [here](https://github.com/MetacitySuite/Metacity-Guide).
+[![Build Status](https://github.com/MetacitySuite/Metacity-Workspace/workflows/Metacity%20Workspace%20CI/badge.svg)](https://github.com/MetacitySuite/Metacity-Workspace/actions?query=workflow%3A%22Metacity+Workspace+CI%22)
+[![Pypi version](https://badge.fury.io/py/metaworkspace.svg)](https://pypi.org/project/metaworkspace/)
+
+Metacity Workspace is a Python package, which is also the main Metacity application. 
 
 See running live:
-
 http://metacity.cc
+
+## Installation
+
+Install with:
+```
+pip install metaworkspace
+```
+For easy installation, follow the instructions described [here](https://github.com/MetacitySuite/Metacity-Guide).
 
 ## Branches
 | Branch | Description |

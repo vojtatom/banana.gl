@@ -18,7 +18,6 @@ def JobWorker(queue: Queue, id: str):
     log = logging.getLogger(logid)
 
     while True:
-
         job_dir = queue.get(block=True, timeout=None)
         log.info(f"Worker {id} started: {job_dir}")
         job = load_job(job_dir, log)
@@ -27,12 +26,13 @@ def JobWorker(queue: Queue, id: str):
             continue
         
         try:
-            job.run() 
+            job.run(log) 
             job.cleanup()
             log.info(f"Worker {id} done: {job_dir}")
         except Exception as e:
             log.error(f"Worker {id}: {job_dir}")
             log.error(e)
+            job.cleanup() #maybe not?
 
 
 class JobQueue:

@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 setup(
     name="metaworkspace",
     packages=find_packages("."),
-    version="0.3.0",
+    version="0.3.1",
     description="Python-React application for visualization of urban data",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -25,7 +25,7 @@ setup(
     ],
     python_requires='>=3.8', # Minimum version requirement of the package
     install_requires=[
-        "metacity>=0.2.5",
+        "metacity>=0.2.8",
         "requests>=2.26.0",
         "twine>=3.4.2",
         "fastapi>=0.68.1",
