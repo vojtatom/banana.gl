@@ -61,6 +61,10 @@ class JobQueue:
         status += f"queue [ full: {self.queue.full()} ] [empty: {self.queue.empty()} ]"
         return status
 
+    @property
+    def all_running(self):
+        return all([w.is_alive() for w in self.workers])
+
 
 class EventManager:
     def __init__(self, queue: JobQueue):
@@ -121,6 +125,14 @@ class JobManager:
                 time.sleep(15)
                 sys.stdout.flush()
                 sys.stderr.flush()
+
+                if not self.queue.all_running:
+                    log.info("Some workers are dead, stopping observer, exiting")
+                    observer.stop()
+                    observer.join()
+                    self.queue.stop_workers()
+                    break
+
         except KeyboardInterrupt:
             observer.stop()
             observer.join()

@@ -63,11 +63,11 @@ class ProcessManager:
 
     def export_pid(self):
         pid = os.getpid()
-        if os.path.exists(self.config):
-            pid = self.pid
-            if pid is None:
-                raise Exception("Workspace is in invalid state, pid file is present in workspace dir, however it does not contain valid PID")
-            raise Exception(f"Workspace is already running as process {pid} or the process was killed before, stop the process:\n    python -m metaworkspace --stop <workspace name>")
+        #if os.path.exists(self.config):
+        #    pid = self.pid
+        #    if pid is None:
+        #        raise Exception("Workspace is in invalid state, pid file is present in workspace dir, however it does not contain valid PID")
+        #    raise Exception(f"Workspace is already running as process {pid} or the process was killed before, stop the process:\n    python -m metaworkspace --stop <workspace name>")
         
         pid = os.getpid()
         print(f"Running as process with PID {pid}")
@@ -84,12 +84,12 @@ class ProcessManager:
             return None
 
     def stop(self, stop_in_background=True):
-        if stop_in_background:
-            pid = self.pid
-            if pid is None:
-                raise Exception("Cannot stop process since the PID is unknown, please stop process manually")
-            print(f"Trying to kill running workspace with pid {pid}...")
-            subprocess.run(["kill", "-9", str(-pid)])
+        #if stop_in_background:
+        #    pid = self.pid
+        #    if pid is None:
+        #        raise Exception("Cannot stop process since the PID is unknown, please stop process manually")
+        #    print(f"Trying to kill running workspace with pid {pid}...")
+        #    subprocess.run(["kill", "-9", str(-pid)])
 
         if os.path.exists(self.config):
             os.remove(self.config)

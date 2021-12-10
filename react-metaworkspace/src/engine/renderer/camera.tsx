@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { CSM } from './csm/CSM';
 import { MapControls } from './controls';
+import { CSM } from './csm/CSM';
 
 
 class PerspectiveControls {
@@ -67,6 +67,7 @@ class OrthographicControls {
         this.camera.position.copy( controls.object.position );
         controls.target.copy( this.camera.position );
         controls.target.z = 0;
+        controls.minDistance = 50;
         controls.maxDistance = 10000;
         controls.enableRotate = false;
     }
