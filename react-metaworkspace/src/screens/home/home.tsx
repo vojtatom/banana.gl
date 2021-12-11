@@ -85,6 +85,9 @@ export function Home() {
 					<Link href="https://www.cesnet.cz/">
 						<img className="logo" src={'../../assets/logos/cesnet.svg'} alt="Cesnet"/>
 					</Link>
+					<Link href="https://www.oncue.design/">
+						<img className="logo" src={'../../assets/logos/ocd_logo_2.png'} alt="Ira Winder"/>
+					</Link>
 				</Pane>
 			</Pane>
 		</>
