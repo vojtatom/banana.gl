@@ -1,4 +1,4 @@
-import { Button, IconButton, LayersIcon, MinusIcon, Pane, PlusIcon, SelectIcon, SettingsIcon, StyleIcon, TimeIcon, Tooltip } from "evergreen-ui";
+import { Button, CameraIcon, IconButton, LayersIcon, MinusIcon, Pane, PlusIcon, SelectIcon, SettingsIcon, StyleIcon, TimeIcon, Tooltip } from "evergreen-ui";
 import { useEffect, useState } from "react";
 import { MetacityEngine } from "../../engine/engine";
 import { Compas } from "./menucompas";
@@ -99,6 +99,9 @@ export function ViewMenu(props: { engine: MetacityEngine | undefined }) {
                 </Tooltip>
                 <Tooltip content="Export region">
                     <IconButton icon={SelectIcon} className={menu === Menu.Selector && menuShown ? "active" : ""} appearance="minimal" onClick={() => toggleMenu(Menu.Selector)} />
+                </Tooltip>
+                <Tooltip content="Save screenshot">
+                    <IconButton icon={CameraIcon} appearance="minimal" onClick={() => { engine?.controls?.takeScreenshot(); }} />
                 </Tooltip>
                 <Tooltip content="Switch between 2D/3D view">
                     <Button appearance="minimal" id="perspectiveControl" onClick={swapCamera} disabled={menu === Menu.Selector}>

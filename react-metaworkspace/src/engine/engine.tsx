@@ -17,6 +17,9 @@ export class EngineControls {
     project: Project;
     keymap: {[key: string]: boolean};
 
+    savescreen: boolean;
+
+
     showMetaCallback?: (meta: {[name: string]: any}) => void;
     closeMetaCallback?: () => void;
     updateCompasCallback?: (angle: number) => void;
@@ -34,6 +37,7 @@ export class EngineControls {
         this.clickTime = 0;
         this.selectingRegion = false;
         this.selectingRegionDown = false;
+        this.savescreen = false;
     }
 
     select(oid: number) {
@@ -119,7 +123,41 @@ export class EngineControls {
         this.keymap[key] = false;
     }
 
-    actions() {
+    snapshot() {
+        if (!this.savescreen)
+            return;
+
+        this.savescreen = false;
+        this.renderer.renderer.domElement.toBlob((blob) => {
+            if (!blob)
+                return;
+
+            // Function to download data to a file
+            let file = blob;
+            if ((window.navigator as any).msSaveOrOpenBlob) // IE10+
+                (window.navigator as any).msSaveOrOpenBlob(file, "metacity-render.png");
+
+            else { // Others
+                console.log(file);
+                let a = document.createElement("a"),
+                        url = URL.createObjectURL(file);
+                a.href = url;
+                a.download = "metacity-render.png";
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    window.URL.revokeObjectURL(url);  
+                }, 0); 
+            }
+        });
+    }
+
+    takeScreenshot() {
+        this.savescreen = true;
+    }
+
+    preRenderActions() {
         if (this.keymap['KeyU'])
         {
             this.renderer.updateHelper();
@@ -129,6 +167,10 @@ export class EngineControls {
         if (this.updateTimeCallback){
             this.updateTimeCallback(this.renderer.timeline.time, this.renderer.timeline.start, this.renderer.timeline.end);
         }
+    }
+    
+    postRenderActions() {
+        this.snapshot();
     }
 
     swapCamera() {
@@ -243,7 +285,10 @@ export class MetacityEngine {
         
         this.renderer = new Renderer(this.canvas,  () => {
             if (this.controls)
-                this.controls.actions();
+                this.controls.preRenderActions();
+        }, () => {
+            if (this.controls)
+                this.controls.postRenderActions();
         });
 
         this.selector = new Selector(this.renderer);

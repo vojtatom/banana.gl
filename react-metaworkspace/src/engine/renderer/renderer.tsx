@@ -31,7 +31,8 @@ export class Renderer {
     changed: boolean;
 
     updateShadows = false;
-    actionCall: CallableFunction;
+    preRenderActionsCall: CallableFunction;
+    postRenderActionsCall: CallableFunction;
     status: StatusManager;
 
 
@@ -39,9 +40,10 @@ export class Renderer {
     selector: Selector;
     placeholders: GridPlaceholders;
 
-    constructor(canvas: HTMLCanvasElement, actionCall: CallableFunction) {
+    constructor(canvas: HTMLCanvasElement, preRenderActionsCall: CallableFunction, postRenderActionsCall: CallableFunction) {
         this.canvas = canvas;
-        this.actionCall = actionCall;
+        this.preRenderActionsCall = preRenderActionsCall;
+        this.postRenderActionsCall = postRenderActionsCall;
         this.status = new StatusManager();
         
         //basic threejs
@@ -154,17 +156,12 @@ export class Renderer {
     }
 
     frame() {
-        this.actionCall();
+        this.preRenderActionsCall();
         this.timeline.tick();
         this.controls.update();
         
         if (this.changed) {
-            this.csm.update();
-            if (this.updateShadows) {
-                this.renderer.shadowMap.needsUpdate = true;
-            }
-
-            this.renderer.render(this.scene, this.controls.camera);
+            this.render();
         }
 
         if (SHOWSTATS) {
@@ -173,6 +170,16 @@ export class Renderer {
         }
 
         this.changed = false;
+        this.postRenderActionsCall();
+    }
+
+    render() {
+        this.csm.update();
+        if (this.updateShadows) {
+            this.renderer.shadowMap.needsUpdate = true;
+        }
+
+        this.renderer.render(this.scene, this.controls.camera);
     }
 
     click(x: number, y: number) {

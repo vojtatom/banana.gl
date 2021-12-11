@@ -11,7 +11,7 @@ README = (HERE / "README.md").read_text()
 setup(
     name="metaworkspace",
     packages=find_packages("."),
-    version="0.3.4",
+    version="0.3.5",
     description="Python-React application for visualization of urban data",
     long_description=README,
     long_description_content_type="text/markdown",
