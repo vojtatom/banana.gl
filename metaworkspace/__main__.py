@@ -100,7 +100,7 @@ if __name__ == "__main__":
     parser.add_argument('--createuser', help='Create new user', action="store_true")
     parser.add_argument('--ip', nargs=1, help='IP adress to run on', default=['127.0.0.1'])
     parser.add_argument('--port', nargs=1, help='Port to run on', default=['5000'])
-    parser.add_argument('--python', nargs=1, help='Port to run on', default=['python'])
+    parser.add_argument('--python', nargs=1, help='Custom python interpreter path (for running outside virtual python environment)', default=['python'])
     parser.add_argument('--migrate', help='Migrate existing projects after installation of newer version', action="store_true")
     parser.add_argument('--stop', help='Will try to stop the running workspace if pid file is in working directory', action="store_true")
     parser.add_argument('workspace_dir', type=str, help='Path to newly created Metacity workspace')
