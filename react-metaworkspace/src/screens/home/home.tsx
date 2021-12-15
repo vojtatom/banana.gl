@@ -82,11 +82,14 @@ export function Home() {
 					<Link href="https://fit.cvut.cz/cs">
 						<img className="logo" src={'../../assets/logos/information_technology.svg'} alt="FIT CTU"/>
 					</Link>
+					<Link href="http://www.oncue.design/">
+						<img className="logo" src={'../../assets/logos/ocd_logo_2.png'} alt="Ira Winder"/>
+					</Link>
 					<Link href="https://www.cesnet.cz/">
 						<img className="logo" src={'../../assets/logos/cesnet.svg'} alt="Cesnet"/>
 					</Link>
-					<Link href="http://www.oncue.design/">
-						<img className="logo" src={'../../assets/logos/ocd_logo_2.png'} alt="Ira Winder"/>
+					<Link href="https://www.fujitsu.com/">
+						<img className="logo" src={'../../assets/logos/fujitsu.png'} alt="Fujitsu"/>
 					</Link>
 				</Pane>
 			</Pane>
