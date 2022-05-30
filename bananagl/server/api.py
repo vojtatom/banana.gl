@@ -1,11 +1,22 @@
+import os
 from datetime import datetime, timedelta
-from typing import Optional
-from fastapi import APIRouter, Depends, FastAPI, HTTPException, status
+from typing import List, Optional
+
+from fastapi import (APIRouter, Depends, FastAPI, File, Form, HTTPException,
+                     Response, UploadFile, status)
+from fastapi.responses import JSONResponse
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jose import JWTError, jwt
 from passlib.context import CryptContext
 from pydantic import BaseModel
-from metaworkspace.runtime.workspace import mws
+
+router = APIRouter(prefix="/api",
+                   tags=["api"])
+
+
+class ProjectData(BaseModel):
+    name: str
+    
 
 class Token(BaseModel):
     access_token: str
@@ -24,6 +35,7 @@ class User(BaseModel):
 
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
+
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
@@ -67,6 +79,7 @@ async def get_current_active_user(current_user: User = Depends(get_current_user)
 router = APIRouter(prefix="/auth",
                    tags=["auth"])
 
+
 @router.post("/token", response_model=Token)
 async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends()):
     user = mws.security.verify_user(form_data.username, form_data.password)
@@ -86,3 +99,27 @@ async def login_for_access_token(form_data: OAuth2PasswordRequestForm = Depends(
 @router.get("/user", response_model=User)
 async def read_users_me(current_user: User = Depends(get_current_active_user)):
     return current_user
+
+
+#### PROJECT
+
+@router.get("/projects", response_class=JSONResponse)
+def list_projects():
+    projects = []
+    for project in mws.project_names:
+        projects.append(project)
+    return JSONResponse(projects)
+
+
+@router.post("/project")
+def add_project(project: ProjectData, current_user: User = Depends(get_current_active_user)):
+    for p in mws.project_names:
+        if p == project.name:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=f"Project {project.name} already exists"
+            )
+
+    mws.create_project(project.name)
+    return Response(status_code=status.HTTP_201_CREATED) 
+

@@ -9,9 +9,9 @@ README = (HERE / "README.md").read_text()
 
 # This call to setup() does all the work
 setup(
-    name="metaworkspace",
+    name="bananagl",
     packages=find_packages("."),
-    version="0.3.6",
+    version="0.4.0",
     description="Python-React application for visualization of urban data",
     long_description=README,
     long_description_content_type="text/markdown",
@@ -25,14 +25,12 @@ setup(
     ],
     python_requires='>=3.8', # Minimum version requirement of the package
     install_requires=[
-        "metacity>=0.2.8",
         "requests>=2.26.0",
         "twine>=3.4.2",
         "fastapi>=0.68.1",
         "uvicorn>=0.15.0",
         "aiofiles>=0.7.0",
         "jinja2>=3.0.1",
-        "watchdog>=2.1.5",
         "bcrypt>=3.2.0",
         "python-jose>=3.3.0",
         "python-jwt>=2.0.1",

@@ -1,11 +1,11 @@
-import { PolygonalModel, PolygonalProxyModel } from "../geometry/polygons"
-import { LineModel, LineProxyModel } from "../geometry/lines"
-import { PointModel, PointProxyModel } from "../geometry/points"
+import { Interval } from "../datamodel/interval";
 import { Tile } from "../datamodel/tile";
 import { IModel, IMovement } from "../types";
-import { Model } from "./base"
-import { Interval } from "../datamodel/interval";
+import { Model } from "./base";
+import { LineModel, LineProxyModel } from "./lines";
 import { Move } from "./movement";
+import { PointModel, PointProxyModel } from "./points";
+import { PolygonalModel, PolygonalProxyModel } from "./polygons";
 
 
 const registeredModels: {[name: string]: {[name: string]: new(data: IModel, tile: Tile, callback: CallableFunction, abort: CallableFunction) => Model }} = {

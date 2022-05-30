@@ -1,6 +1,6 @@
 import Editor, { Monaco } from "@monaco-editor/react";
 import { Button, CodeIcon, CornerDialog, CubeIcon, Heading, Pane, Pre, ProjectsIcon, UpdatedIcon } from 'evergreen-ui';
-import * as monaco from "monaco-editor/esm/vs/editor/editor.api";
+import * as monaco from "monaco-editor";
 import { useEffect, useState } from 'react';
 import { useHistory, useParams } from 'react-router';
 import { toast } from 'react-toastify';

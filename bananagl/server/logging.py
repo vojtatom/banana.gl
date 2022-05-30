@@ -1,12 +1,11 @@
 import logging
 import os
 from logging.handlers import RotatingFileHandler
-from metaworkspace.runtime.workspace import mws 
-
+from bananagl.server.config import path
 
 def setup_logging(name, scrnlog=False, txtlog=True, loglevel=logging.DEBUG):
     print(f"Initializing logger {name}")
-    logdir = os.path.abspath(mws.logs_dir)
+    logdir = os.path.abspath(path)
 
     if not os.path.exists(logdir):
         os.mkdir(logdir)
