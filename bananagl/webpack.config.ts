@@ -32,5 +32,6 @@ const config: Configuration = {
       async: false
     }),
   ],
+  watch: true
 };
 export default config;

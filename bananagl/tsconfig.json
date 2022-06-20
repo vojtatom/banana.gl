@@ -4,8 +4,11 @@
       "target": "ES6",
       "strict": true,
       "noEmit": true,
+      "allowJs": true,
       "esModuleInterop": true,
-      "declaration": true
+      "skipLibCheck": true,
+      "declaration": true,
+      "moduleResolution": "node",
     },
     "include": ["src/**/*"],
     "exclude": ["node_modules"]
