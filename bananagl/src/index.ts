@@ -20,9 +20,7 @@ window.onload = () => {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
     const gl = new BananaGL({ canvas });
     gl.layer({
-        path: "test/buildings",
+        path: "/data/grid",
     })
-      
-
 }
 

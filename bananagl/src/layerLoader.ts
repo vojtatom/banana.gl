@@ -1,17 +1,20 @@
 import { Layer } from "./layer";
 import axios from "axios";
+import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
+
 
 type TileType = {
     x: number;
     y: number;
     file: string;
+    size: number;
 }
 
 
 type LayoutType = {
-    tile_xdim: number;
-    tile_ydim: number;
-    tile_list: TileType[];
+    tileWidth: number;
+    tileHeight: number;
+    tiles: TileType[];
 }
 
 
@@ -27,7 +30,6 @@ export class LayerLoader {
     }
 
     private getLayout() {
-        this.layer.objects = [];
         axios.get(`${this.path}/layout.json`).then((response) => {
             this.layout = response.data;
             this.load();
@@ -39,7 +41,7 @@ export class LayerLoader {
 
     private load() {
         if (this.layout) {
-            this.layout.tile_list.forEach((tile) => {
+            this.layout.tiles.forEach((tile) => {
                 this.loadTile(tile);
             });
         }
@@ -47,9 +49,12 @@ export class LayerLoader {
 
     private loadTile(tile: TileType): any {
         console.log(`Loading tile ${tile.x} ${tile.y}, ${tile.file}`);
-        axios.get(`${this.path}/${tile.file}`).then((response) => {
-            console.log(response.data);
-            console.log(`Loaded tile ${tile.file}`);
+        const loader = new GLTFLoader();
+        loader.load(`${this.path}/${tile.file}`, (gltf) => {
+            this.layer.onDataLoaded(gltf.scene);
+        }, undefined, (error) => {
+            console.error(`Could not load tile ${tile.x} ${tile.y}, ${tile.file}`);
+            console.log(error);
         });
     }
 }

@@ -16,6 +16,6 @@ export class BananaGL {
     }
 
     layer(props: LayerType) {
-        this.layers.push(new Layer(props));
+        this.layers.push(new Layer(props, this.graphics));
     }
 }
