@@ -48,10 +48,12 @@ export class LayerLoader {
     }
 
     private loadTile(tile: TileType): any {
-        console.log(`Loading tile ${tile.x} ${tile.y}, ${tile.file}`);
+        //console.log(`Loading tile ${tile.x} ${tile.y}, ${tile.file}`);
         const loader = new GLTFLoader();
+
         loader.load(`${this.path}/${tile.file}`, (gltf) => {
             this.layer.onDataLoaded(gltf.scene);
+       
         }, undefined, (error) => {
             console.error(`Could not load tile ${tile.x} ${tile.y}, ${tile.file}`);
             console.log(error);
