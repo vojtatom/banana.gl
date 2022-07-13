@@ -18,12 +18,12 @@ import { BananaGL } from "./bananagl";
 
 window.onload = () => {
     const canvas = document.getElementById("canvas") as HTMLCanvasElement;
-    const gl = new BananaGL({ canvas });
+    const gl = new BananaGL({ canvas, workerPath: "dist/worker.js" });
     gl.layer({
         path: "/data/buildings",
     });
-    /*gl.layer({
+    gl.layer({
         path: "/data/terrain",
-    })*/
+    });
 }
 

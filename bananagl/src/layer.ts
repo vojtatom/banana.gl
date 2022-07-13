@@ -1,6 +1,5 @@
-import { LayerLoader } from "./layerLoader";
-import { Group, Box3, Vector3, Mesh, BufferGeometry } from "three";
-import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { LayerLoader } from "./loader";
+import { Box3, Vector3, Mesh, BufferGeometry, BufferAttribute } from "three";
 import { Graphics } from "./graphics";
 
 export type LayerType = {
@@ -8,6 +7,12 @@ export type LayerType = {
     name?: string;
 }
 
+
+type ParsedGeometry = {
+    positions: Float32Array;
+    normals: Float32Array;
+    colors: Float32Array;
+}
 
 export class Layer {
     name: string;
@@ -20,28 +25,21 @@ export class Layer {
         this.loader = new LayerLoader(this, props.path);
     }
 
-    onDataLoaded(group: Group) {
-        const aabb = new Box3();
-        aabb.setFromObject( group );
-        const center = aabb.getCenter(new Vector3());
-        const geometries: BufferGeometry[] = []
+    locate(x: number, y: number) {
+        this.loader.locate(x, y);
+    }
 
-        group.children.forEach((child) => {
-            if (child instanceof Group) {
-                this.onDataLoaded(child);
-            } else if (child instanceof Mesh) {
-                child.material = this.graphics.materialLibrary.default;
-                geometries.push(child.geometry);
-                child.remove();
-            } else {
-                console.error(`Unknown child type ${child.type}`);
-            }
-        });
-
-        const singleGeometry = mergeBufferGeometries(geometries);
-        const m = new Mesh(singleGeometry, this.graphics.materialLibrary.default);
-        singleGeometry.computeVertexNormals();
+    onDataLoaded(parsed_geometry: ParsedGeometry) {
+        const geometry = new BufferGeometry();
+        geometry.setAttribute('position', new BufferAttribute(parsed_geometry.positions, 3));
+        geometry.setAttribute('normal', new BufferAttribute(parsed_geometry.normals, 3));
+        geometry.setAttribute('color', new BufferAttribute(parsed_geometry.colors, 3));
+        const m = new Mesh(geometry, this.graphics.materialLibrary.default);
         this.graphics.scene.add(m);
+
+        const aabb = new Box3();
+        aabb.setFromObject(m);
+        const center = aabb.getCenter(new Vector3());
         this.graphics.focus(center.x, center.y, center.z);
     }
 }

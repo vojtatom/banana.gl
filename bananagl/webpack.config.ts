@@ -3,7 +3,10 @@ import { Configuration } from "webpack";
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
 const config: Configuration = {
-  entry: "./src/index.ts",
+  entry: {
+    bananagl: "./src/index.ts",
+    worker: './src/loaderWorker.ts'
+  },
   module: {
     rules: [
       {
@@ -23,7 +26,7 @@ const config: Configuration = {
   },
   output: {
     path: path.resolve(__dirname, "dist"),
-    filename: "bananagl.js",
+    filename: "[name].js",
     library: 'libpack',
     libraryTarget:'umd'
   },

@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { MaterialLibrary } from './material';
 import { MapControls } from './controls';
+import { Navigation } from './navigation';
 
 
 export class Graphics {
@@ -33,6 +34,11 @@ export class Graphics {
         dirLight.target.position.set( 0, 0, 0 );
         this.scene.add( dirLight );
 
+
+        canvas.onmouseup = (e) => {
+            const target = this.controls.target;
+            Navigation.Instance.setLocation(target.x, target.y);
+        };
 
         const frame = () => {
             requestAnimationFrame(frame);
