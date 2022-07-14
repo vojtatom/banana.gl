@@ -30,7 +30,7 @@ window.onload = () => {
         path: "/data/buildings",
         material: {
             baseColor: 0xffffff,
-            lineColor: 0xff0000,
+            lineColor: 0xfdbe56,
         },
         pickable: true,
     });

@@ -31,7 +31,7 @@ export class Layer {
     readonly pickable: boolean;
     
     constructor(props: LayerProps, graphics: Graphics) {
-        this.materialLibrary = new MaterialLibrary(props.material);
+        this.materialLibrary = new MaterialLibrary(graphics.resolution, props.material);
         this.name = props.name? props.name : props.path;
         this.graphics = graphics;
         this.loader = new LayerLoader(this, props.path);

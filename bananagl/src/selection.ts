@@ -1,4 +1,5 @@
-import { Box3, Vector3, LineSegments, BufferGeometry, BufferAttribute, BoxGeometry, WireframeGeometry } from "three";
+import { Box3, Vector3 } from "three";
+import { LineSegments2, LineSegmentsGeometry } from 'three-fatline';
 import { Graphics } from "./graphics";
 import { MaterialLibrary } from "./material";
 
@@ -11,7 +12,7 @@ export type ObjectSelectionProps = {
 
 export class ObjectSelection {
     graphics: Graphics;
-    mesh: LineSegments;
+    mesh: LineSegments2;
 
     constructor(props: ObjectSelectionProps) { 
         this.graphics = props.graphics;
@@ -47,10 +48,10 @@ export class ObjectSelection {
             box.max.x, box.max.y, box.max.z,
         ]);
 
-        const geometry = new WireframeGeometry();
-        geometry.setAttribute('position', new BufferAttribute(vertices, 3));
+        const geometry = new LineSegmentsGeometry();
+        geometry.setPositions(vertices);
         
-        this.mesh = new LineSegments(geometry, props.material.line);
+        this.mesh = new LineSegments2(geometry, props.material.line);
         this.graphics.scene.add(this.mesh);
     }
 

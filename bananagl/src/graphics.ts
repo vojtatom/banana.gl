@@ -23,16 +23,16 @@ export class Graphics {
 
     constructor(props: GraphicsProps) {
         const canvas = props.canvas;
-        this.materialLibrary = new MaterialLibrary({});
         this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
         this.camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 100000);
         this.scene = new THREE.Scene();
         this.controls = new MapControls(this.camera, canvas);
-    
+        this.materialLibrary = new MaterialLibrary(this.resolution);
+        
         this.renderer.setSize(canvas.clientWidth, canvas.clientHeight);
         this.renderer.setClearColor(props.background ?? 0xffffff, 1);
         this.renderer.setPixelRatio(window.devicePixelRatio);
-
+        
 
         this.camera.position.set(0, 0, 100);
         this.camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -78,6 +78,10 @@ export class Graphics {
         };
 
         frame();
+    }
+
+    get resolution() {
+        return this.renderer.getSize(new THREE.Vector2());
     }
 
     focus(x: number, y: number) {
