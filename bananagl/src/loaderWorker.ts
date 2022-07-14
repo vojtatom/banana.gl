@@ -1,30 +1,37 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { Group, Mesh, BufferGeometry, BufferAttribute } from "three";
+import { Color, Group, Mesh, BufferGeometry, BufferAttribute, Box3 } from "three";
 import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
-function randomColorBuffer(size: number) {
+function getIDBuffer(size: number, id: number) {
     const buffer = new BufferAttribute(new Float32Array(size * 3), 3);
-    const R = Math.random();
-    const G = Math.random();
-    const B = Math.random();
-    for (let i = 0; i < size; i++) {
-        buffer.setXYZ(i, R, G, B);
-    }
+    let color = new Color();
+    color.setHex(id);
+
+    for (let i = 0; i < size; i++)
+        buffer.setXYZ(i, color.r, color.g, color.b);
     return buffer;
 }
 
-const geometries: BufferGeometry[] = []
-
-function preprocess(group: Group) {
+function preprocess(group: Group, idOffset: number) {
     const geometries: BufferGeometry[] = []
+    const metadata: {[id: number]: any} = {};
 
     const flatten = (group: Group) => {
         group.children.forEach((child) => {
             if (child instanceof Group) {
-                preprocess(child);
+                flatten(child);
             } else if (child instanceof Mesh) {
                 const geometry = child.geometry as BufferGeometry;
-                const colors = randomColorBuffer(geometry.attributes.position.count);
+                
+                const colors = getIDBuffer(geometry.attributes.position.count, idOffset);
+                
+                const bbox = new Box3();
+                bbox.setFromObject(child);
+                child.userData.bbox = [ bbox.min.toArray(), bbox.max.toArray() ];   
+                metadata[idOffset] = child.userData;
+
+                idOffset++;
+
                 geometry.setAttribute('color', colors);
                 geometries.push(child.geometry);
                 child.remove();
@@ -37,11 +44,14 @@ function preprocess(group: Group) {
     flatten(group);
     const singleGeometry = mergeBufferGeometries(geometries);
     singleGeometry.computeVertexNormals();
-    return singleGeometry;
+
+    return {
+        geometry: singleGeometry, 
+        metadata: metadata
+        };
 }
 
-//eslint-disable-next-line no-restricted-globals
-self.onmessage = (message: MessageEvent) => {
+function loadModel(message: MessageEvent) {
     const loader = new GLTFLoader();
 
     const data = message.data;
@@ -50,19 +60,24 @@ self.onmessage = (message: MessageEvent) => {
     };
 
     loader.load(data.file, (gltf) => {
-        console.log(gltf.scene);
-        const geometry = preprocess(gltf.scene);
+        const { geometry, metadata } = preprocess(gltf.scene, data.idOffset);
         response.geometry = {
             positions: geometry.attributes.position.array,
             normals: geometry.attributes.normal.array,
             colors: geometry.attributes.color.array,
+            metadata: metadata
         };
         postMessage(response);
 
     }, undefined, (error) => {
         console.error(`Could not load tile ${data.file}`);
-        console.log(error);
+        console.error(error);
     });
+}
+
+//eslint-disable-next-line no-restricted-globals
+self.onmessage = (message: MessageEvent) => {
+    loadModel(message);
 }
 
 

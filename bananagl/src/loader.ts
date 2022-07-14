@@ -7,7 +7,8 @@ const POOLSIZE = 5;
 
 interface Job {
     file: string,
-    jobID: number
+    jobID: number,
+    idOffset: number,
 }
 
 interface Result {
@@ -23,6 +24,7 @@ export class Loaders {
     private jobIDs: number;
     private resultMap: Map<number, Result>;
     static workerPath = "worker.js";
+    private idCounter = 0;
     
     private constructor()
     {
@@ -35,6 +37,7 @@ export class Loaders {
         {
             this.workers.push(new Worker(Loaders.workerPath));
             this.worker_busy.push(false);
+            
 
             this.workers[i].onmessage = (message) => {
                 const {data} = message;
@@ -67,14 +70,20 @@ export class Loaders {
         return undefined;
     }
 
-    process(data: any, callback: (...output: any[]) => void) 
+    process(data: {file: string, objectsToLoad: number}, callback: (...output: any[]) => void) 
     {
         const jobID = this.jobIDs++;
         this.resultMap.set(jobID, {
             callback: callback
         });
 
-        this.queue.push({file: data, jobID: jobID});
+        this.queue.push({
+            file: data.file,
+            jobID: jobID,
+            idOffset: this.idCounter,
+        });
+
+        this.idCounter += data.objectsToLoad;
         this.submit();
     }
 
@@ -125,12 +134,12 @@ export class LayerLoader {
             this.load(response.data);
         }).catch((error) => {
             console.error(`Could not load layout for layer ${this.path}`);
-            console.log(error);
+            console.error(error);
         });
     }
 
     locate(x: number, y: number) {
-        const RADIUS = 2000 * 2000;
+        const RADIUS = 4000 * 4000;
         if (this.layout) {
             const halfx = this.layout.tileWidth * 0.5;
             const halfy = this.layout.tileHeight * 0.5;
@@ -140,7 +149,6 @@ export class LayerLoader {
                 const d = dx * dx + dy * dy;
                 if (d < RADIUS) {
                     this.loadTile(tile);
-
                 }
             });
         }
@@ -161,8 +169,10 @@ export class LayerLoader {
         const ymedian = median(this.layout.tiles.map((tile) => tile.y)) * this.layout.tileHeight;
         if (Navigation.Instance.isSet)
             this.locate(Navigation.Instance.location.x, Navigation.Instance.location.y);
-        else
+        else {
+            this.layer.graphics.focus(xmedian, ymedian);
             Navigation.Instance.setLocation(xmedian, ymedian);
+        }
         
     }
 
@@ -172,7 +182,10 @@ export class LayerLoader {
 
         tile.loaded = true;
         const path = `${this.path}/${tile.file}`;
-        Loaders.Instance.process(path, (scene) => {
+        Loaders.Instance.process({
+            file: path,
+            objectsToLoad: tile.size
+         }, (scene) => {
             this.layer.onDataLoaded(scene);
         });
     }

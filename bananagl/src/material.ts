@@ -1,26 +1,32 @@
 import * as THREE from 'three';
-import { MeshToonMaterial } from 'three';
+import { MeshPhysicalMaterial, LineBasicMaterial } from 'three';
 
+
+export type MaterialLibraryProps = {
+    baseColor?: number;
+    lineColor?: number;
+}
 
 export class MaterialLibrary {
-    default: MeshToonMaterial;
+    readonly default: MeshPhysicalMaterial;
+    readonly line: LineBasicMaterial;
 
-    constructor() {
-        const gradient = new THREE.DataTexture(
-            Uint8Array.from([0, 0, 0, 255, 128, 128, 128, 255, 255, 255, 255, 255]), 3, 1, THREE.RGBAFormat
-        );
-        
-        gradient.minFilter = THREE.NearestFilter;
-        gradient.magFilter = THREE.NearestFilter;
-        gradient.needsUpdate = true;
+    constructor(props?: MaterialLibraryProps) {
+        if (!props)
+            props = {};
 
-        this.default = new MeshToonMaterial({
+        this.default = new MeshPhysicalMaterial({
             side: THREE.DoubleSide,
-            color: 0xFFFFFF,
-            //vertexColors: true,
-            gradientMap: gradient,
+            color: props.baseColor ?? 0xffffff,
         });
 
         this.default.needsUpdate = true;
+
+        this.line = new LineBasicMaterial({
+            color: props.lineColor ?? 0xFFFFFF,
+            linewidth: 1,
+            transparent: true,
+            opacity: 1.0,
+        });
     }
 }
