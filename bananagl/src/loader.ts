@@ -1,60 +1,18 @@
 import { Layer } from "./layer";
 import axios from "axios";
 import { Navigation } from "./navigation";
-
-const POOLSIZE = 5;
-
-
-interface Job {
-    file: string,
-    jobID: number,
-    idOffset: number,
-}
-
-interface Result {
-    callback: CallableFunction
-}
+import { Vector3 } from "three";
+import { WorkerPool } from "./workerPool";
 
 
-export class Loaders {
-    private static _instance: Loaders;
-    private workers: Worker[];
-    private worker_busy: boolean[];
-    private queue: Job[];
-    private jobIDs: number;
-    private resultMap: Map<number, Result>;
+export class LoaderWorkerPool extends WorkerPool  {
+    private static _instance: LoaderWorkerPool;
     static workerPath = "worker.js";
-    private idCounter = 0;
+    private idOffset = 0;
     
     private constructor()
     {
-        this.workers = [];
-        this.worker_busy = [];
-        this.jobIDs = 0;
-        this.resultMap = new Map();
-
-        for(let i = 0; i < POOLSIZE; ++i)
-        {
-            this.workers.push(new Worker(Loaders.workerPath));
-            this.worker_busy.push(false);
-            
-
-            this.workers[i].onmessage = (message) => {
-                const {data} = message;
-                const {geometry, jobID} = data;
-
-                const res = this.resultMap.get(jobID);
-                
-                if (!res) 
-                    return;
-
-                res.callback(geometry);
-
-                this.worker_busy[i] = false;
-                this.submit();
-            }
-        }
-        this.queue = [];
+        super(LoaderWorkerPool.workerPath, 5);
     }
 
     public static get Instance()
@@ -62,42 +20,13 @@ export class Loaders {
         return this._instance || (this._instance = new this());
     }
 
-    private get worker() {
-        for (let i = 0; i < POOLSIZE; ++i) {
-            if (!this.worker_busy[i])
-                return i;
-        }
-        return undefined;
-    }
-
     process(data: {file: string, objectsToLoad: number}, callback: (...output: any[]) => void) 
     {
-        const jobID = this.jobIDs++;
-        this.resultMap.set(jobID, {
-            callback: callback
-        });
-
-        this.queue.push({
+        super.process({
             file: data.file,
-            jobID: jobID,
-            idOffset: this.idCounter,
-        });
-
-        this.idCounter += data.objectsToLoad;
-        this.submit();
-    }
-
-    private submit() {
-        const i = this.worker;
-        if (i === undefined)
-            return;
-        
-        const job = this.queue.shift();
-        if (!job)
-            return;
-
-        this.worker_busy[i] = true;
-        this.workers[i].postMessage(job);
+            idOffset: this.idOffset
+        }, callback);
+        this.idOffset += data.objectsToLoad;
     }
 }
 
@@ -170,8 +99,10 @@ export class LayerLoader {
         if (Navigation.Instance.isSet)
             this.locate(Navigation.Instance.location.x, Navigation.Instance.location.y);
         else {
-            this.layer.graphics.focus(xmedian, ymedian);
-            Navigation.Instance.setLocation(xmedian, ymedian);
+            const position = new Vector3(xmedian, ymedian, 1000);
+            const target = new Vector3(xmedian, ymedian, 0);
+            this.layer.graphics.focus(position, target);
+            Navigation.Instance.setLocation(position, target);
         }
         
     }
@@ -182,7 +113,7 @@ export class LayerLoader {
 
         tile.loaded = true;
         const path = `${this.path}/${tile.file}`;
-        Loaders.Instance.process({
+        LoaderWorkerPool.Instance.process({
             file: path,
             objectsToLoad: tile.size
          }, (scene) => {

@@ -1,16 +1,18 @@
-import { Vector3, Vector2 } from "three";
+import { Vector3 } from "three";
 import { Graphics, GraphicsProps } from "./graphics";
 import { Layer, LayerProps } from "./layer";
-import { Loaders } from "./loader";
+import { LoaderWorkerPool } from "./loader";
+import { Style, StylerWorkerPool } from "./styles";
 import { Navigation } from "./navigation";
-import { MaterialLibraryProps } from "./material";
 
 type BananaGLProps = {
     graphics: GraphicsProps
-    workerPath?: string;
+    loaderPath?: string;
+    stylerPath?: string;
     location?: {
         x: number;
         y: number;
+        z: number;
     };
 }
 
@@ -21,15 +23,19 @@ export class BananaGL {
     constructor(props: BananaGLProps) {
         this.graphics = new Graphics(props.graphics);
 
-        if (props.workerPath) {
-            Loaders.workerPath = props.workerPath;
-        }
+        if (props.loaderPath)
+            LoaderWorkerPool.workerPath = props.loaderPath;
+
+        if (props.stylerPath)
+            StylerWorkerPool.workerPath = props.stylerPath;
 
         if (props.location) {
-            Navigation.Instance.setLocation(props.location.x, props.location.y);
-            this.graphics.focus(props.location.x, props.location.y);
+            const position = new Vector3(props.location.x, props.location.y, props.location.z);
+            const target = new Vector3(props.location.x, props.location.y, 0);
+            Navigation.Instance.setLocation(position, target);
+            this.graphics.focus(position, target);
         } else if (Navigation.Instance.isSet) {
-            this.graphics.focus(Navigation.Instance.location.x, Navigation.Instance.location.y);
+            this.graphics.focus(Navigation.Instance.location, Navigation.Instance.target);
         }
 
         Navigation.Instance.layers = this.layers;
@@ -42,7 +48,11 @@ export class BananaGL {
 
     }
 
-    layer(props: LayerProps) {
+    loadLayer(props: LayerProps) {
         this.layers.push(new Layer(props, this.graphics));
+    }
+
+    get style() {
+        return new Style();
     }
 }

@@ -2,11 +2,8 @@ import path from "path";
 import { Configuration } from "webpack";
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
-const config: Configuration = {
-  entry: {
-    bananagl: "./src/index.ts",
-    worker: './src/loaderWorker.ts'
-  },
+
+const common = {
   module: {
     rules: [
       {
@@ -24,17 +21,51 @@ const config: Configuration = {
   resolve: {
     extensions: [".ts", ".js"],
   },
-  output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "[name].js",
-    library: 'libpack',
-    libraryTarget:'umd'
-  },
   plugins: [
     new ForkTsCheckerWebpackPlugin({
       async: false
     }),
   ],
   watch: true
+}
+
+const configMain: Configuration = {
+  entry: {
+    bananagl: "./src/bananagl.ts"
+  },
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "[name].js",
+    library:'BananaGL',
+    libraryTarget: 'window',
+  },
+  ...common
 };
-export default config;
+
+const configLoader: Configuration = {
+  entry: {
+    loader: './src/loaderWorker.ts'
+  },
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "[name].js",
+    library:'BananaGLLoader',
+    libraryTarget: 'umd'
+  },
+  ...common
+};
+
+const configStyler: Configuration = {
+  entry: {
+    styler: './src/styleWorker.ts'
+  },
+  output: {
+    path: path.resolve(__dirname, "dist"),
+    filename: "[name].js",
+    library:'BananaGLStyler',
+    libraryTarget: 'umd'
+  },
+  ...common
+};
+
+export default [configMain, configLoader, configStyler];

@@ -66,9 +66,13 @@ export class Graphics {
                 }
             }
 
-            const target = this.controls.target;
-            Navigation.Instance.setLocation(target.x, target.y);
+            Navigation.Instance.setLocation(this.camera.position, this.controls.target);
         };
+
+        canvas.addEventListener("wheel", (e) => {
+            Navigation.Instance.setLocation(this.camera.position, this.controls.target);
+        }, {passive: true});
+
 
         const frame = () => {
             requestAnimationFrame(frame);
@@ -84,12 +88,10 @@ export class Graphics {
         return this.renderer.getSize(new THREE.Vector2());
     }
 
-    focus(x: number, y: number) {
-        console.log("focusing:", x, y);
-        this.controls.target = new THREE.Vector3(x, y, 0);
-        this.camera.position.x = x;
-        this.camera.position.y = y;
-        this.camera.position.z = 1000;
+    focus(location: THREE.Vector3, target: THREE.Vector3) {
+        console.log("focusing:", location, target);
+        this.controls.target.copy(target);
+        this.camera.position.copy(location);
     }
 } 
 

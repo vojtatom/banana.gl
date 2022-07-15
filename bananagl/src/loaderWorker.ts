@@ -22,18 +22,13 @@ function preprocess(group: Group, idOffset: number) {
                 flatten(child);
             } else if (child instanceof Mesh) {
                 const geometry = child.geometry as BufferGeometry;
-                
-                const colors = getIDBuffer(geometry.attributes.position.count, idOffset);
-                
-                const bbox = new Box3();
-                bbox.setFromObject(child);
-                child.userData.bbox = [ bbox.min.toArray(), bbox.max.toArray() ];   
-                metadata[idOffset] = child.userData;
-
-                idOffset++;
-
-                geometry.setAttribute('color', colors);
+                const ids = getIDBuffer(geometry.attributes.position.count, idOffset);
+                geometry.setAttribute('ids', ids);
                 geometries.push(child.geometry);
+                
+                computeInternalMetadata(child);   
+                metadata[idOffset++] = child.userData;
+
                 child.remove();
             } else {
                 console.error(`Unknown child type ${child.type}`);
@@ -51,20 +46,30 @@ function preprocess(group: Group, idOffset: number) {
         };
 }
 
+function computeInternalMetadata(child: Mesh<any, any>) {
+    const bbox = new Box3();
+    bbox.setFromObject(child);
+    child.userData.bbox = [bbox.min.toArray(), bbox.max.toArray()];
+    child.userData.baseHeight = bbox.min.z;
+    child.userData.height = bbox.max.z - bbox.min.z;
+}
+
 function loadModel(message: MessageEvent) {
-    const loader = new GLTFLoader();
-
-    const data = message.data;
+    
+    const { jobID, data } = message.data;
+    const { file, idOffset } = data;
+    
     const response: any = {
-        jobID: data.jobID
+        jobID: jobID
     };
-
-    loader.load(data.file, (gltf) => {
-        const { geometry, metadata } = preprocess(gltf.scene, data.idOffset);
-        response.geometry = {
+    
+    const loader = new GLTFLoader();
+    loader.load(file, (gltf) => {
+        const { geometry, metadata } = preprocess(gltf.scene, idOffset);
+        response.result = {
             positions: geometry.attributes.position.array,
             normals: geometry.attributes.normal.array,
-            colors: geometry.attributes.color.array,
+            ids: geometry.attributes.ids.array,
             metadata: metadata
         };
         postMessage(response);
