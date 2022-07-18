@@ -1,4 +1,4 @@
-import { Metadata } from "./layer";
+import { MetadataTable } from "./layer";
 import { WorkerPool } from "./workerPool";
 
 
@@ -16,7 +16,7 @@ export class StylerWorkerPool extends WorkerPool  {
         return this._instance || (this._instance = new this());
     }
 
-    process(data: { style: Style, metadata: Metadata, ids: Float32Array }, callback: (...output: any[]) => void) 
+    process(data: { style: Style, metadata: MetadataTable, ids: Float32Array }, callback: (...output: any[]) => void) 
     {
         const serialized = data.style.serialize();
         super.process({
@@ -29,12 +29,12 @@ export class StylerWorkerPool extends WorkerPool  {
 
 abstract class StyleRule {
     $type?: string;
-    abstract apply(metadata: Metadata): number;
+    abstract apply(metadata: MetadataTable): number;
 }
 
 export class StyleRuleAlways extends StyleRule {
     $type = "always";
-    apply(metadata: Metadata) {
+    apply(metadata: MetadataTable) {
         return Math.random();
     }
 }
@@ -50,7 +50,7 @@ export class StyleRuleAttributeEqualTo extends StyleRule {
         this.value = props.value;
     }
 
-    apply(metadata: Metadata) {
+    apply(metadata: MetadataTable) {
         if (metadata.hasOwnProperty(this.attribute) && metadata[this.attribute as any] == this.value) {
             return 1;
         }
@@ -76,7 +76,7 @@ export class StyleRuleAttributeRange extends StyleRule {
         this.max = props.max;
     }
 
-    apply(metadata: Metadata) {
+    apply(metadata: MetadataTable) {
         if (metadata.hasOwnProperty(this.attribute)) {
             const value = metadata[this.attribute as any];
             return clamp((value - this.min) / (this.max - this.min), 0, 1);
@@ -172,7 +172,7 @@ export class Style {
         return color;
     }
 
-    apply(metadata: Metadata) {
+    apply(metadata: MetadataTable) {
         let applyColorIndicator = Math.random();
         for (const rule of this.rules) {
             applyColorIndicator = rule.apply(metadata);

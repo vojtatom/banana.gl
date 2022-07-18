@@ -20,8 +20,6 @@ export class MaterialLibrary {
             color: props.baseColor ?? 0xffffff,
         });
 
-        this.default.needsUpdate = true;
-
         this.line = new LineMaterial({
             color: props.lineColor ?? 0xFFFFFF,
             linewidth: 5,

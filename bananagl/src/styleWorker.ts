@@ -1,9 +1,9 @@
 import { Style } from "./styles";
-import { Metadata } from "./layer";
+import { MetadataTable } from "./layer";
 import { Color } from "three";
 
 
-function computeColorTable(style: Style, metadataTable: {[id: number] : Metadata}) {
+function computeColorTable(style: Style, metadataTable: MetadataTable) {
     const colorTable = new Map<number, Color>();
     for (const obj in metadataTable) {
         const color = style.apply(metadataTable[obj]);

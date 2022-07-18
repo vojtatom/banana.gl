@@ -6,11 +6,9 @@ import { Graphics } from "./graphics";
 export class Navigation {
     location: Vector3;
     target: Vector3;
-    private static instance: Navigation;
     private layers_: Layer[] = [];
 
-    private constructor() {
-       //singleton
+    constructor() {
         const url = new URL(window.location.href);
         const location = url.searchParams.get("location");
         const target = url.searchParams.get("target");
@@ -26,12 +24,6 @@ export class Navigation {
 
         console.log("Init with location:", this.location);
     }
-
-    static get Instance() {
-        if (!Navigation.instance)
-            Navigation.instance = new Navigation();
-        return Navigation.instance;
-    }   
 
     setLocation(position: Vector3, target: Vector3) {
         this.location.copy(position);

@@ -26,7 +26,8 @@
             const gl = new BananaGL.BananaGL({ 
                 graphics: {
                     canvas: canvas, 
-                    background: 0x495155
+                    //background: 0x495155
+                    background: 0xeeeeee
                 },
                 loaderPath: "dist/loader.js",
                 stylerPath: "dist/styler.js"
@@ -41,6 +42,7 @@
                 pickable: true,
                 styles: [
                     gl.style.withAttributeRange("height", 0, 50).useColor([0xfdbe56, 0xfa9a2e, 0xf76f00, 0xf54200, 0xf30000]),
+                    //gl.style.withAttributeRange("height", 0, 50).useColor([0x3333f3, 0xf33333 ]),
                     //gl.style.withAttributeRange("height", 0, 50).useColor([0x000000, 0xffffff]),
                 ]
             });
@@ -48,10 +50,22 @@
             gl.loadLayer({
                 path: "/data/terrain",
                 material: {
-                    baseColor: 0x495155,
+                    //baseColor: 0x495155,
+                    //baseColor: 0xcfd0d1,
+                    baseColor: 0xeeeeee,
+                }
+            });
+
+            gl.loadLayer({
+                path: "/data/bridges",
+                material: {
+                    //baseColor: 0x495155,
+                    //baseColor: 0xcfd0d1,
+                    baseColor: 0xeeeeee,
                 }
             });
         }
     </script>
+
 </body>
 </html>

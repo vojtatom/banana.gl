@@ -3,6 +3,8 @@ import { MaterialLibrary, MaterialLibraryProps } from './material';
 import { MapControls } from './controls';
 import { Navigation } from './navigation';
 import { GPUPicker } from './picker';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
+import { SSAOPass } from 'three/examples/jsm/postprocessing/SSAOPass';
 
 
 export type GraphicsProps = {
@@ -17,14 +19,18 @@ export class Graphics {
     readonly controls: MapControls;
     readonly materialLibrary;
     readonly picker: GPUPicker;
+    readonly navigation: Navigation;
     private mouseLastDownTime = 0;
+
+    readonly ssao: SSAOPass;
     
     onClick: ((x: number, y: number, id: number) => void) | undefined;
 
     constructor(props: GraphicsProps) {
         const canvas = props.canvas;
-        this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true });
-        this.camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 100000);
+        this.navigation = new Navigation();
+        this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
+        this.camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 10, 1000);
         this.scene = new THREE.Scene();
         this.controls = new MapControls(this.camera, canvas);
         this.materialLibrary = new MaterialLibrary(this.resolution);
@@ -33,6 +39,15 @@ export class Graphics {
         this.renderer.setClearColor(props.background ?? 0xffffff, 1);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         
+        let composer = new EffectComposer( this.renderer );
+
+        const ssaoPass = new SSAOPass( this.scene, this.camera );
+        ssaoPass.normalMaterial.side = THREE.DoubleSide;
+        ssaoPass.depthRenderMaterial.side = THREE.DoubleSide;
+        ssaoPass.kernelRadius = 16;
+        //ssaoPass.maxDistance = 0.01;
+        this.ssao = ssaoPass;
+        composer.addPass( ssaoPass );
 
         this.camera.position.set(0, 0, 100);
         this.camera.lookAt(new THREE.Vector3(0, 0, 0));
@@ -49,9 +64,11 @@ export class Graphics {
 
         canvas.onmousedown = (e) => {
             this.mouseLastDownTime = Date.now();
+            this.controls.onMouseDown(e);
         }
 
         canvas.onmouseup = (e) => {
+            this.controls.onMouseUp(e);
             const now = Date.now();
             const duration = now - this.mouseLastDownTime;
 
@@ -66,22 +83,58 @@ export class Graphics {
                 }
             }
 
-            Navigation.Instance.setLocation(this.camera.position, this.controls.target);
+            this.navigation.setLocation(this.camera.position, this.controls.target);
         };
 
         canvas.addEventListener("wheel", (e) => {
-            Navigation.Instance.setLocation(this.camera.position, this.controls.target);
+            this.navigation.setLocation(this.camera.position, this.controls.target);
+            this.updateCameraBoundries();
         }, {passive: true});
 
 
         const frame = () => {
             requestAnimationFrame(frame);
             this.controls.update();
-            this.renderer.render(this.scene, this.camera);
+
+            if (this.controls.changed)
+                this.renderer.render(this.scene, this.camera);
+            else
+                composer.render();
             //this.renderer.render(this.picker.pickingScene, this.camera);
         };
 
         frame();
+    }
+
+    private updateCameraBoundries() {
+        const Z0 = -1000;
+        const Z1 = 1000;
+        //set camera far to intersect the 0 z-plane
+        const camera = this.camera;
+        const target = this.controls.target;
+        const position = camera.position;
+        const direction = target.clone().sub(position).normalize();
+        
+        const z0DistanceUnits = (position.z - Z0) / Math.abs(direction.z);
+        const z0Target = position.clone().addScaledVector(direction, z0DistanceUnits);
+        const z0Distance = z0Target.distanceTo(position) * Math.sign(z0DistanceUnits);
+
+        const z1DistanceUnits = (position.z - Z1) / Math.abs(direction.z);
+        const z1Target = position.clone().addScaledVector(direction, z1DistanceUnits);
+        const z1Distance = z1Target.distanceTo(position) * Math.sign(z1DistanceUnits);
+        
+        camera.near = Math.max(z1Distance, 10);
+        camera.far = Math.max(z0Distance, 1000);
+        console.log("camera:", camera.near, camera.far);
+        camera.updateProjectionMatrix();
+
+        this.ssao.ssaoMaterial.uniforms.cameraNear.value = camera.near;
+        this.ssao.ssaoMaterial.uniforms.cameraFar.value = camera.far;
+        this.ssao.ssaoMaterial.uniformsNeedUpdate = true;
+        this.ssao.depthRenderMaterial.uniforms.cameraNear.value = camera.near;
+        this.ssao.depthRenderMaterial.uniforms.cameraFar.value = camera.far;
+        this.ssao.depthRenderMaterial.uniformsNeedUpdate = true;
+
     }
 
     get resolution() {
@@ -92,6 +145,7 @@ export class Graphics {
         console.log("focusing:", location, target);
         this.controls.target.copy(target);
         this.camera.position.copy(location);
+        this.updateCameraBoundries();
     }
 } 
 

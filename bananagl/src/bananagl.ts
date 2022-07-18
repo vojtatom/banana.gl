@@ -22,6 +22,7 @@ export class BananaGL {
 
     constructor(props: BananaGLProps) {
         this.graphics = new Graphics(props.graphics);
+        const nav = this.graphics.navigation;
 
         if (props.loaderPath)
             LoaderWorkerPool.workerPath = props.loaderPath;
@@ -32,13 +33,13 @@ export class BananaGL {
         if (props.location) {
             const position = new Vector3(props.location.x, props.location.y, props.location.z);
             const target = new Vector3(props.location.x, props.location.y, 0);
-            Navigation.Instance.setLocation(position, target);
+            nav.setLocation(position, target);
             this.graphics.focus(position, target);
-        } else if (Navigation.Instance.isSet) {
-            this.graphics.focus(Navigation.Instance.location, Navigation.Instance.target);
+        } else if (nav.isSet) {
+            this.graphics.focus(nav.location, nav.target);
         }
 
-        Navigation.Instance.layers = this.layers;
+        nav.layers = this.layers;
 
         this.graphics.onClick = (x: number, y: number, id: number) => {
             this.layers.forEach((layer) => {

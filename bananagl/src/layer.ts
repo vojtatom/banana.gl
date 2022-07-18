@@ -13,24 +13,25 @@ export type LayerProps = {
     styles?: Style[];
 }
 
-export type Metadata = {[id: number]: any};
+export type MetadataTable = {[id: number]: any};
 
 type ParsedGeometry = {
     positions: Float32Array;
     normals: Float32Array;
     ids: Float32Array;
-    metadata: Metadata;
+    metadata: MetadataTable;
 }
 
 
 
 export class Layer {
     name: string;
-    loader: LayerLoader;
-    graphics: Graphics;
-    metadata: Metadata;
+    metadata: MetadataTable;
     styles: Style[];
     selection: ObjectSelection[] = [];
+    
+    readonly loader: LayerLoader;
+    readonly graphics: Graphics;
     readonly materialLibrary : MaterialLibrary;
     readonly pickable: boolean;
     
@@ -48,7 +49,7 @@ export class Layer {
         this.loader.locate(x, y);
     }
 
-    private addMetadata(metadata: Metadata) {
+    private addMetadata(metadata: MetadataTable) {
         for (const id in metadata) {
             if (this.metadata.hasOwnProperty(id)) {
                 console.log("conflict", id, this.metadata[id], metadata[id]);

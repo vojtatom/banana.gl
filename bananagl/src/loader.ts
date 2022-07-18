@@ -68,7 +68,7 @@ export class LayerLoader {
     }
 
     locate(x: number, y: number) {
-        const RADIUS = 4000 * 4000;
+        const RADIUS = 2000 * 2000;
         if (this.layout) {
             const halfx = this.layout.tileWidth * 0.5;
             const halfy = this.layout.tileHeight * 0.5;
@@ -96,13 +96,14 @@ export class LayerLoader {
 
         const xmedian = median(this.layout.tiles.map((tile) => tile.x)) * this.layout.tileWidth;
         const ymedian = median(this.layout.tiles.map((tile) => tile.y)) * this.layout.tileHeight;
-        if (Navigation.Instance.isSet)
-            this.locate(Navigation.Instance.location.x, Navigation.Instance.location.y);
+        const nav = this.layer.graphics.navigation;
+        if (this.layer.graphics.navigation.isSet)
+            this.locate(nav.location.x, nav.location.y);
         else {
             const position = new Vector3(xmedian, ymedian, 1000);
             const target = new Vector3(xmedian, ymedian, 0);
             this.layer.graphics.focus(position, target);
-            Navigation.Instance.setLocation(position, target);
+            nav.setLocation(position, target);
         }
         
     }

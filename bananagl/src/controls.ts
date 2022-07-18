@@ -3,6 +3,9 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls';
 
 
 export class MapControls extends OrbitControls {
+    lastPosition = new THREE.Vector3();
+    lastTarget = new THREE.Vector3();
+    mouseDownCnt = 0;
 
     constructor(camera: THREE.Camera, domElement: HTMLCanvasElement) {
 
@@ -27,4 +30,26 @@ export class MapControls extends OrbitControls {
         this.maxPolarAngle = Math.PI * 0.4;
         this.update();
     }
+
+    onMouseDown(event: MouseEvent) {
+        this.mouseDownCnt++;
+    }
+
+    onMouseUp(event: MouseEvent) {
+        this.mouseDownCnt--;
+    }
+
+    get changed() {
+        if (this.mouseDownCnt)
+            return true;
+
+        if (this.target.equals(this.lastTarget) && this.object.position.equals(this.lastPosition))
+            return false;
+
+        this.lastTarget.copy(this.target);
+        this.lastPosition.copy(this.object.position);
+        return true;
+    }
+
+    
 }
