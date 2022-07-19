@@ -1,6 +1,6 @@
 {
   "name": "bananagl",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "Urban data visualization framework 🍌",
   "main": "src/banana.ts",
   "scripts": {
