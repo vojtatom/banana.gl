@@ -1,9 +1,8 @@
 {
   "name": "bananagl",
-  "version": "1.0.3",
+  "version": "1.0.4",
   "description": "Urban data visualization framework 🍌",
-  "main": "dist/bananagl.js",
-  "typings": "dist/types/bananagl.d.ts",
+  "main": "src/banana.ts",
   "scripts": {
     "build-prod": "webpack --mode production",
     "build": "webpack --mode development",
