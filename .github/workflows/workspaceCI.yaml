@@ -1,4 +1,4 @@
-name: Metacity Workspace CI
+name: BananaGL CI
 
 on:
   push:
@@ -38,148 +38,11 @@ jobs:
         esac
         echo "::set-output name=deploy::$deploy"
 
-  test-build:
-    runs-on: ubuntu-latest
-    needs: run-settings
-    if: github.event_name == 'push' && contains(github.ref, 'dev') 
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '16'
-
-    - name: Install npm dependencies
-      run: |
-        cd react-metaworkspace
-        npm install
-        cd ..
-
-    - name: Build React
-      run: |
-        cd react-metaworkspace
-        npm run build
-        cd ..
-        rm -r metaworkspace/client/
-        mkdir metaworkspace/client/
-        cp -a react-metaworkspace/build/. metaworkspace/client/
 
 
-  bump:
-    runs-on: ubuntu-latest
-    needs: test-build
-    if: needs.run-settings.outputs.out-bump == 1 && github.event_name == 'push' && contains(github.ref, 'dev')
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
 
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install bump
 
-    - name: Get version
-      run: |
-        log=$(git log --pretty=oneline --max-count=1)
-        case "$log" in
-            *version::major* ) cmd='bump --major --reset';;
-            *version::minor* ) cmd='bump --minor --reset';;
-            * ) cmd='bump --patch';;
-        esac
-        eval $cmd
 
-    - uses: EndBug/add-and-commit@v7
-      with:
-        default_author: github_actions
-        message: "Bumped package version"
-
-  package-deploy:
-    runs-on: ubuntu-latest
-    needs: run-settings
-    outputs:
-      out-version: ${{ steps.dist.outputs.version }}
-    if: needs.run-settings.outputs.out-package == 1 && github.event_name == 'push' && contains(github.ref, 'main')
-    steps:
-    - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
-
-    - name: Set up Python 3.9
-      uses: actions/setup-python@v2
-      with:
-        python-version: 3.9
-
-    - uses: actions/setup-node@v2
-      with:
-        node-version: '16'
-
-    - name: Install npm dependencies
-      run: |
-        cd react-metaworkspace
-        npm install
-        cd ..
-
-    - name: Build React
-      run: |
-        cd react-metaworkspace
-        npm run build
-        cd ..
-        rm -r metaworkspace/client/
-        mkdir metaworkspace/client/
-        cp -a react-metaworkspace/build/. metaworkspace/client/
-      
-    - name: Prepare for dist
-      id: dist
-      run: |
-        python setup.py sdist
-        v=$(cat setup.py| grep "version=" | cut -d '"' -f2 | cut -d '"' -f1)
-        echo "::set-output name=version::$v"
-
-    - name: Publish package
-      uses: pypa/gh-action-pypi-publish@release/v1
-      with:
-        user: __token__
-        password: ${{ secrets.PYPI_API_TOKEN }}
-
-  server-deploy:
-    runs-on: ubuntu-latest
-    needs: package-deploy
-    if: needs.run-settings.outputs.out-deploy == 1 && github.event_name == 'push' && contains(github.ref, 'main')
-    steps:
-    - name: Passive wait for PyPI to update after deploy
-      run: sleep 180
-
-    - name: SSH Deploy
-      uses: appleboy/ssh-action@master
-      with:
-        host: ${{ secrets.DEPHOST }}
-        username: ${{ secrets.DEPUSERNAME }}
-        key: ${{ secrets.DEPKEY }}
-        timeout: 300s
-        command_timeout: 300m
-        script: |
-          whoami;
-          cd /home/monika/metaworkspace;
-          . ./env/bin/activate;
-          python -m metaworkspace --stop workspace
-          pip install --force-reinstall metaworkspace==${{ needs.package-deploy.outputs.out-version }}";
-          RESULT=$?
-          if [ $RESULT -eq 0 ]; then
-          python -m metaworkspace --migrate workspace;
-          echo "Done";
-          fi
 
 

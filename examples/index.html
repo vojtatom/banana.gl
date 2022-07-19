@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+    <title>Testing Project</title>
+</head>
+<body>
+    <canvas id="canvas">Your browser does not support canvas</canvas>
+    <script src="bananagl.js"></script>
+    <script>
+        window.onload = () => {
+            const canvas = document.getElementById("canvas");
+
+            const gl = new BananaGL.BananaGL({ 
+                graphics: {
+                    canvas: canvas, 
+                    background: 0xeeeeee
+                },
+                loaderPath: "loader.js",
+                stylerPath: "styler.js"
+            });
+
+            gl.loadLayer({
+                path: "/data/buildings",
+                material: {
+                    baseColor: 0xffffff,
+                    lineColor: 0xfdbe56,
+                },
+                pickable: true,
+                styles: [
+                    gl.style.withAttributeRange("height", 20, 50).useColor([
+                     0xAED6F1,
+                     0x229954,
+                     0x27AE60,
+                     0x2ECC71,
+                     0x58D68D,
+                     0x82E0AA,
+                     0xABEBC6,
+                     0xD5F5E3,
+                     0xFCF3CF,
+                     0xF9E79F,
+                     0xF7DC6F,
+                     0xFAD7A0,
+                     0xF8C471,
+                     0xF0B27A,
+                     0xE67E22,
+                     0xD35400,
+                     0xCB4335
+                    ]),
+                    //gl.style.withAttributeRange("height", 0, 50).useColor([0x3333f3, 0xf33333 ]),
+                    //gl.style.withAttributeRange("height", 0, 50).useColor([0x000000, 0xffffff]),
+                ]
+            });
+
+            gl.loadLayer({
+                path: "/data/terrain",
+                material: {
+                    baseColor: 0xeeeeee,
+                }
+            });
+
+            gl.loadLayer({
+                path: "/data/bridges",
+                material: {
+                    baseColor: 0xeeeeee,
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
