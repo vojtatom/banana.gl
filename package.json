@@ -8,7 +8,9 @@
     "build": "webpack --mode development",
     "types": "tsc src/index.ts --declaration --allowJs --emitDeclarationOnly --outDir dist",
     "lint": "eslint --ext .js,.ts src",
-    "serve": "python3 -m http.server"
+    "serve": "python3 -m http.server",
+    "prepare": "npm run build-ts",
+    "build-ts": "tsc"
   },
   "keywords": [
     "urban data",
