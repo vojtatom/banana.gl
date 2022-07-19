@@ -4,7 +4,7 @@ import { WorkerPool } from "./workerPool";
 
 export class StylerWorkerPool extends WorkerPool  {
     private static _instance: StylerWorkerPool;
-    static workerPath = "worker.js";
+    static workerPath = "styler.js";
     
     private constructor()
     {

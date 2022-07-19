@@ -25,24 +25,25 @@ export class WorkerPool {
         this.jobIDs = 0;
         this.resultMap = new Map();
         this.poolsize = poolsize ?? 5;
+        console.log(workerPath);
 
         for(let i = 0; i < this.poolsize; ++i)
         {
             this.workers.push(new Worker(workerPath));
             this.worker_busy.push(false);
             
-
+            
             this.workers[i].onmessage = (message) => {
                 const {data} = message;
                 const {result, jobID} = data;
-
+                
                 const res = this.resultMap.get(jobID);
                 
                 if (!res) 
-                    return;
-
+                return;
+                
                 res.callback(result);
-
+                
                 this.worker_busy[i] = false;
                 this.submit();
             }

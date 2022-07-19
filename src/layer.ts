@@ -92,6 +92,7 @@ export class Layer {
         geometry.setAttribute('idcolor', new BufferAttribute(parsed_geometry.ids, 3));
         const m = new Mesh(geometry, this.materialLibrary.default);
         this.graphics.scene.add(m);
+        this.graphics.needsRedraw = true;
 
         this.styles.forEach((style) => {
             StylerWorkerPool.Instance.process({
@@ -103,6 +104,7 @@ export class Layer {
                 geometry.setAttribute('color', new BufferAttribute(color, 3));
                 this.materialLibrary.default.vertexColors = true;
                 this.materialLibrary.default.needsUpdate = true;
+                this.graphics.needsRedraw = true;
             })
         });
 

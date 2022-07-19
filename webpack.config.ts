@@ -50,7 +50,7 @@ const configLoader: Configuration = {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
     library:'BananaGLLoader',
-    libraryTarget: 'umd'
+    libraryTarget: 'window'
   },
   ...common
 };
@@ -63,7 +63,7 @@ const configStyler: Configuration = {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
     library:'BananaGLStyler',
-    libraryTarget: 'umd'
+    libraryTarget: 'window'
   },
   ...common
 };

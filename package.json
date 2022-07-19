@@ -1,6 +1,6 @@
 {
   "name": "bananagl",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "Urban data visualization framework 🍌",
   "main": "dist/bananagl.js",
   "typings": "dist/types/bananagl.d.ts",
