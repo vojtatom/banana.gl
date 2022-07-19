@@ -1,43 +1,56 @@
-# Metacity Workspace
+# BananaGL 🍌
 
-[![Build Status](https://github.com/MetacitySuite/Metacity-Workspace/workflows/Metacity%20Workspace%20CI/badge.svg)](https://github.com/MetacitySuite/Metacity-Workspace/actions?query=workflow%3A%22Metacity+Workspace+CI%22)
-[![Pypi version](https://badge.fury.io/py/metaworkspace.svg)](https://pypi.org/project/metaworkspace/)
+Metacity + BananaGL = Potassium for your urban data visualization on the web
 
-Metacity Workspace is a Python package, which is also the main Metacity application. 
+## Minimal Example
 
-See running live:
-http://metacity.cc
+```js
+const canvas = document.getElementById("canvas");
 
-## Installation
+const gl = new BananaGL.BananaGL({ 
+    graphics: {
+        canvas: canvas, 
+        background: 0x495155
+    },
+    loaderPath: "loader.js",
+    stylerPath: "styler.js"
+});
 
-Install with:
+gl.loadLayer({
+    path: "/data/buildings",
+    material: {
+        baseColor: 0xffffff,
+        lineColor: 0xfdbe56,
+    },
+    pickable: true,
+    styles: [
+        gl.style.withAttributeRange("height", 0, 50)
+                .useColor([0xfdbe56, 0xfa9a2e, 0xf76f00, 0xf54200, 0xf30000]),
+    ]
+});
+
+gl.loadLayer({
+    path: "/data/terrain",
+    material: {
+        baseColor: 0xeeeeee,
+    }
+});
+
+gl.loadLayer({
+    path: "/data/bridges",
+    material: {
+        baseColor: 0xeeeeee,
+    }
+});
 ```
-pip install metaworkspace
-```
-For easy installation, follow the instructions described [here](https://github.com/MetacitySuite/Metacity-Guide).
 
-## Branches
-| Branch | Description |
-| ------ | ----------- |
-| main   | protected, merged PRs auto tested and deployed to PyPI and to live server if tag present |
-| dev    | merged PRs auto tested and version bumped if tag present |
+---
+
+## History
+
+This is a complete rewrite of the original Metacity-Workspace library. After some experimentation, we have concluded, that maintaining the original library is not worth the effort. Instead, we propose to develop a smaller js library which will handle loading and manipulating files produced by the `metacity` package (Python). We will try make it as simple as possible.
+
+Warning: Work in progress. The API is not stable yet.
 
 
-## PR Merge Commit message conventions
-Use any of the following tags in the merge commit message title to indicate the type of PR:
-
-| In commit message | Descrition | Branches |
-| ---------------------- | ----------- | ------- |
-| `action::bump` | flag to run bump pipeline | dev |
-| `action::package` | flag to run deploy package to PyPI | main |
-| `action::deploy` | flag to run deploy to metacity.cc server | main |
-
-Dev branch actions (together with `action::bump`):
-
-| In commit message | Descrition | Branches |
-| ---------------------- | ----------- | ------- |
-| `version::patch` | bump version after patch/bug fix/minor change | dev |
-| `version::minor` | bump version after new feature/minor change | dev |
-| `version::major` | bump version after major change/breaking change | dev |
-
-If no tag is used, no action runs after the PR is merged. If no version tag is used, the version is bumped as patch.
+ 

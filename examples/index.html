@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        #canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+    </style>
+
+    <title>Testing Project</title>
+</head>
+<body>
+    <canvas id="canvas">Your browser does not support canvas</canvas>
+    <script src="bananagl.js"></script>
+    <script>
+        window.onload = () => {
+            const canvas = document.getElementById("canvas");
+
+            const gl = new BananaGL.BananaGL({ 
+                graphics: {
+                    canvas: canvas, 
+                    background: 0xeeeeee
+                },
+                loaderPath: "loader.js",
+                stylerPath: "styler.js"
+            });
+
+            gl.loadLayer({
+                path: "/data/buildings",
+                material: {
+                    baseColor: 0xffffff,
+                    lineColor: 0xfdbe56,
+                },
+                pickable: true,
+                styles: [
+                    gl.style.withAttributeRange("height", 0, 50).useColor([0xfdbe56, 0xfa9a2e, 0xf76f00, 0xf54200, 0xf30000]),
+                    //gl.style.withAttributeRange("height", 0, 50).useColor([0x3333f3, 0xf33333 ]),
+                    //gl.style.withAttributeRange("height", 0, 50).useColor([0x000000, 0xffffff]),
+                ]
+            });
+
+            gl.loadLayer({
+                path: "/data/terrain",
+                material: {
+                    baseColor: 0xeeeeee,
+                }
+            });
+
+            gl.loadLayer({
+                path: "/data/bridges",
+                material: {
+                    baseColor: 0xeeeeee,
+                }
+            });
+        }
+    </script>
+
+</body>
+</html>
