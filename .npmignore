@@ -214,10 +214,6 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/node,macos,linux,windows
 
-
-data
-examples
-
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudiocode
 
@@ -247,3 +243,11 @@ examples
 *.code-workspace
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
+
+
+data
+examples
+title.png
+.github
+dist/*
+dist/.*
