@@ -1,8 +1,21 @@
 # BananaGL 🍌
 
-Metacity + BananaGL = Potassium for your urban data visualization on the web
+[![NPM Package](https://img.shields.io/npm/v/bananagl)](https://www.npmjs.com/package/bananagl)
+
+![title.png](title.png)
+
+Provides web visualization for urban data processed by the [`Metacity` package](https://github.com/MetacitySuite/Metacity).
+
+## Installation
+
+```
+npm i bananagl
+```
+
 
 ## Minimal Example
+
+Requres data preprocesed by the [`Metacity` package](https://github.com/MetacitySuite/Metacity). The output data can be visualized by `BananaGL`:
 
 ```js
 const canvas = document.getElementById("canvas");
