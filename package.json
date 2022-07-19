@@ -1,8 +1,9 @@
 {
   "name": "bananagl",
-  "version": "1.0.5",
+  "version": "1.0.6",
   "description": "Urban data visualization framework 🍌",
-  "main": "src/banana.ts",
+  "main": "build/bananagl.js",
+  "types": "build/index.d.ts",
   "scripts": {
     "build-prod": "webpack --mode production",
     "build": "webpack --mode development",
@@ -10,7 +11,7 @@
     "lint": "eslint --ext .js,.ts src",
     "serve": "python3 -m http.server",
     "prepare": "npm run build-ts",
-    "build-ts": "tsc"
+    "build-ts": "webpack --mode production && tsc"
   },
   "keywords": [
     "urban data",

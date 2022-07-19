@@ -244,10 +244,9 @@ $RECYCLE.BIN/
 
 # End of https://www.toptal.com/developers/gitignore/api/visualstudiocode
 
-
+src
+dist
 data
 examples
 title.png
 .github
-dist/*
-dist/.*

@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-      "outDir": "dist",
+      "outDir": "build",
       "target": "ES6",
       "strict": true,
       "noEmit": false,
