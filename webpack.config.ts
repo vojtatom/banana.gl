@@ -26,7 +26,7 @@ const common = {
       async: false
     }),
   ],
-  watch: true
+  //watch: true
 }
 
 const configMain: Configuration = {

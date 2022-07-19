@@ -1,9 +1,9 @@
 {
     "compilerOptions": {
-      "outDir": "dist",
+      "outDir": "build",
       "target": "ES6",
       "strict": true,
-      "noEmit": true,
+      "noEmit": false,
       "allowJs": true,
       "esModuleInterop": true,
       "skipLibCheck": true,
