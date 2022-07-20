@@ -1,6 +1,6 @@
-import { Style } from "./styles";
-import { MetadataTable } from "./layer";
-import { Color } from "three";
+import { Style } from './styles';
+import { MetadataTable } from './layer';
+import { Color } from 'three';
 
 
 function computeColorTable(style: Style, metadataTable: MetadataTable) {
@@ -24,7 +24,7 @@ function computeColorBuffer(ids: Float32Array, colorTable: Map<number, Color>) {
         idBuffer[2] = ids[offset + 1] * 255;
         idBuffer[3] = ids[offset + 2] * 255;
         return view.getInt32(0);
-    }
+    };
 
     let id, color;
     for (let offset = 0; offset < ids.length; offset += 3) {
@@ -63,7 +63,7 @@ function applyStyle(message: MessageEvent) {
 //eslint-disable-next-line no-restricted-globals
 self.onmessage = (message: MessageEvent) => {
     applyStyle(message);
-}
+};
 
 
 

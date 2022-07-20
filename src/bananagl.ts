@@ -1,9 +1,8 @@
-import { Vector3 } from "three";
-import { Graphics, GraphicsProps } from "./graphics";
-import { Layer, LayerProps } from "./layer";
-import { LoaderWorkerPool } from "./loader";
-import { Style, StylerWorkerPool } from "./styles";
-import { Navigation } from "./navigation";
+import { Vector3 } from 'three';
+import { Graphics, GraphicsProps } from './graphics';
+import { Layer, LayerProps } from './layer';
+import { LoaderWorkerPool } from './loader';
+import { Style, StylerWorkerPool } from './styles';
 
 type BananaGLProps = {
     graphics: GraphicsProps
@@ -45,7 +44,7 @@ export class BananaGL {
             this.layers.forEach((layer) => {
                 layer.select(id);
             });
-        }
+        };
 
     }
 

@@ -34,12 +34,12 @@ export class GPUPicker {
         this.pickingScene = new THREE.Scene();
 
         this.pickingMaterial = new THREE.ShaderMaterial(
-        {
-            vertexShader: vs3D,
-            fragmentShader: fs3D,
-            transparent: false,
-            side: THREE.DoubleSide
-        });
+            {
+                vertexShader: vs3D,
+                fragmentShader: fs3D,
+                transparent: false,
+                side: THREE.DoubleSide
+            });
     }
 
     addPickable(mesh: THREE.Mesh) {
@@ -62,7 +62,7 @@ export class GPUPicker {
             1,
         );
         // render the scene
-        this.renderer.setRenderTarget(pickingTexture)
+        this.renderer.setRenderTarget(pickingTexture);
         this.renderer.render(this.pickingScene, camera);
         this.renderer.setRenderTarget(null);
 

@@ -1,13 +1,13 @@
-import { Layer } from "./layer";
-import axios from "axios";
-import { Navigation } from "./navigation";
-import { Vector3 } from "three";
-import { WorkerPool } from "./workerPool";
+import { Layer } from './layer';
+import axios from 'axios';
+import { Navigation } from './navigation';
+import { Vector3 } from 'three';
+import { WorkerPool } from './workerPool';
 
 
 export class LoaderWorkerPool extends WorkerPool  {
     private static _instance: LoaderWorkerPool;
-    static workerPath = "loaderWorker.js";
+    static workerPath = 'loaderWorker.js';
     private idOffset = 0;
     
     private constructor()
@@ -118,7 +118,7 @@ export class LayerLoader {
         LoaderWorkerPool.Instance.process({
             file: url.toString(),
             objectsToLoad: tile.size
-         }, (scene) => {
+        }, (scene) => {
             this.layer.onDataLoaded(scene);
         });
     }

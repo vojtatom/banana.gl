@@ -1,10 +1,10 @@
-import { LayerLoader } from "./loader";
-import { Mesh, BufferGeometry, BufferAttribute, Points } from "three";
-import { Graphics } from "./graphics";
-import { ObjectSelection } from "./selection";
-import { MaterialLibrary, MaterialLibraryProps } from "./material";
-import { Style, StylerWorkerPool } from "./styles";
-import { LayerType } from "./types";
+import { LayerLoader } from './loader';
+import { Mesh, BufferGeometry, BufferAttribute, Points } from 'three';
+import { Graphics } from './graphics';
+import { ObjectSelection } from './selection';
+import { MaterialLibrary, MaterialLibraryProps } from './material';
+import { Style, StylerWorkerPool } from './styles';
+import { LayerType } from './types';
 
 export type LayerProps = {
     path: string;
@@ -13,6 +13,8 @@ export type LayerProps = {
     pickable?: boolean;
     styles?: Style[];
 }
+
+export type MetadataRecord = any;
 
 export type MetadataTable = {[id: number]: any};
 
@@ -53,15 +55,15 @@ export class Layer {
 
     private addMetadata(metadata: MetadataTable) {
         for (const id in metadata) {
-            if (this.metadata.hasOwnProperty(id)) {
-                console.log("conflict", id, this.metadata[id], metadata[id]);
+            if (Object.prototype.hasOwnProperty.call(this.metadata, id)) {
+                console.log('conflict', id, this.metadata[id], metadata[id]);
             }
             this.metadata[id] = metadata[id];
         }
     }
 
     private getMetadata(id: number) {
-        if (this.metadata.hasOwnProperty(id)) {
+        if (Object.prototype.hasOwnProperty.call(this.metadata, id)) {
             console.log(this.metadata[id]);
             return this.metadata[id];
         }
@@ -112,7 +114,7 @@ export class Layer {
                     this.materialLibrary.default.vertexColors = true;
                     this.materialLibrary.default.needsUpdate = true;
                     this.graphics.needsRedraw = true;
-                })
+                });
             });
     
             if (this.pickable) {

@@ -40,13 +40,13 @@ export class WorkerPool {
                 const res = this.resultMap.get(jobID);
                 
                 if (!res) 
-                return;
+                    return;
                 
                 res.callback(result);
                 
                 this.worker_busy[i] = false;
                 this.submit();
-            }
+            };
         }
         this.queue = [];
     }
