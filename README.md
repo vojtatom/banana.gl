@@ -1,16 +1,13 @@
 # BananaGL 🍌
 
-[![NPM Package](https://img.shields.io/npm/v/bananagl)](https://www.npmjs.com/package/bananagl)
-
 ![title.png](title.png)
 
 Provides web visualization for urban data processed by the [`Metacity` package](https://github.com/MetacitySuite/Metacity).
 
 ## Installation
 
-```
-npm i bananagl
-```
+
+Download latest release from [GitHub releases](https://github.com/MetacitySuite/BananaGL/releases) and extract the archive. We are working on NPM support. The library utilizes Web Workers, so setting up the NPM support might take a while, and it is also recommended to use a modern browser. 
 
 
 ## Minimal Example

@@ -1,13 +1,13 @@
 {
     "compilerOptions": {
-      "outDir": "build",
+      "outDir": "types",
       "target": "ES6",
       "strict": true,
-      "noEmit": false,
       "allowJs": true,
       "esModuleInterop": true,
       "skipLibCheck": true,
       "declaration": true,
+      "emitDeclarationOnly": true,
       "moduleResolution": "node"
     },
     "include": ["src/**/*"],

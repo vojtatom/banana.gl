@@ -18,7 +18,7 @@
 </head>
 <body>
     <canvas id="canvas">Your browser does not support canvas</canvas>
-    <script src="bananagl.js"></script>
+    <script src="../dist/bananagl.js"></script>
     <script>
         window.onload = () => {
             const canvas = document.getElementById("canvas");
@@ -28,8 +28,8 @@
                     canvas: canvas, 
                     background: 0xeeeeee
                 },
-                loaderPath: "loader.js",
-                stylerPath: "styler.js"
+                loaderPath: "../dist/loaderWorker.js",
+                stylerPath: "../dist/styleWorker.js"
             });
 
             gl.loadLayer({

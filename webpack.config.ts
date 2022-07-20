@@ -44,26 +44,26 @@ const configMain: Configuration = {
 
 const configLoader: Configuration = {
   entry: {
-    loader: './src/loaderWorker.ts'
+    loaderWorker: './src/loaderWorker.ts'
   },
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
     library:'BananaGLLoader',
-    libraryTarget: 'window'
+    libraryTarget: 'umd'
   },
   ...common
 };
 
 const configStyler: Configuration = {
   entry: {
-    styler: './src/styleWorker.ts'
+    styleWorker: './src/styleWorker.ts'
   },
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
     library:'BananaGLStyler',
-    libraryTarget: 'window'
+    libraryTarget: 'umd'
   },
   ...common
 };
