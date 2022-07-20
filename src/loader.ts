@@ -7,7 +7,7 @@ import { WorkerPool } from "./workerPool";
 
 export class LoaderWorkerPool extends WorkerPool  {
     private static _instance: LoaderWorkerPool;
-    static workerPath = "loader.js";
+    static workerPath = "loaderWorker.js";
     private idOffset = 0;
     
     private constructor()
