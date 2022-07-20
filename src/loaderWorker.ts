@@ -1,6 +1,7 @@
 import { GLTFLoader } from "three/examples/jsm/loaders/GLTFLoader";
-import { Color, Group, Mesh, BufferGeometry, BufferAttribute, Box3 } from "three";
+import { Color, Group, Mesh, BufferGeometry, BufferAttribute, Box3, Points } from "three";
 import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
+import { LayerType } from "./types";
 
 function getIDBuffer(size: number, id: number) {
     const buffer = new BufferAttribute(new Float32Array(size * 3), 3);
@@ -15,8 +16,9 @@ function getIDBuffer(size: number, id: number) {
 function preprocess(group: Group, idOffset: number) {
     const geometries: BufferGeometry[] = []
     const metadata: {[id: number]: any} = {};
+    let type: LayerType = LayerType.None;
 
-    const flatten = (group: Group) => {
+    let flatten = (group: Group) => {
         group.children.forEach((child) => {
             if (child instanceof Group) {
                 flatten(child);
@@ -25,11 +27,24 @@ function preprocess(group: Group, idOffset: number) {
                 const ids = getIDBuffer(geometry.attributes.position.count, idOffset);
                 geometry.setAttribute('ids', ids);
                 geometries.push(child.geometry);
+                geometry.computeVertexNormals();
                 
                 computeInternalMetadata(child);   
                 metadata[idOffset++] = child.userData;
 
                 child.remove();
+                type = LayerType.Mesh;
+
+            } else if (child instanceof Points) {
+                const geometry = child.geometry as BufferGeometry;
+                const ids = getIDBuffer(geometry.attributes.position.count, idOffset);
+                geometry.setAttribute('ids', ids);
+                geometries.push(child.geometry);
+                
+                metadata[idOffset++] = child.userData;
+
+                child.remove();
+                type = LayerType.Points;
             } else {
                 console.error(`Unknown child type ${child.type}`);
             }
@@ -37,12 +52,13 @@ function preprocess(group: Group, idOffset: number) {
     }
 
     flatten(group);
+
     const singleGeometry = mergeBufferGeometries(geometries);
-    singleGeometry.computeVertexNormals();
 
     return {
         geometry: singleGeometry, 
-        metadata: metadata
+        metadata: metadata,
+        type: type
         };
 }
 
@@ -65,12 +81,13 @@ function loadModel(message: MessageEvent) {
     
     const loader = new GLTFLoader();
     loader.load(file, (gltf) => {
-        const { geometry, metadata } = preprocess(gltf.scene, idOffset);
+        const { geometry, metadata, type } = preprocess(gltf.scene, idOffset);
         response.result = {
             positions: geometry.attributes.position.array,
-            normals: geometry.attributes.normal.array,
+            normals: geometry.attributes.normal ? geometry.attributes.normal.array : undefined,
             ids: geometry.attributes.ids.array,
-            metadata: metadata
+            metadata: metadata,
+            type: type
         };
         postMessage(response);
 

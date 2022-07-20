@@ -1,9 +1,10 @@
 import { LayerLoader } from "./loader";
-import { Mesh, BufferGeometry, BufferAttribute } from "three";
+import { Mesh, BufferGeometry, BufferAttribute, Points } from "three";
 import { Graphics } from "./graphics";
 import { ObjectSelection } from "./selection";
 import { MaterialLibrary, MaterialLibraryProps } from "./material";
 import { Style, StylerWorkerPool } from "./styles";
+import { LayerType } from "./types";
 
 export type LayerProps = {
     path: string;
@@ -15,12 +16,15 @@ export type LayerProps = {
 
 export type MetadataTable = {[id: number]: any};
 
+
 type ParsedGeometry = {
     positions: Float32Array;
     normals: Float32Array;
     ids: Float32Array;
     metadata: MetadataTable;
+    type: LayerType;
 }
+
 
 export class Layer {
     name: string;
@@ -86,30 +90,45 @@ export class Layer {
 
     onDataLoaded(parsed_geometry: ParsedGeometry) {
         this.addMetadata(parsed_geometry.metadata);
-        const geometry = new BufferGeometry();
-        geometry.setAttribute('position', new BufferAttribute(parsed_geometry.positions, 3));
-        geometry.setAttribute('normal', new BufferAttribute(parsed_geometry.normals, 3));
-        geometry.setAttribute('idcolor', new BufferAttribute(parsed_geometry.ids, 3));
-        const m = new Mesh(geometry, this.materialLibrary.default);
-        this.graphics.scene.add(m);
-        this.graphics.needsRedraw = true;
 
-        this.styles.forEach((style) => {
-            StylerWorkerPool.Instance.process({
-                style: style,
-                metadata: parsed_geometry.metadata,
-                ids: parsed_geometry.ids
-            }, (results) => {
-                const { color } = results;
-                geometry.setAttribute('color', new BufferAttribute(color, 3));
-                this.materialLibrary.default.vertexColors = true;
-                this.materialLibrary.default.needsUpdate = true;
-                this.graphics.needsRedraw = true;
-            })
-        });
 
-        if (this.pickable) {
-            this.graphics.picker.addPickable(m);
+        if (parsed_geometry.type === LayerType.Mesh) {
+            const geometry = new BufferGeometry();
+            geometry.setAttribute('position', new BufferAttribute(parsed_geometry.positions, 3));
+            geometry.setAttribute('normal', new BufferAttribute(parsed_geometry.normals, 3));
+            geometry.setAttribute('idcolor', new BufferAttribute(parsed_geometry.ids, 3));
+            const m = new Mesh(geometry, this.materialLibrary.default);
+            this.graphics.scene.add(m);
+            this.graphics.needsRedraw = true;
+
+            this.styles.forEach((style) => {
+                StylerWorkerPool.Instance.process({
+                    style: style,
+                    metadata: parsed_geometry.metadata,
+                    ids: parsed_geometry.ids
+                }, (results) => {
+                    const { color } = results;
+                    geometry.setAttribute('color', new BufferAttribute(color, 3));
+                    this.materialLibrary.default.vertexColors = true;
+                    this.materialLibrary.default.needsUpdate = true;
+                    this.graphics.needsRedraw = true;
+                })
+            });
+    
+            if (this.pickable) {
+                this.graphics.picker.addPickable(m);
+            }
+        } else if (parsed_geometry.type === LayerType.Points) {
+            const geometry = new BufferGeometry();
+            geometry.setAttribute('position', new BufferAttribute(parsed_geometry.positions, 3));
+            geometry.setAttribute('idcolor', new BufferAttribute(parsed_geometry.ids, 3));
+            const m = new Points(geometry, this.materialLibrary.point);
+            this.graphics.scene.add(m);
+            this.graphics.needsRedraw = true;
+
+            //if (this.pickable) {
+            //    this.graphics.picker.addPickable(m);
+            //}
         }
     }
 }

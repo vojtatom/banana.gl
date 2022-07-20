@@ -2,11 +2,10 @@
   "name": "bananagl",
   "version": "1.0.7",
   "description": "Urban data visualization framework 🍌",
-  "main": "dist/bananagl.js",
   "types": "types/index.d.ts",
   "scripts": {
     "build-prod": "webpack --mode production",
-    "build": "webpack --mode development",
+    "build": "webpack --mode development --watch",
     "types": "tsc src/index.ts --declaration --allowJs --emitDeclarationOnly --outDir dist",
     "lint": "eslint --ext .js,.ts src",
     "serve": "python3 -m http.server",

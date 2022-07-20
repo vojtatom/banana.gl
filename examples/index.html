@@ -33,7 +33,7 @@
             });
 
             gl.loadLayer({
-                path: "/data/buildings",
+                path: "./data/buildings",
                 material: {
                     baseColor: 0xffffff,
                     lineColor: 0xfdbe56,
@@ -65,16 +65,23 @@
             });
 
             gl.loadLayer({
-                path: "/data/terrain",
+                path: "./data/terrain",
                 material: {
                     baseColor: 0xeeeeee,
                 }
             });
 
             gl.loadLayer({
-                path: "/data/bridges",
+                path: "./data/bridges",
                 material: {
                     baseColor: 0xeeeeee,
+                }
+            });
+
+            gl.loadLayer({
+                path: "./data/trees",
+                material: {
+                    baseColor: 0x000000,
                 }
             });
         }

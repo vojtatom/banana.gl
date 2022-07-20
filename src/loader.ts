@@ -114,8 +114,9 @@ export class LayerLoader {
 
         tile.loaded = true;
         const path = `${this.path}/${tile.file}`;
+        const url = new URL(path, window.location.href);
         LoaderWorkerPool.Instance.process({
-            file: path,
+            file: url.toString(),
             objectsToLoad: tile.size
          }, (scene) => {
             this.layer.onDataLoaded(scene);
