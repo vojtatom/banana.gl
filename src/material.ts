@@ -28,9 +28,9 @@ export class MaterialLibrary {
         });
 
         this.point = new PointsMaterial({
-            size: 5,
+            size: 10,
             color: props.baseColor ?? 0x000000,
-            sizeAttenuation: false,
+            sizeAttenuation: true,
         });
     }
 }

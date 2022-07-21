@@ -98,7 +98,7 @@ export class Graphics {
             requestAnimationFrame(frame);
             this.controls.update();
             
-            //this.renderer.render(this.scene, this.camera);
+            this.renderer.render(this.scene, this.camera);
             if (this.needsRedraw) {
                 if (this.controls.changed)
                     this.renderer.render(this.scene, this.camera);

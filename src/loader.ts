@@ -1,6 +1,5 @@
 import { Layer } from './layer';
 import axios from 'axios';
-import { Navigation } from './navigation';
 import { Vector3 } from 'three';
 import { WorkerPool } from './workerPool';
 
@@ -12,7 +11,7 @@ export class LoaderWorkerPool extends WorkerPool  {
     
     private constructor()
     {
-        super(LoaderWorkerPool.workerPath, 5);
+        super(LoaderWorkerPool.workerPath, 10);
     }
 
     public static get Instance()
@@ -98,14 +97,23 @@ export class LayerLoader {
         const ymedian = median(this.layout.tiles.map((tile) => tile.y)) * this.layout.tileHeight;
         const nav = this.layer.graphics.navigation;
         if (this.layer.graphics.navigation.isSet)
-            this.locate(nav.location.x, nav.location.y);
+            this.locate(nav.target.x, nav.target.y);
         else {
             const position = new Vector3(xmedian, ymedian, 1000);
             const target = new Vector3(xmedian, ymedian, 0);
             this.layer.graphics.focus(position, target);
             nav.setLocation(position, target);
+        }        
+    }
+
+    private loadTiles() {
+        if (!this.layout)
+            return;
+
+        this.layout.tiles.forEach((tile) => {
+            this.loadTile(tile);
         }
-        
+        );
     }
 
     private loadTile(tile: TileType): any {

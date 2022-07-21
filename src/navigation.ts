@@ -49,9 +49,7 @@ export class Navigation {
 
     private updateLayers() {
         this.layers_.forEach((layer) => {
-            layer.locate(this.location.x, this.location.y);
+            layer.locate(this.target.x, this.target.y);
         });
     }
-
-    
 }
