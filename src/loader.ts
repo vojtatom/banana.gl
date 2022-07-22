@@ -126,14 +126,13 @@ export class LayerLoader {
         const path = `${this.path}/${tile.file}`;
         const url = new URL(path, window.location.href);
 
-        setTimeout(() => {
-            LoaderWorkerPool.Instance.process({
-                file: url.toString(),
-                objectsToLoad: tile.size
-            }, (scene) => {
-                this.layer.graphics.scene.remove(mesh);
-                this.layer.onDataLoaded(scene);
-            });
-        }, 500);
+        LoaderWorkerPool.Instance.process({
+            file: url.toString(),
+            objectsToLoad: tile.size
+        }, (scene) => {
+            this.layer.graphics.scene.remove(mesh);
+            this.layer.onDataLoaded(scene);
+        });
+
     }
 }
