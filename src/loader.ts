@@ -49,7 +49,7 @@ type LayoutType = {
 export class LayerLoader {
     private layer: Layer;
     private path: string;
-    private layout: LayoutType | undefined;
+    private layout!: LayoutType;
 
     constructor(layer: Layer, path: string) {
         this.layer = layer;
@@ -116,18 +116,24 @@ export class LayerLoader {
         );
     }
 
-    private loadTile(tile: TileType): any {
+    private loadTile(tile: TileType) {
         if (tile.loaded)
             return;
+
+        const mesh = this.layer.loadingPlaceholder(new Vector3(tile.x * this.layout.tileWidth, tile.y * this.layout.tileHeight, 0), new Vector3(this.layout.tileWidth, this.layout.tileHeight, 0));
 
         tile.loaded = true;
         const path = `${this.path}/${tile.file}`;
         const url = new URL(path, window.location.href);
-        LoaderWorkerPool.Instance.process({
-            file: url.toString(),
-            objectsToLoad: tile.size
-        }, (scene) => {
-            this.layer.onDataLoaded(scene);
-        });
+
+        setTimeout(() => {
+            LoaderWorkerPool.Instance.process({
+                file: url.toString(),
+                objectsToLoad: tile.size
+            }, (scene) => {
+                this.layer.graphics.scene.remove(mesh);
+                this.layer.onDataLoaded(scene);
+            });
+        }, 500);
     }
 }

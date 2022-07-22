@@ -113,8 +113,8 @@ export class Graphics {
     }
 
     private updateCameraBoundries() {
-        const Z0 = -1000;
-        const Z1 = 1000;
+        const Z0 = -2000;
+        const Z1 = 2000;
         //set camera far to intersect the 0 z-plane
         const camera = this.camera;
         const target = this.controls.target;
@@ -130,8 +130,7 @@ export class Graphics {
         const z1Distance = z1Target.distanceTo(position) * Math.sign(z1DistanceUnits);
         
         camera.near = Math.max(z1Distance, 10);
-        camera.far = Math.max(z0Distance, 1000);
-        console.log('camera:', camera.near, camera.far);
+        camera.far = Math.max(z0Distance, 4000);
         camera.updateProjectionMatrix();
 
         this.ssao.ssaoMaterial.uniforms.cameraNear.value = camera.near;
@@ -148,7 +147,6 @@ export class Graphics {
     }
 
     focus(location: THREE.Vector3, target: THREE.Vector3) {
-        console.log('focusing:', location, target);
         this.controls.target.copy(target);
         this.camera.position.copy(location);
         this.updateCameraBoundries();

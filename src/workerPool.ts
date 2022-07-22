@@ -83,6 +83,7 @@ export class WorkerPool {
         if (!job)
             return;
 
+        
         this.worker_busy[i] = true;
         this.workers[i].postMessage(job);
     }

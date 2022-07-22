@@ -1,4 +1,5 @@
 import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import { Color, Group, Mesh, BufferGeometry, BufferAttribute, Box3, Points, Object3D } from 'three';
 import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 import { LayerType } from './types';
@@ -109,6 +110,12 @@ function preprocess(group: Group, idOffset: number) {
     return result(singleGeometry, props.meta, props.type);
 }
 
+const loader = new GLTFLoader();
+const dracoLoader = new DRACOLoader();
+//dracoLoader.setDecoderPath( '/examples/js/libs/draco/' );
+loader.setDRACOLoader( dracoLoader );
+
+
 function loadModel(message: MessageEvent) {
     
     const { jobID, data } = message.data;
@@ -118,7 +125,6 @@ function loadModel(message: MessageEvent) {
         jobID: jobID
     };
     
-    const loader = new GLTFLoader();
     loader.load(file, (gltf) => {
         const result = preprocess(gltf.scene, idOffset);
         response.result = result;
