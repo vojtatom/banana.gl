@@ -1,6 +1,5 @@
 import { Vector3 } from 'three';
 import { Layer } from './layer';
-import { Graphics } from './graphics';
 
 
 export class Navigation {

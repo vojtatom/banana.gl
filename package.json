@@ -11,7 +11,8 @@
     "lintfix": "eslint --ext .js,.ts --fix src",
     "serve": "python3 -m http.server",
     "prepare": "npm run build-ts",
-    "build-ts": "webpack --mode production && tsc"
+    "build-ts": "webpack --mode production && tsc",
+    "docs": "typedoc"
   },
   "keywords": [
     "urban data",
@@ -47,6 +48,7 @@
     "@types/three": "^0.141.0",
     "axios": "^0.27.2",
     "three": "^0.141.0",
-    "three-fatline": "^0.5.3"
+    "three-fatline": "^0.5.3",
+    "typedoc": "^0.23.8"
   }
 }

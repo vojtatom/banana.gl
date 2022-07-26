@@ -1,10 +1,11 @@
 import * as THREE from 'three';
-import { MaterialLibrary, MaterialLibraryProps } from './material';
+import { MaterialLibrary } from './material';
 import { MapControls } from './controls';
 import { Navigation } from './navigation';
 import { GPUPicker } from './picker';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { SSAOPass } from 'three/examples/jsm/postprocessing/SSAOPass';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 
 export type GraphicsProps = {
@@ -150,6 +151,18 @@ export class Graphics {
         this.controls.target.copy(target);
         this.camera.position.copy(location);
         this.updateCameraBoundries();
+    }
+
+    miniload(model: string) {
+        const loader = new GLTFLoader();
+        loader.load(model, (gltf) => {
+            const scene = gltf.scene;
+            this.scene.add(scene);
+            this.updateCameraBoundries();
+        }, undefined, (error) => {
+            console.error(error);
+        }
+        );
     }
 } 
 

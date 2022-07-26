@@ -1,5 +1,5 @@
 import { Style } from './styles';
-import { MetadataTable } from './layer';
+import { MetadataTable } from './types';
 import { Color } from 'three';
 
 
