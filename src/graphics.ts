@@ -99,12 +99,13 @@ export class Graphics {
             requestAnimationFrame(frame);
             this.controls.update();
             
-            this.renderer.render(this.scene, this.camera);
+            //this.renderer.render(this.scene, this.camera);
+            //composer.render();
             if (this.needsRedraw) {
-                if (this.controls.changed)
-                    this.renderer.render(this.scene, this.camera);
-                else
-                    composer.render();
+            //    if (this.controls.changed)
+            //        this.renderer.render(this.scene, this.camera);
+            //    else
+                composer.render();
             }
 
             //this.renderer.render(this.picker.pickingScene, this.camera);
