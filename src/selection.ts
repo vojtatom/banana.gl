@@ -1,7 +1,7 @@
-import { Box3, Vector3 } from "three";
+import { Box3, Vector3 } from 'three';
 import { LineSegments2, LineSegmentsGeometry } from 'three-fatline';
-import { Graphics } from "./graphics";
-import { MaterialLibrary } from "./material";
+import { Graphics } from './graphics';
+import { MaterialLibrary } from './material';
 
 export type ObjectSelectionProps = {
     graphics: Graphics,

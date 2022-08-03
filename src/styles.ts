@@ -1,10 +1,10 @@
-import { MetadataTable } from "./layer";
-import { WorkerPool } from "./workerPool";
+import { MetadataTable, MetadataRecord } from './types';
+import { WorkerPool } from './workerPool';
 
 
 export class StylerWorkerPool extends WorkerPool  {
     private static _instance: StylerWorkerPool;
-    static workerPath = "styleWorker.js";
+    static workerPath = 'styleWorker.js';
     
     private constructor()
     {
@@ -29,29 +29,29 @@ export class StylerWorkerPool extends WorkerPool  {
 
 abstract class StyleRule {
     $type?: string;
-    abstract apply(metadata: MetadataTable): number;
+    abstract apply(metadata: MetadataRecord): number;
 }
 
 export class StyleRuleAlways extends StyleRule {
-    $type = "always";
-    apply(metadata: MetadataTable) {
+    $type = 'always';
+    apply() {
         return Math.random();
     }
 }
 
 export class StyleRuleAttributeEqualTo extends StyleRule {
     attribute: string;
-    value: any;
-    $type = "attributeEqualTo";
+    value: number | string;
+    $type = 'attributeEqualTo';
 
-    constructor(props: { attribute: string, value: any }) {
+    constructor(props: { attribute: string, value: number | string }) {
         super();
         this.attribute = props.attribute;
         this.value = props.value;
     }
 
-    apply(metadata: MetadataTable) {
-        if (metadata.hasOwnProperty(this.attribute) && metadata[this.attribute as any] == this.value) {
+    apply(metadata: MetadataRecord) {
+        if (Object.prototype.hasOwnProperty.call(metadata, this.attribute) && metadata[this.attribute] == this.value) {
             return 1;
         }
         return -1;
@@ -67,7 +67,7 @@ export class StyleRuleAttributeRange extends StyleRule {
     attribute: string;
     min: number;
     max: number;
-    $type = "attributeRange";
+    $type = 'attributeRange';
 
     constructor(props: { attribute: string, min: number, max: number }) {
         super();
@@ -76,9 +76,9 @@ export class StyleRuleAttributeRange extends StyleRule {
         this.max = props.max;
     }
 
-    apply(metadata: MetadataTable) {
-        if (metadata.hasOwnProperty(this.attribute)) {
-            const value = metadata[this.attribute as any];
+    apply(metadata: MetadataRecord) {
+        if (Object.prototype.hasOwnProperty.call(metadata, this.attribute)) {
+            const value = metadata[this.attribute];
             return clamp((value - this.min) / (this.max - this.min), 0, 1);
         }
         return -1;
@@ -89,18 +89,18 @@ export function serialize(rule: StyleRule) {
     return JSON.stringify(rule);
 }
 
-//ugly but safe
 export function deserialize(rule: string) {
     const rule_ = JSON.parse(rule);
+    //ugly but safe
     switch (rule_.$type) {
-        case "always":
-            return new StyleRuleAlways();
-        case "attributeEqualTo":
-            return new StyleRuleAttributeEqualTo(rule_);
-        case "attributeRange":
-            return new StyleRuleAttributeRange(rule_);
-        default:
-            throw new Error("Unknown rule type: " + rule_.$type);
+    case 'always':
+        return new StyleRuleAlways();
+    case 'attributeEqualTo':
+        return new StyleRuleAttributeEqualTo(rule_);
+    case 'attributeRange':
+        return new StyleRuleAttributeRange(rule_);
+    default:
+        throw new Error('Unknown rule type: ' + rule_.$type);
     }
 }
 
@@ -138,19 +138,19 @@ export class Style {
 
     private lerpColor(a: number, b: number, fade: number) {
         const ar = a >> 16,
-              ag = a >> 8 & 0xff,
-              ab = a & 0xff,
+            ag = a >> 8 & 0xff,
+            ab = a & 0xff,
     
-              br = b >> 16,
-              bg = b >> 8 & 0xff,
-              bb = b & 0xff,
+            br = b >> 16,
+            bg = b >> 8 & 0xff,
+            bb = b & 0xff,
     
-              rr = ar + fade * (br - ar),
-              rg = ag + fade * (bg - ag),
-              rb = ab + fade * (bb - ab);
+            rr = ar + fade * (br - ar),
+            rg = ag + fade * (bg - ag),
+            rb = ab + fade * (bb - ab);
     
         return (rr << 16) + (rg << 8) + (rb | 0);
-    };
+    }
 
     private linearInterpolateColor(colorHexMap: number[], index: number) {
         if (colorHexMap.length == 1) {

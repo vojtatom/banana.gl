@@ -1,4 +1,4 @@
-import { Group, Box3, Vector3 } from "three";
+import { Group, Box3, Vector3 } from 'three';
 
 export function groupCentorid(group: Group) {
     const aabb = new Box3();

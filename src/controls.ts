@@ -31,11 +31,11 @@ export class MapControls extends OrbitControls {
         this.update();
     }
 
-    onMouseDown(event: MouseEvent) {
+    onMouseDown() {
         this.mouseDownCnt++;
     }
 
-    onMouseUp(event: MouseEvent) {
+    onMouseUp() {
         this.mouseDownCnt--;
     }
 
