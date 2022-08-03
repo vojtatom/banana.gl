@@ -32,7 +32,11 @@ export class Graphics {
         const canvas = props.canvas;
         this.navigation = new Navigation();
         this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-        this.camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 10, 1000);
+        this.camera = new THREE.PerspectiveCamera(5, canvas.clientWidth / canvas.clientHeight, 10, 1000);
+        //let aspect = canvas.clientWidth / canvas.clientHeight;
+        //let d = 20;
+        //this.camera = new THREE.OrthographicCamera( - d * aspect, d * aspect, d, - d, 1, 10000);
+
         this.scene = new THREE.Scene();
         this.controls = new MapControls(this.camera, canvas);
         this.materialLibrary = new MaterialLibrary(this.resolution);
@@ -99,13 +103,13 @@ export class Graphics {
             requestAnimationFrame(frame);
             this.controls.update();
             
-            //this.renderer.render(this.scene, this.camera);
+            this.renderer.render(this.scene, this.camera);
             //composer.render();
             if (this.needsRedraw) {
             //    if (this.controls.changed)
             //        this.renderer.render(this.scene, this.camera);
             //    else
-                composer.render();
+                //composer.render();
             }
 
             //this.renderer.render(this.picker.pickingScene, this.camera);
