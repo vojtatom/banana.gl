@@ -1,31 +1,15 @@
-import { LayerLoader } from './loader';
-import { Mesh, BufferGeometry, BufferAttribute, Points, Vector3, BoxGeometry } from 'three';
 import { Graphics } from './graphics';
 import { ObjectSelection } from './selection';
-import { MaterialLibrary, MaterialLibraryProps } from './material';
-import { Style, StylerWorkerPool } from './styles';
-import { LayerType } from './types';
+import { MaterialLibrary } from './material';
+import { Style } from './styles';
+import { LayerProps, LayerType, LayoutType, MetadataTable, ParsedGeometry, TileType } from './types';
+import axios from 'axios';
+import * as THREE from 'three';
+import { LoaderWorkerPool } from './loader';
+import { LoadingAnimation } from './models/loadingAnimation';
+import { MeshGeometry } from './models/mesh';
+import { PointInstance, PointsGeometry } from './models/points';
 
-export type LayerProps = {
-    path: string;
-    name?: string;
-    material?: MaterialLibraryProps;
-    pickable?: boolean;
-    styles?: Style[];
-}
-
-export type MetadataRecord = any;
-
-export type MetadataTable = {[id: number]: any};
-
-
-type ParsedGeometry = {
-    positions: Float32Array;
-    normals: Float32Array;
-    ids: Float32Array;
-    metadata: MetadataTable;
-    type: LayerType;
-}
 
 
 export class Layer {
@@ -34,23 +18,94 @@ export class Layer {
     styles: Style[];
     selection: ObjectSelection[] = [];
     
-    readonly loader: LayerLoader;
     readonly graphics: Graphics;
     readonly materialLibrary : MaterialLibrary;
     readonly pickable: boolean;
+    readonly path: string;
+    
+    private pointInstance?: PointInstance;
+    private layout?: LayoutType;
     
     constructor(props: LayerProps, graphics: Graphics) {
         this.materialLibrary = new MaterialLibrary(graphics.resolution, props.material);
         this.name = props.name? props.name : props.path;
         this.graphics = graphics;
-        this.loader = new LayerLoader(this, props.path);
         this.pickable = props.pickable ?? false;
         this.styles = props.styles ?? [];
+        this.path = props.path;
         this.metadata = {};
+
+        if (props.points && props.points.instanceModel) {
+            this.pointInstance = new PointInstance(props.points.instanceModel);
+        }
+
+        axios.get(`${this.path}/layout.json`).then((response) => {
+            this.layout = response.data;
+
+            if (!this.layout)
+                return;
+
+            function median(arr: number[]) {
+                arr.sort();
+                const mid = Math.floor(arr.length / 2);
+                if (arr.length % 2)
+                    return arr[mid];
+                return (arr[mid - 1] + arr[mid]) / 2;
+            }
+    
+            const xmedian = median(this.layout.tiles.map((tile) => tile.x)) * this.layout.tileWidth;
+            const ymedian = median(this.layout.tiles.map((tile) => tile.y)) * this.layout.tileHeight;
+            const nav = this.graphics.navigation;
+            
+            if (this.graphics.navigation.isSet)
+                this.locate(nav.target.x, nav.target.y);
+            else {
+                const position = new THREE.Vector3(xmedian, ymedian, 1000);
+                const target = new THREE.Vector3(xmedian, ymedian, 0);
+                this.graphics.focus(position, target);
+                nav.setLocation(position, target);
+            }  
+
+        }).catch((error) => {
+            console.error(`Could not load layout for layer ${this.path}`);
+            console.error(error);
+        });
     }
 
     locate(x: number, y: number) {
-        this.loader.locate(x, y);
+        const RADIUS = 2000 * 2000;
+        if (this.layout) {
+            const halfx = this.layout.tileWidth * 0.5;
+            const halfy = this.layout.tileHeight * 0.5;
+            this.layout.tiles.forEach((tile) => {
+                if (this.layout) {
+                    const dx = tile.x * this.layout.tileWidth + halfx - x;
+                    const dy = tile.y * this.layout.tileHeight + halfy - y;
+                    const d = dx * dx + dy * dy;
+                    if (d < RADIUS) {
+                        this.loadTile(tile);
+                    }
+                }
+            });
+        }
+    }
+
+    private loadTile(tile: TileType) {
+        if (tile.loaded || !this.layout)
+            return;
+
+        tile.loaded = true;
+        const loading = new LoadingAnimation(tile, this.layout, this.graphics);
+        const url = new URL(`${this.path}/${tile.file}`, window.location.href);
+
+        LoaderWorkerPool.Instance.process({
+            file: url.toString(),
+            objectsToLoad: tile.size
+        }, (scene) => {
+            loading.finished();
+            this.onDataLoaded(scene);
+        });
+
     }
 
     private addMetadata(metadata: MetadataTable) {
@@ -90,65 +145,15 @@ export class Layer {
         this.selection.length = 0;
     }
 
-    loadingPlaceholder(position: Vector3, size: Vector3) {
-        console.log(position, size);
-        const s = Math.min(size.x, size.y) / 2;
-        const geometry = new BoxGeometry(s, s, s / 20);
-        const material = this.materialLibrary.loading;
-        const mesh = new Mesh(geometry, material);
-        mesh.position.copy(position.addScaledVector(size, 0.5));
-        this.graphics.scene.add(mesh);
-        
-        let tick = 0;
-        mesh.onBeforeRender = () => {
-            const scl = Math.sin(tick++ / 20) * 0.3 + 0.7;
-            mesh.scale.set(scl, scl, scl);
-        };
-
-        return mesh;
-    }
-
     onDataLoaded(parsed_geometry: ParsedGeometry) {
         this.addMetadata(parsed_geometry.metadata);
 
-
         if (parsed_geometry.type === LayerType.Mesh) {
-            const geometry = new BufferGeometry();
-            geometry.setAttribute('position', new BufferAttribute(parsed_geometry.positions, 3));
-            geometry.setAttribute('normal', new BufferAttribute(parsed_geometry.normals, 3));
-            geometry.setAttribute('idcolor', new BufferAttribute(parsed_geometry.ids, 3));
-            const m = new Mesh(geometry, this.materialLibrary.default);
-            this.graphics.scene.add(m);
-            this.graphics.needsRedraw = true;
-
-            this.styles.forEach((style) => {
-                StylerWorkerPool.Instance.process({
-                    style: style,
-                    metadata: parsed_geometry.metadata,
-                    ids: parsed_geometry.ids
-                }, (results) => {
-                    const { color } = results;
-                    geometry.setAttribute('color', new BufferAttribute(color, 3));
-                    this.materialLibrary.default.vertexColors = true;
-                    this.materialLibrary.default.needsUpdate = true;
-                    this.graphics.needsRedraw = true;
-                });
-            });
-    
-            if (this.pickable) {
-                this.graphics.picker.addPickable(m);
-            }
+            new MeshGeometry(this, parsed_geometry);
         } else if (parsed_geometry.type === LayerType.Points) {
-            const geometry = new BufferGeometry();
-            geometry.setAttribute('position', new BufferAttribute(parsed_geometry.positions, 3));
-            geometry.setAttribute('idcolor', new BufferAttribute(parsed_geometry.ids, 3));
-            const m = new Points(geometry, this.materialLibrary.point);
-            this.graphics.scene.add(m);
-            this.graphics.needsRedraw = true;
-
-            //if (this.pickable) {
-            //    this.graphics.picker.addPickable(m);
-            //}
+            new PointsGeometry(this, parsed_geometry, this.pointInstance);
+        } else {
+            //TODO lines
         }
     }
 }

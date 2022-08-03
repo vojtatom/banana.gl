@@ -1,6 +1,7 @@
 import { Vector3 } from 'three';
 import { Graphics, GraphicsProps } from './graphics';
-import { Layer, LayerProps } from './layer';
+import { Layer } from './layer';
+import { LayerProps } from './types';
 import { LoaderWorkerPool } from './loader';
 import { Style, StylerWorkerPool } from './styles';
 

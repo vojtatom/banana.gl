@@ -112,7 +112,6 @@ function preprocess(group: Group, idOffset: number) {
 
 const loader = new GLTFLoader();
 const dracoLoader = new DRACOLoader();
-//dracoLoader.setDecoderPath( '/examples/js/libs/draco/' );
 loader.setDRACOLoader( dracoLoader );
 
 

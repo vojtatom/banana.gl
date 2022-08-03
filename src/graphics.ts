@@ -1,10 +1,11 @@
 import * as THREE from 'three';
-import { MaterialLibrary, MaterialLibraryProps } from './material';
+import { MaterialLibrary } from './material';
 import { MapControls } from './controls';
 import { Navigation } from './navigation';
 import { GPUPicker } from './picker';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { SSAOPass } from 'three/examples/jsm/postprocessing/SSAOPass';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 
 export type GraphicsProps = {
@@ -31,7 +32,11 @@ export class Graphics {
         const canvas = props.canvas;
         this.navigation = new Navigation();
         this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
-        this.camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 10, 1000);
+        this.camera = new THREE.PerspectiveCamera(5, canvas.clientWidth / canvas.clientHeight, 10, 1000);
+        //let aspect = canvas.clientWidth / canvas.clientHeight;
+        //let d = 20;
+        //this.camera = new THREE.OrthographicCamera( - d * aspect, d * aspect, d, - d, 1, 10000);
+
         this.scene = new THREE.Scene();
         this.controls = new MapControls(this.camera, canvas);
         this.materialLibrary = new MaterialLibrary(this.resolution);
@@ -99,11 +104,12 @@ export class Graphics {
             this.controls.update();
             
             this.renderer.render(this.scene, this.camera);
+            //composer.render();
             if (this.needsRedraw) {
-                if (this.controls.changed)
-                    this.renderer.render(this.scene, this.camera);
-                else
-                    composer.render();
+            //    if (this.controls.changed)
+            //        this.renderer.render(this.scene, this.camera);
+            //    else
+                //composer.render();
             }
 
             //this.renderer.render(this.picker.pickingScene, this.camera);
@@ -150,6 +156,18 @@ export class Graphics {
         this.controls.target.copy(target);
         this.camera.position.copy(location);
         this.updateCameraBoundries();
+    }
+
+    miniload(model: string) {
+        const loader = new GLTFLoader();
+        loader.load(model, (gltf) => {
+            const scene = gltf.scene;
+            this.scene.add(scene);
+            this.updateCameraBoundries();
+        }, undefined, (error) => {
+            console.error(error);
+        }
+        );
     }
 } 
 

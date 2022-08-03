@@ -1,4 +1,4 @@
-import { MetadataTable, MetadataRecord } from './layer';
+import { MetadataTable, MetadataRecord } from './types';
 import { WorkerPool } from './workerPool';
 
 

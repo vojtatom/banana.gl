@@ -1,6 +1,5 @@
 import { Vector3 } from 'three';
 import { Layer } from './layer';
-import { Graphics } from './graphics';
 
 
 export class Navigation {
@@ -27,6 +26,7 @@ export class Navigation {
 
     setLocation(position: Vector3, target: Vector3) {
         this.location.copy(position);
+        //this.target.copy(position.add(new Vector3(-1, 1, -1)));
         this.target.copy(target);
         this.updateURL();
         this.updateLayers();
