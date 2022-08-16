@@ -1,4 +1,4 @@
-name: BananaGL CI
+name: BananaGL Deploy CI
 
 on:  
   push:
