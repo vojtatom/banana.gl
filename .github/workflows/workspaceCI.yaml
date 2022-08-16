@@ -10,8 +10,6 @@ jobs:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v2
-    - name: "Set env tag"
-      run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})
     - name: "Setup Node.js"
         uses: "actions/setup-node@v1"
         with:
@@ -29,5 +27,4 @@ jobs:
       with:
         artifacts: "bananagl.zip"
         token: ${{ secrets.YOUR_GITHUB_TOKEN }}
-        name: "BananaGL ${{ env.RELEASE_VERSION }}"
         generateReleaseNotes: true
