@@ -4,15 +4,11 @@
   "description": "Urban data visualization framework 🍌",
   "types": "types/index.d.ts",
   "scripts": {
-    "build-prod": "webpack --mode production",
-    "build": "webpack --mode development --watch",
+    "dev": "webpack --mode development --watch",
+    "build": "webpack --mode production",
     "types": "tsc src/index.ts --declaration --allowJs --emitDeclarationOnly --outDir dist",
     "lint": "eslint --ext .js,.ts src",
-    "lintfix": "eslint --ext .js,.ts --fix src",
-    "serve": "python3 -m http.server",
-    "prepare": "npm run build-ts",
-    "build-ts": "webpack --mode production && tsc",
-    "docs": "typedoc"
+    "lintfix": "eslint --ext .js,.ts --fix src"
   },
   "keywords": [
     "urban data",
@@ -48,7 +44,6 @@
     "@types/three": "^0.141.0",
     "axios": "^0.27.2",
     "three": "^0.141.0",
-    "three-fatline": "^0.5.3",
-    "typedoc": "^0.23.8"
+    "three-fatline": "^0.5.3"
   }
 }

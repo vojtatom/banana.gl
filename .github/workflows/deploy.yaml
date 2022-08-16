@@ -2,54 +2,29 @@ name: BananaGL CI
 
 on:  
   push:
-    tags:
+    tags: 
       - 'v*'
 
-jobs:
-  build:
+  deploy:
     runs-on: ubuntu-latest
+    if: github.event_name == 'push' && contains(github.ref, 'main')
     steps:
     - uses: actions/checkout@v2
-
-    - name: "Set env tag"
-      run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})
-
     - name: "Setup Node.js"
-        uses: "actions/setup-node@v1"
-        with:
-          node-version: 18
-
+      uses: "actions/setup-node@v1"
+      with:
+        node-version: 18
     - name: Install dependencies
       run: |
         npm i
-
     - name: Build library
       run: |
-        npm run build-prod
-
+        npm run build
     - name: Create Release ZIP file
       run: |
         zip bananagl.zip dist/*
-
     - uses: ncipollo/release-action@v1
       with:
         artifacts: "bananagl.zip"
-        token: ${{ secrets.YOUR_GITHUB_TOKEN }}
-        name: "BananaGL ${{ env.RELEASE_VERSION }}"
+        token: ${{ secrets.GITHUB_TOKEN }}
         generateReleaseNotes: true
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
