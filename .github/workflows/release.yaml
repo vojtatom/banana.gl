@@ -1,4 +1,4 @@
-name: BananaGL Deploy CI
+name: BananaGL Release CI
 
 on:  
   push:
@@ -6,9 +6,9 @@ on:
       - 'v*'
 
 jobs:
-  deploy:
+  release:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && contains(github.ref, 'main')
+    if: github.event_name == 'push' && contains(github.event.base_ref, 'main')
     steps:
     - uses: actions/checkout@v2
     - name: "Setup Node.js"
