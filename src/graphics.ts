@@ -1,10 +1,11 @@
 import * as THREE from 'three';
-import { MaterialLibrary, MaterialLibraryProps } from './material';
+import { MaterialLibrary } from './material';
 import { MapControls } from './controls';
 import { Navigation } from './navigation';
 import { GPUPicker } from './picker';
 import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer';
 import { SSAOPass } from 'three/examples/jsm/postprocessing/SSAOPass';
+import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 
 
 export type GraphicsProps = {
@@ -30,8 +31,12 @@ export class Graphics {
     constructor(props: GraphicsProps) {
         const canvas = props.canvas;
         this.navigation = new Navigation();
-        this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: "high-performance" });
-        this.camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 10, 1000);
+        this.renderer = new THREE.WebGLRenderer({ canvas, antialias: true, powerPreference: 'high-performance' });
+        this.camera = new THREE.PerspectiveCamera(5, canvas.clientWidth / canvas.clientHeight, 10, 1000);
+        //let aspect = canvas.clientWidth / canvas.clientHeight;
+        //let d = 20;
+        //this.camera = new THREE.OrthographicCamera( - d * aspect, d * aspect, d, - d, 1, 10000);
+
         this.scene = new THREE.Scene();
         this.controls = new MapControls(this.camera, canvas);
         this.materialLibrary = new MaterialLibrary(this.resolution);
@@ -40,7 +45,7 @@ export class Graphics {
         this.renderer.setClearColor(props.background ?? 0xffffff, 1);
         this.renderer.setPixelRatio(window.devicePixelRatio);
         
-        let composer = new EffectComposer( this.renderer );
+        const composer = new EffectComposer( this.renderer );
 
         const ssaoPass = new SSAOPass( this.scene, this.camera );
         ssaoPass.normalMaterial.side = THREE.DoubleSide;
@@ -66,11 +71,11 @@ export class Graphics {
 
         canvas.onmousedown = (e) => {
             this.mouseLastDownTime = Date.now();
-            this.controls.onMouseDown(e);
-        }
+            this.controls.onMouseDown();
+        };
 
         canvas.onmouseup = (e) => {
-            this.controls.onMouseUp(e);
+            this.controls.onMouseUp();
             const now = Date.now();
             const duration = now - this.mouseLastDownTime;
 
@@ -88,7 +93,7 @@ export class Graphics {
             this.navigation.setLocation(this.camera.position, this.controls.target);
         };
 
-        canvas.addEventListener("wheel", (e) => {
+        canvas.addEventListener('wheel', (e) => {
             this.navigation.setLocation(this.camera.position, this.controls.target);
             this.updateCameraBoundries();
         }, {passive: true});
@@ -98,11 +103,13 @@ export class Graphics {
             requestAnimationFrame(frame);
             this.controls.update();
             
+            this.renderer.render(this.scene, this.camera);
+            //composer.render();
             if (this.needsRedraw) {
-                if (this.controls.changed)
-                    this.renderer.render(this.scene, this.camera);
-                else
-                    composer.render();
+            //    if (this.controls.changed)
+            //        this.renderer.render(this.scene, this.camera);
+            //    else
+                //composer.render();
             }
 
             //this.renderer.render(this.picker.pickingScene, this.camera);
@@ -112,8 +119,8 @@ export class Graphics {
     }
 
     private updateCameraBoundries() {
-        const Z0 = -1000;
-        const Z1 = 1000;
+        const Z0 = -2000;
+        const Z1 = 2000;
         //set camera far to intersect the 0 z-plane
         const camera = this.camera;
         const target = this.controls.target;
@@ -129,8 +136,7 @@ export class Graphics {
         const z1Distance = z1Target.distanceTo(position) * Math.sign(z1DistanceUnits);
         
         camera.near = Math.max(z1Distance, 10);
-        camera.far = Math.max(z0Distance, 1000);
-        console.log("camera:", camera.near, camera.far);
+        camera.far = Math.max(z0Distance, 4000);
         camera.updateProjectionMatrix();
 
         this.ssao.ssaoMaterial.uniforms.cameraNear.value = camera.near;
@@ -147,10 +153,21 @@ export class Graphics {
     }
 
     focus(location: THREE.Vector3, target: THREE.Vector3) {
-        console.log("focusing:", location, target);
         this.controls.target.copy(target);
         this.camera.position.copy(location);
         this.updateCameraBoundries();
+    }
+
+    miniload(model: string) {
+        const loader = new GLTFLoader();
+        loader.load(model, (gltf) => {
+            const scene = gltf.scene;
+            this.scene.add(scene);
+            this.updateCameraBoundries();
+        }, undefined, (error) => {
+            console.error(error);
+        }
+        );
     }
 } 
 

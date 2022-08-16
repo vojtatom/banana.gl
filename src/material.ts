@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { MeshPhysicalMaterial, LineBasicMaterial } from 'three';
-import { Line2, LineGeometry, LineMaterial } from 'three-fatline';
+import { MeshBasicMaterial, MeshPhysicalMaterial, PointsMaterial } from 'three';
+import { LineMaterial } from 'three-fatline';
 
 export type MaterialLibraryProps = {
     baseColor?: number;
@@ -10,6 +10,8 @@ export type MaterialLibraryProps = {
 export class MaterialLibrary {
     readonly default: MeshPhysicalMaterial;
     readonly line: LineMaterial;
+    readonly point: PointsMaterial;
+    readonly loading: MeshBasicMaterial;
 
     constructor(resolution: THREE.Vector2, props?: MaterialLibraryProps) {
         if (!props)
@@ -24,6 +26,17 @@ export class MaterialLibrary {
             color: props.lineColor ?? 0xFFFFFF,
             linewidth: 5,
             resolution: resolution, //WHAT?
+        });
+
+        this.point = new PointsMaterial({
+            size: 10,
+            color: props.baseColor ?? 0x000000,
+            sizeAttenuation: true,
+        });
+
+        this.loading = new MeshBasicMaterial({
+            side: THREE.DoubleSide,
+            color: 0xddffdd,
         });
     }
 }

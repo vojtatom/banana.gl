@@ -2,16 +2,17 @@
   "name": "bananagl",
   "version": "1.0.7",
   "description": "Urban data visualization framework 🍌",
-  "main": "dist/bananagl.js",
   "types": "types/index.d.ts",
   "scripts": {
     "build-prod": "webpack --mode production",
-    "build": "webpack --mode development",
+    "build": "webpack --mode development --watch",
     "types": "tsc src/index.ts --declaration --allowJs --emitDeclarationOnly --outDir dist",
     "lint": "eslint --ext .js,.ts src",
+    "lintfix": "eslint --ext .js,.ts --fix src",
     "serve": "python3 -m http.server",
     "prepare": "npm run build-ts",
-    "build-ts": "webpack --mode production && tsc"
+    "build-ts": "webpack --mode production && tsc",
+    "docs": "typedoc"
   },
   "keywords": [
     "urban data",
@@ -31,8 +32,9 @@
     "@babel/preset-typescript": "^7.17.12",
     "@types/fork-ts-checker-webpack-plugin": "^0.4.5",
     "@types/node": "^17.0.40",
-    "@typescript-eslint/eslint-plugin": "^5.27.1",
-    "@typescript-eslint/parser": "^5.27.1",
+    "@typescript-eslint/eslint-plugin": "^5.30.7",
+    "@typescript-eslint/parser": "^5.30.7",
+    "babel-eslint": "^10.1.0",
     "babel-loader": "^8.2.5",
     "eslint": "^8.17.0",
     "fork-ts-checker-webpack-plugin": "^7.2.11",
@@ -46,6 +48,7 @@
     "@types/three": "^0.141.0",
     "axios": "^0.27.2",
     "three": "^0.141.0",
-    "three-fatline": "^0.5.3"
+    "three-fatline": "^0.5.3",
+    "typedoc": "^0.23.8"
   }
 }
