@@ -1,42 +1,49 @@
 name: BananaGL CI
 
-on:
+on:  
   push:
-    branches: [ main, dev ]
+    tags:
+      - 'v*'
 
 jobs:
-  run-settings:
+  build:
     runs-on: ubuntu-latest
-    outputs:
-      out-bump: ${{ steps.run.outputs.bump }}
-      out-package: ${{ steps.run.outputs.package }}
-      out-deploy: ${{ steps.run.outputs.deploy }}
     steps:
     - uses: actions/checkout@v2
-      with:
-        submodules: 'recursive'
 
-    - name: Check for commit tags
-      id: run
+    - name: "Set env tag"
+      run: echo ::set-env name=RELEASE_VERSION::$(echo ${GITHUB_REF:10})
+
+    - name: "Setup Node.js"
+        uses: "actions/setup-node@v1"
+        with:
+          node-version: 18
+
+    - name: Install dependencies
       run: |
-        log=$(git log --pretty=oneline --max-count=1)
-        case "$log" in
-            *action::bump* ) bump=1;;
-            * ) bump=0;;
-        esac
-        echo "::set-output name=bump::$bump"
+        npm i
 
-        case "$log" in
-            *action::package* ) package=1;;
-            * ) package=0;;
-        esac
-        echo "::set-output name=package::$package"
+    - name: Build library
+      run: |
+        npm run build-prod
 
-        case "$log" in
-            *action::deploy* ) deploy=1;;
-            * ) deploy=0;;
-        esac
-        echo "::set-output name=deploy::$deploy"
+    - name: Create Release ZIP file
+      run: |
+        zip bananagl.zip dist/*
+
+    - uses: ncipollo/release-action@v1
+      with:
+        artifacts: "bananagl.zip"
+        token: ${{ secrets.YOUR_GITHUB_TOKEN }}
+        name: "BananaGL ${{ env.RELEASE_VERSION }}"
+        generateReleaseNotes: true
+
+
+
+
+
+
+
 
 
 
