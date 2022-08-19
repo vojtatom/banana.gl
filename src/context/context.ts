@@ -52,7 +52,7 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
     const canvas = props.canvas;
     const renderer = Renderer(props);
     const ratio = canvas.clientWidth / canvas.clientHeight;
-    const camera = new THREE.PerspectiveCamera(5, ratio, 10, 100000);
+    const camera = new THREE.PerspectiveCamera(5, ratio, 1000, 100000);
     const scene = new THREE.Scene();
     const picker = GPUPicker(renderer, camera);
     const controls = new MapControls(camera, canvas);
@@ -72,7 +72,7 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
         camera.aspect = ratio;
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
-    }
+    };
 
     frame();
 

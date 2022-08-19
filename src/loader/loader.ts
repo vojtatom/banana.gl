@@ -16,9 +16,9 @@ export function LoaderWorkerPool(workerPath: string, poolsize?: number): LoaderW
             idOffset: idOffset
         }, callback);
         idOffset += data.objectsToLoad;
-    }
+    };
 
     return {
         process
-    }
+    };
 }

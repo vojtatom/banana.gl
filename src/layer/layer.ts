@@ -39,11 +39,11 @@ export function Layer(ctx: GraphicContext, props: LayerProps) {
     }; 
 
     const layout = Layout(props, (center) => {
-        ctx.navigation.focusIfNotSet(center);
+        ctx.navigation.positionCameraIfNotSet(center);
         loadTiles(ctx.navigation.coordinates);
     });
 
-    let layer: Layer = {
+    const layer: Layer = {
         name,
         layout,
         materials,
@@ -57,7 +57,7 @@ export function Layer(ctx: GraphicContext, props: LayerProps) {
             const animation = LoadingAnimation(tile, layer);
             loadTile(tile, animation);
         });
-    }; 
+    } 
 
     function loadTile(tile: TileType, animation: LoadingAnimation) {
         tile.loaded = true;

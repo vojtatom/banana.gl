@@ -1,7 +1,7 @@
-import * as THREE from "three";
-import { MaterialLibrary } from "../context/materials";
-import { Layer } from "./layer";
-import { TileType } from "./layout";
+import * as THREE from 'three';
+import { MaterialLibrary } from '../context/materials';
+import { Layer } from './layer';
+import { TileType } from './layout';
 
 
 function pulsingPlaceholder(position:THREE.Vector3, size: THREE.Vector3, matlib: MaterialLibrary) {
@@ -36,5 +36,5 @@ export function LoadingAnimation(tile: TileType, layer: Layer) {
         stop: () => {
             layer.ctx.scene.remove(mesh);
         },
-    }
+    };
 }

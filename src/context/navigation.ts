@@ -43,7 +43,7 @@ function updateURL(location: THREE.Vector3, target: THREE.Vector3) {
 
 export interface Navigation {
     update: () => void;
-    focusIfNotSet: (target: THREE.Vector3, location?: THREE.Vector3 ) => void;
+    positionCameraIfNotSet: (target: THREE.Vector3, location?: THREE.Vector3 ) => void;
     set onchange(f: (target: THREE.Vector3, location?: THREE.Vector3 ) => void);
     get coordinates(): THREE.Vector3;
 }
@@ -57,21 +57,21 @@ export function Navigation(props: NavigationProps, camera: THREE.Camera, control
         location = props.location;
     } 
     
-    focus(target, location);
+    positionCamera(target, location);
 
     const update = () => {
         updateURL(camera.position, controls.target);
         onchangefs.forEach(f => f(controls.target, camera.position));
     };
     
-    const focusIfNotSet = (target: THREE.Vector3, location?: THREE.Vector3) => {
+    const positionCameraIfNotSet = (target: THREE.Vector3, location?: THREE.Vector3) => {
         if (controls.target.equals(new THREE.Vector3(Infinity, Infinity, Infinity)))
-        focus(target, location);
+            positionCamera(target, location);
     };
     
     return {
         update,
-        focusIfNotSet,
+        positionCameraIfNotSet,
         set onchange(f: (target: THREE.Vector3, location?: THREE.Vector3 ) => void) {
             onchangefs.push(f);
         },
@@ -80,11 +80,11 @@ export function Navigation(props: NavigationProps, camera: THREE.Camera, control
         }
     };
 
-    function focus(target: THREE.Vector3, location?: THREE.Vector3) {
+    function positionCamera(target: THREE.Vector3, location?: THREE.Vector3) {
         if (!location)
         {
             location = target.clone();
-            const o = props.offset ?? 2000;
+            const o = props.offset ?? 8000;
             const offset = new THREE.Vector3(-o, o, o);
             location.add(offset);
         }
@@ -92,5 +92,5 @@ export function Navigation(props: NavigationProps, camera: THREE.Camera, control
         controls.target.copy(target);
         camera.position.copy(location);
         updateURL(camera.position, controls.target);
-    };
+    }
 }
