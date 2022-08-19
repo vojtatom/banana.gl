@@ -56,13 +56,31 @@ export function Navigation(props: NavigationProps, camera: THREE.Camera, control
         target = props.target;
         location = props.location;
     } 
+    
+    focus(target, location);
 
     const update = () => {
         updateURL(camera.position, controls.target);
         onchangefs.forEach(f => f(controls.target, camera.position));
     };
+    
+    const focusIfNotSet = (target: THREE.Vector3, location?: THREE.Vector3) => {
+        if (controls.target.equals(new THREE.Vector3(Infinity, Infinity, Infinity)))
+        focus(target, location);
+    };
+    
+    return {
+        update,
+        focusIfNotSet,
+        set onchange(f: (target: THREE.Vector3, location?: THREE.Vector3 ) => void) {
+            onchangefs.push(f);
+        },
+        get coordinates() {
+            return controls.target.clone();
+        }
+    };
 
-    const focus = (target: THREE.Vector3, location?: THREE.Vector3 ) => {
+    function focus(target: THREE.Vector3, location?: THREE.Vector3) {
         if (!location)
         {
             location = target.clone();
@@ -73,25 +91,6 @@ export function Navigation(props: NavigationProps, camera: THREE.Camera, control
 
         controls.target.copy(target);
         camera.position.copy(location);
-        update();
-    };
-
-    console.log("focus", target, location);
-    focus(target, location);
-
-    const focusIfNotSet = (target: THREE.Vector3, location?: THREE.Vector3) => {
-        if (controls.target.equals(new THREE.Vector3(Infinity, Infinity, Infinity)))
-            focus(target, location);
-    };
-
-    return {
-        update,
-        focusIfNotSet,
-        set onchange(f: (target: THREE.Vector3, location?: THREE.Vector3 ) => void) {
-            onchangefs.push(f);
-        },
-        get coordinates() {
-            return controls.target.clone();
-        }
+        updateURL(camera.position, controls.target);
     };
 }

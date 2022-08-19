@@ -46,8 +46,11 @@ export function assignMetadataIds(models: ModelGroups, idOffset: number) {
         id: idOffset,
     };
 
-    models.points.forEach(points => processModelMetadata(points, metadata));
-    models.meshes.forEach(mesh => processModelMetadata(mesh, metadata, MetaProcessing.Enrich));
+    for (let i = 0; i < models.meshes.length; i++)
+        processModelMetadata(models.meshes[i], metadata, MetaProcessing.Enrich);
+
+    for(let i = 0; i < models.points.length; i++)
+        processModelMetadata(models.points[i], metadata, MetaProcessing.None);
 
     return metadata;
 }

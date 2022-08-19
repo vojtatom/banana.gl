@@ -19,6 +19,12 @@ export interface LayoutType {
     tiles: TileType[];
 }
 
+
+export interface Layout {
+    getTilesToLoad(x: number, y: number): TileType[];
+    get tileDims(): { tileWidth: number, tileHeight: number };
+}
+
 export function Layout(props: LayerProps, onLoad: (layout: THREE.Vector3) => void) {
     let layout: LayoutType;
     let halfx: number, halfy: number;
@@ -33,14 +39,19 @@ export function Layout(props: LayerProps, onLoad: (layout: THREE.Vector3) => voi
         console.error(error);
     });
 
-    const getTiles = (x: number, y: number) => {
+    const getTilesToLoad = (x: number, y: number) => {
         if (layout)
             return layout.tiles.filter((tile) => loadable(tile, x, y));
         return [];
     };
 
     return {
-        getTiles
+        getTilesToLoad,
+        get tileDims() {
+            if (!layout)
+                return { tileWidth: 0, tileHeight: 0 };
+            return { tileWidth: layout.tileWidth, tileHeight: layout.tileHeight };
+        }
     };
 
     function init(response: AxiosResponse<any, any>) {

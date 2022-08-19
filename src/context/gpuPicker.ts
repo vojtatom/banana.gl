@@ -1,5 +1,6 @@
 import * as THREE from 'three';
- 
+import { Camera } from './mapControls';
+
 
 
 const vs3D = `
@@ -21,8 +22,6 @@ export interface GPUPicker {
     addPickable(mesh: THREE.Mesh): void;
     pick(x: number, y: number): number;
 }
-
-type Camera = THREE.OrthographicCamera | THREE.PerspectiveCamera;
 
 export function GPUPicker(renderer: THREE.WebGLRenderer, camera: Camera): GPUPicker {
     // create a 1x1 pixel render target

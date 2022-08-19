@@ -13,7 +13,8 @@ export function groupModelsByType(object: THREE.Object3D) : ModelGroups {
 
     const sort = (object: THREE.Object3D) => {
         if (object instanceof THREE.Group) {
-            object.children.forEach(sort);
+            for (let i = 0; i < object.children.length; i++)
+                sort(object.children[i]);
         } else if (object instanceof THREE.Mesh) {
             meshes.push(object);
         } else if (object instanceof THREE.Points) {

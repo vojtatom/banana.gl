@@ -7,7 +7,12 @@ export type Model = THREE.Mesh | THREE.Points;
 function merge(models: Model[]) {
     if (models.length === 0)
         return undefined;
-    return mergeBufferGeometries(models.map(m => m.geometry));
+
+    const geometries = [];
+    for (let i = 0; i < models.length; i++)
+        geometries.push(models[i].geometry);
+
+    return mergeBufferGeometries(geometries);
 }
 
 

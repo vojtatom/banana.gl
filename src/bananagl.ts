@@ -37,6 +37,10 @@ export function BananaGL(props: BananaProps) {
         }, 100);
     });
 
+    window.onresize = () => {
+        ctx.updateSize(window.innerWidth, window.innerHeight);
+    }
+
 
     const loadLayer = (props: LayerProps) => {
         Layer(ctx, props);

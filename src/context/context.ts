@@ -43,6 +43,7 @@ export interface GraphicContext {
     scene: THREE.Scene;
     picker: GPUPicker;
     loader: LoaderWorkerPool;
+    updateSize: (width: number, height: number) => void;
     get resolution(): THREE.Vector2;
 }
 
@@ -66,6 +67,13 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
         //this.renderer.render(this.picker.pickingScene, this.camera);
     };
 
+    const updateSize = (width: number, height: number) => {
+        const ratio = width / height;
+        camera.aspect = ratio;
+        camera.updateProjectionMatrix();
+        renderer.setSize(width, height);
+    }
+
     frame();
 
     return {
@@ -73,6 +81,7 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
         picker,
         navigation,
         loader,
+        updateSize,
         get resolution() {
             return renderer.getSize(new THREE.Vector2());
         }
