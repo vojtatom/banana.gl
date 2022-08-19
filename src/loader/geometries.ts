@@ -1,4 +1,4 @@
-import { ModelGroups } from "./group";
+import { ModelGroups } from './group';
 import { mergeBufferGeometries } from 'three/examples/jsm/utils/BufferGeometryUtils.js';
 
 export type Model = THREE.Mesh | THREE.Points;

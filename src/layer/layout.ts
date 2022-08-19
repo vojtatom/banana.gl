@@ -1,5 +1,5 @@
 import axios, { AxiosResponse } from 'axios';
-import * as THREE from "three";
+import * as THREE from 'three';
 import { LayerProps } from './layer';
 import { layoutUrl, median, notLoadedError } from './utils';
 
@@ -22,6 +22,7 @@ export interface LayoutType {
 export function Layout(props: LayerProps, onLoad: (layout: THREE.Vector3) => void) {
     let layout: LayoutType;
     let halfx: number, halfy: number;
+    const radius = props.loadRadius ?? 2000;
     const path = layoutUrl(props.api);
 
     axios.get(path).then((response) => {
@@ -51,8 +52,8 @@ export function Layout(props: LayerProps, onLoad: (layout: THREE.Vector3) => voi
     function loadable(tile: TileType, x: number, y: number) {
         if (tile.loaded)
             return false;
-        return Math.abs(tile.x + halfx - x) < props.loadRadius
-            && Math.abs(tile.y + halfy - y) < props.loadRadius;
+        return Math.abs(tile.x * layout.tileWidth + halfx - x) < radius
+            && Math.abs(tile.y * layout.tileHeight + halfy - y) < radius;
     }
 
     function computeCenter() {

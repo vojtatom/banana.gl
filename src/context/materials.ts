@@ -9,7 +9,7 @@ export interface MaterialLibraryProps {
 }
 
 export interface MaterialLibrary {
-    base: MeshPhysicalMaterial;
+    mesh: MeshPhysicalMaterial;
     line: LineMaterial;
     point: PointsMaterial;
     loading: MeshBasicMaterial;
@@ -19,7 +19,7 @@ export function MaterialLibrary(props?: MaterialLibraryProps): MaterialLibrary {
     if (!props)
         props = {};
 
-    const base = new MeshPhysicalMaterial({
+    const mesh = new MeshPhysicalMaterial({
         side: THREE.DoubleSide,
         color: props.baseColor ?? 0xffffff,
     });
@@ -41,7 +41,7 @@ export function MaterialLibrary(props?: MaterialLibraryProps): MaterialLibrary {
     });
 
     return {
-        base,
+        mesh,
         line,
         point,
         loading,

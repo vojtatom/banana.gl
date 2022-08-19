@@ -13,5 +13,5 @@ export function layoutUrl(base: string) {
 }
 
 export function notLoadedError(path: string) {
-    `Could not load layout for layer ${path}`
+    `Could not load layout for layer ${path}`;
 }

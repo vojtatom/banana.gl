@@ -21,7 +21,7 @@ export function groupModelsByType(object: THREE.Object3D) : ModelGroups {
         } else {
             console.error(`Unknown child type ${object.type}`);
         }
-    }
+    };
 
     sort(object);
 

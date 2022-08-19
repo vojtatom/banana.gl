@@ -2,9 +2,13 @@ import * as THREE from 'three';
 import { Navigation, NavigationProps } from './navigation';
 import { GPUPicker } from './gpuPicker';
 import { MapControls } from './mapControls';
+import { LoaderWorkerPool } from '../loader/loader';
+
 
 export interface GraphicsProps extends NavigationProps {
     canvas: HTMLCanvasElement;
+    loaderPath: string;
+    stylerPath: string;
     background?: number;
 }
 
@@ -38,6 +42,7 @@ export interface GraphicContext {
     navigation: Navigation;
     scene: THREE.Scene;
     picker: GPUPicker;
+    loader: LoaderWorkerPool;
     get resolution(): THREE.Vector2;
 }
 
@@ -52,9 +57,11 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
     const controls = new MapControls(camera, canvas);
     const lights = Lights(scene);
     const navigation = Navigation(props, camera, controls);
+    const loader = LoaderWorkerPool(props.loaderPath);
 
     const frame = () => {
         requestAnimationFrame(frame);
+        controls.update();
         renderer.render(scene, camera);
         //this.renderer.render(this.picker.pickingScene, this.camera);
     };
@@ -65,6 +72,7 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
         scene,
         picker,
         navigation,
+        loader,
         get resolution() {
             return renderer.getSize(new THREE.Vector2());
         }

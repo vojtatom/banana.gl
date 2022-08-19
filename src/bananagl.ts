@@ -1,9 +1,7 @@
-import { GraphicsProps, GraphicContext } from "./context/context";
-import { LayerProps, Layer } from "./layer/layer";
+import { GraphicsProps, GraphicContext } from './context/context';
+import { LayerProps, Layer } from './layer/layer';
 
 interface BananaProps extends GraphicsProps {
-    loaderPath?: string;
-    stylerPath?: string;
     onClick?: (id: number) => void;
 }
 
@@ -11,7 +9,7 @@ export function BananaGL(props: BananaProps) {
     const ctx = GraphicContext(props);
     const canvas = props.canvas;
     let mouseLastDownTime = 0;
-    let layers = [];
+    const layers = [];
 
     canvas.onmousedown = (e) => {
         mouseLastDownTime = Date.now();
@@ -25,25 +23,26 @@ export function BananaGL(props: BananaProps) {
             const x = e.clientX;
             const y = e.clientY;
             const id = ctx.picker.pick(x, y);
-            props.onClick?.(id);
+            console.log(id);
         }
 
         ctx.navigation.update();
     };
 
+    let updateCall: any;
     canvas.addEventListener('wheel', (e) => {
-        const updateCall = setTimeout(() => {
+        clearTimeout(updateCall);
+        updateCall = setTimeout(() => {
             ctx.navigation.update();
-            clearTimeout(updateCall);
-        }, 500);
-    }, { passive: true });
+        }, 100);
+    });
 
 
     const loadLayer = (props: LayerProps) => {
         Layer(ctx, props);
-    }
+    };
 
     return {
         loadLayer
-    }
+    };
 }

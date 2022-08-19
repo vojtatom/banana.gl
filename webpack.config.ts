@@ -44,7 +44,7 @@ const configMain: Configuration = {
 
 const configLoader: Configuration = {
   entry: {
-    loaderWorker: './src/load.ts'
+    loaderWorker: './src/loader/worker.ts'
   },
   output: {
     path: path.resolve(__dirname, "dist"),

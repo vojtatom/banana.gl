@@ -1,6 +1,6 @@
-import * as THREE from "three";
-import { Model } from "./geometries";
-import { ModelGroups } from "./group";
+import * as THREE from 'three';
+import { Model } from './geometries';
+import { ModelGroups } from './group';
 
 
 function createIDBuffer(size: number, id: number) {
@@ -25,7 +25,7 @@ function enrichMetadata(model: Model) {
 enum MetaProcessing {
     None,
     Enrich
-};
+}
 
 
 function processModelMetadata(model: Model, metadata: any, enrich?: MetaProcessing) {

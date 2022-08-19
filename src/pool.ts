@@ -3,6 +3,10 @@ interface Job {
     jobID: number
 }
 
+export interface WorkerPool {
+    process(data: any, callback: (...output: any[]) => void): void;
+}
+
 export function WorkerPool(workerPath: string, poolsize: number) {
     const workers: Worker[] = [];
     const worker_busy: boolean[] = [];
@@ -20,7 +24,7 @@ export function WorkerPool(workerPath: string, poolsize: number) {
         });
 
         submit();
-    }
+    };
 
     for (let i = 0; i < poolsize; ++i) {
         workers.push(new Worker(workerPath));
@@ -40,7 +44,7 @@ export function WorkerPool(workerPath: string, poolsize: number) {
 
     return {
         process
-    }
+    };
 
     function getworker() {
         for (let i = 0; i < poolsize; ++i) {
