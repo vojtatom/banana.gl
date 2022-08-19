@@ -84,7 +84,6 @@ function loadObject(object: Object3D, props: LoadProps) {
     } else {
         console.error(`Unknown child type ${object.type}`);
     }
-
 }
 
 function result(geometry: BufferGeometry, metadata: metadict, type: LayerType) {
@@ -124,6 +123,7 @@ function loadModel(message: MessageEvent) {
         jobID: jobID
     };
     
+    console.log(`Loading ${file}`);
     loader.load(file, (gltf) => {
         const result = preprocess(gltf.scene, idOffset);
         response.result = result;

@@ -38,7 +38,7 @@
 
         #canvas {
             width: 100%;
-            height: calc(100% - 3rem);
+            height: 100%;
         }
 
         #main {
@@ -130,7 +130,7 @@
 </head>
 <body>
     <div id="main">
-        <h1>Metacity <span class="post">Demo Project</span> <a href="mailto:hi@stdio.cz">Get in touch</a></h1>
+        
         <div id="legend">
             <h2>Building Height</h2>
             <div id="map">
@@ -158,7 +158,7 @@
             });
 
             gl.loadLayer({
-                path: "./data/buildings",
+                path: "https://data.metacity.cc/buildings",
                 material: {
                     baseColor: 0xffffff,
                     lineColor: 0xfdbe56,
@@ -191,21 +191,21 @@
             });
 
             gl.loadLayer({
-                path: "./data/terrain",
+                path: "https://data.metacity.cc/terrain",
                 material: {
                     baseColor: 0xeeeeee,
                 }
             });
 
             gl.loadLayer({
-                path: "./data/bridges",
+                path: "https://data.metacity.cc/bridges",
                 material: {
                     baseColor: 0xeeeeee,
                 }
             });
 
             gl.loadLayer({
-                path: "./data/trees",
+                path: "https://data.metacity.cc/trees",
                 points: {
                     instanceModel: "tree.glb"
                 }

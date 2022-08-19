@@ -60,10 +60,8 @@ export class Layer {
             if (this.graphics.navigation.isSet)
                 this.locate(nav.target.x, nav.target.y);
             else {
-                const position = new THREE.Vector3(xmedian, ymedian, 1000);
                 const target = new THREE.Vector3(xmedian, ymedian, 0);
-                this.graphics.focus(position, target);
-                nav.setLocation(position, target);
+                this.graphics.focus(target);
             }  
 
         }).catch((error) => {
@@ -74,6 +72,7 @@ export class Layer {
 
     locate(x: number, y: number) {
         const RADIUS = 2000 * 2000;
+        console.log(x, y);
         if (this.layout) {
             const halfx = this.layout.tileWidth * 0.5;
             const halfy = this.layout.tileHeight * 0.5;

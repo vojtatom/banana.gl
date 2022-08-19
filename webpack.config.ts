@@ -44,7 +44,7 @@ const configMain: Configuration = {
 
 const configLoader: Configuration = {
   entry: {
-    loaderWorker: './src/loaderWorker.ts'
+    loaderWorker: './src/load.ts'
   },
   output: {
     path: path.resolve(__dirname, "dist"),
@@ -57,7 +57,7 @@ const configLoader: Configuration = {
 
 const configStyler: Configuration = {
   entry: {
-    styleWorker: './src/styleWorker.ts'
+    styleWorker: './src/style.ts'
   },
   output: {
     path: path.resolve(__dirname, "dist"),
