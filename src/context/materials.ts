@@ -6,6 +6,7 @@ import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 export interface MaterialLibraryProps {
     baseColor?: number;
     lineColor?: number;
+    pointColor?: number;
 }
 
 export interface MaterialLibrary {
@@ -30,8 +31,8 @@ export function MaterialLibrary(props?: MaterialLibraryProps): MaterialLibrary {
     });
 
     const point = new PointsMaterial({
-        size: 10,
-        color: props.baseColor ?? 0x000000,
+        size: 100,
+        color: props.pointColor ?? 0x000000,
         sizeAttenuation: true,
     });
 

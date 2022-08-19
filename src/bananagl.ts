@@ -9,7 +9,6 @@ export function BananaGL(props: BananaProps) {
     const ctx = GraphicContext(props);
     const canvas = props.canvas;
     let mouseLastDownTime = 0;
-    const layers = [];
 
     canvas.onmousedown = (e) => {
         mouseLastDownTime = Date.now();
@@ -34,13 +33,13 @@ export function BananaGL(props: BananaProps) {
         clearTimeout(updateCall);
         updateCall = setTimeout(() => {
             ctx.navigation.update();
+            //TODO calculate near and far to fit
         }, 100);
     });
 
     window.onresize = () => {
         ctx.updateSize(window.innerWidth, window.innerHeight);
     }
-
 
     const loadLayer = (props: LayerProps) => {
         Layer(ctx, props);
