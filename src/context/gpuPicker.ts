@@ -19,6 +19,7 @@ gl_FragColor = vec4(vidcolor,1.0);
 
 
 export interface GPUPicker {
+    get pickingScene(): THREE.Scene;
     addPickable(mesh: THREE.Mesh): void;
     pick(x: number, y: number): number;
 }
@@ -75,6 +76,7 @@ export function GPUPicker(renderer: THREE.WebGLRenderer, camera: Camera): GPUPic
     };
 
     return {
+        get pickingScene() { return pickingScene; },
         addPickable,
         pick
     };

@@ -28,6 +28,7 @@ export function BananaGL(props: BananaProps) {
         ctx.navigation.update();
     };
 
+
     let updateCall: any;
     canvas.addEventListener('wheel', (e) => {
         clearTimeout(updateCall);

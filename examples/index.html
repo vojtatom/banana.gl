@@ -151,7 +151,9 @@
             const gl = new BananaGL.BananaGL({ 
                 canvas: canvas,
                 loaderPath: "../dist/loaderWorker.js",
-                stylerPath: "../dist/styleWorker.js"
+                stylerPath: "../dist/styleWorker.js",
+                //background: 0x151d29,
+                background: 0xd6e7f7,
             });
 
             gl.loadLayer({
@@ -196,6 +198,7 @@
 
             gl.loadLayer({
                 api: "https://data.metacity.cc/trees",
+                pointInstance: "tree.glb"
             });
         }
     </script>

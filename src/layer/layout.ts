@@ -4,29 +4,29 @@ import { LayerProps } from './layer';
 import { layoutUrl, median, notLoadedError } from './utils';
 
 
-export interface TileType {
+export interface TileConfig {
     x: number;
     y: number;
     file: string;
     size: number;
-    loaded: boolean;
 }
 
 
-export interface LayoutType {
+export interface LayoutConfig {
     tileWidth: number;
     tileHeight: number;
-    tiles: TileType[];
+    tiles: TileConfig[];
 }
 
 
 export interface Layout {
-    getTilesToLoad(x: number, y: number): TileType[];
+    getTilesToLoad(x: number, y: number): TileConfig[];
+    tileDistanceSqr(loc: THREE.Vector3, tile: TileConfig): number;
     get tileDims(): { tileWidth: number, tileHeight: number };
 }
 
-export function Layout(props: LayerProps, onLoad: (layout: THREE.Vector3) => void) {
-    let layout: LayoutType;
+export function Layout(props: LayerProps, onLoad: (layout: THREE.Vector3) => void): Layout {
+    let layout: LayoutConfig;
     let halfx: number, halfy: number;
     const radius = props.loadRadius ?? 2000;
     const path = layoutUrl(props.api);
@@ -45,8 +45,15 @@ export function Layout(props: LayerProps, onLoad: (layout: THREE.Vector3) => voi
         return [];
     };
 
+    const tileDistanceSqr = (loc: THREE.Vector3, tile: TileConfig) => {
+        const x = tile.x * layout.tileWidth + halfx - loc.x;
+        const y = tile.y * layout.tileHeight + halfy - loc.y;
+        return x * x + y * y;
+    };
+
     return {
         getTilesToLoad,
+        tileDistanceSqr,
         get tileDims() {
             if (!layout)
                 return { tileWidth: 0, tileHeight: 0 };
@@ -60,9 +67,7 @@ export function Layout(props: LayerProps, onLoad: (layout: THREE.Vector3) => voi
         halfy = layout.tileHeight * 0.5;
     }
 
-    function loadable(tile: TileType, x: number, y: number) {
-        if (tile.loaded)
-            return false;
+    function loadable(tile: TileConfig, x: number, y: number) {
         return Math.abs(tile.x * layout.tileWidth + halfx - x) < radius
             && Math.abs(tile.y * layout.tileHeight + halfy - y) < radius;
     }

@@ -1,12 +1,9 @@
 import { GraphicContext } from '../context/context';
 import { MaterialLibrary, MaterialLibraryProps } from '../context/materials';
-import { Layout, TileType } from './layout';
+import { Layout } from './layout';
 import * as THREE from 'three';
-import { ParsedData } from '../loader/worker';
-import { MeshGeometry } from './mesh';
 import { PointInstanceModel } from './instance';
-import { PointsGeometry } from './points';
-import { LoadingAnimation } from './loading';
+import { TileContainer } from './lod/container';
 
 
 export interface Layer {
@@ -15,6 +12,9 @@ export interface Layer {
     ctx: GraphicContext;
     name: string;
     layout: Layout;
+    api: string;
+    lodLimits: number[];
+    instance?: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>[];
 }
 
 export interface LayerProps extends MaterialLibraryProps {
@@ -23,15 +23,18 @@ export interface LayerProps extends MaterialLibraryProps {
     name?: string;
     pickable?: boolean;
     pointInstance?: string;
+    lodLimits?: number[];
 }
 
-function tileURL(api: string, tile: TileType) {
-    return `${api}/${tile.file}`;
+function propsDefaults(props: LayerProps) {
+    props.name = props.name ?? props.api;
+    props.pickable = props.pickable ?? false;
+    props.lodLimits = props.lodLimits ?? [20000];
 }
 
 export function Layer(ctx: GraphicContext, props: LayerProps) {
+    propsDefaults(props);
     const materials = MaterialLibrary(props);
-    const name = props.name ?? props.api;
     const instance = props.pointInstance ? PointInstanceModel(props.pointInstance) : undefined;
     
     ctx.navigation.onchange = (target: THREE.Vector3) => {
@@ -40,38 +43,24 @@ export function Layer(ctx: GraphicContext, props: LayerProps) {
 
     const layout = Layout(props, (center) => {
         ctx.navigation.positionCameraIfNotSet(center);
-        loadTiles(ctx.navigation.coordinates);
+        loadTiles(ctx.navigation.target);
     });
 
     const layer: Layer = {
-        name,
+        name: props.name!,
+        api: props.api,
+        pickable: props.pickable!,
+        lodLimits: props.lodLimits!,
         layout,
         materials,
-        pickable: props.pickable ?? false,
+        instance,
         ctx
     };
 
+    const tileContainer = TileContainer(layer);
+
     function loadTiles(target: THREE.Vector3) {
         const tiles = layout.getTilesToLoad(target.x, target.y);
-        tiles.forEach(tile => {
-            const animation = LoadingAnimation(tile, layer);
-            loadTile(tile, animation);
-        });
+        tileContainer.load(tiles);
     } 
-
-    function loadTile(tile: TileType, animation: LoadingAnimation) {
-        tile.loaded = true;
-        ctx.loader.process({
-            file: tileURL(props.api, tile),
-            objectsToLoad: tile.size
-        }, (data) =>{
-            animation.stop();
-            display(data);
-        });
-    }
-
-    function display(data: ParsedData) {
-        MeshGeometry(data, layer);
-        PointsGeometry(data, layer, instance);
-    }
 }

@@ -9,7 +9,6 @@ export class CullableInstancedMesh extends THREE.InstancedMesh {
         this.count = count;
         this.geometry.boundingSphere = bsphere;
         this.frustumCulled = true;
-        console.log(this.boundingSphere);
     }
 
     computeBoundingSphere() {

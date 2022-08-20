@@ -38,7 +38,7 @@ export function MaterialLibrary(props?: MaterialLibraryProps): MaterialLibrary {
 
     const loading = new MeshBasicMaterial({
         side: THREE.DoubleSide,
-        color: 0xddffdd,
+        color: 0x88ff88,
     });
 
     return {

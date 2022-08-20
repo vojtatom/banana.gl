@@ -32,12 +32,14 @@ function loadGLTF(model: string, callback: (model: THREE.Mesh[]) => void) {
 }
 
 export function PointInstanceModel(path: string) {
-    const meshes: THREE.Mesh[] = [];
+    const instanceModels: THREE.Mesh[] = [];
+
     loadGLTF(path, (meshes) => {
         meshes.forEach((mesh) => {
-            meshes.push(mesh);
+            instanceModels.push(mesh);
         });
     });
-    return meshes;
+
+    return instanceModels;
 }
 

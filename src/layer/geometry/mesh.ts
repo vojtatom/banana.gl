@@ -1,6 +1,6 @@
 import * as THREE from 'three';
-import { ParsedData } from '../loader/worker';
-import { Layer } from './layer';
+import { ParsedData } from '../../loader/worker';
+import { Layer } from '../layer';
 
 
 export function MeshGeometry(data: ParsedData, layer: Layer) {
@@ -18,4 +18,6 @@ export function MeshGeometry(data: ParsedData, layer: Layer) {
     if (layer.pickable) {
         layer.ctx.picker.addPickable(m);
     }
+
+    return m;
 }

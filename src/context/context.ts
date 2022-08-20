@@ -1,16 +1,8 @@
 import * as THREE from 'three';
 import { Navigation, NavigationProps } from './navigation';
 import { GPUPicker } from './gpuPicker';
-import { MapControls } from './mapControls';
+import { MapControls, MapControlsProps } from './mapControls';
 import { LoaderWorkerPool } from '../loader/loader';
-
-
-export interface GraphicsProps extends NavigationProps {
-    canvas: HTMLCanvasElement;
-    loaderPath: string;
-    stylerPath: string;
-    background?: number;
-}
 
 
 function Renderer(props: GraphicsProps) {
@@ -20,7 +12,7 @@ function Renderer(props: GraphicsProps) {
         powerPreference: 'high-performance'
     });
     renderer.setSize(props.canvas.clientWidth, props.canvas.clientHeight);
-    renderer.setClearColor(props.background ?? 0xffffff, 1);
+    renderer.setClearColor(props.background!, 1);
     renderer.setPixelRatio(window.devicePixelRatio);
 
     return renderer;
@@ -37,6 +29,15 @@ function Lights(scene: THREE.Scene) {
     return [ambientLight, directionalLight];
 }
 
+export interface GraphicsProps extends NavigationProps, MapControlsProps {
+    canvas: HTMLCanvasElement;
+    loaderPath: string;
+    stylerPath: string;
+    background?: number;
+    near?: number;
+    far?: number;
+}
+
 
 export interface GraphicContext {
     navigation: Navigation;
@@ -48,14 +49,22 @@ export interface GraphicContext {
 }
 
 
+function propsDefaults(props: GraphicsProps) {
+    props.near = props.near ?? 1000;
+    props.far = props.far ?? 100000;
+    props.background = props.background ?? 0xffffff;
+}
+
+
 export function GraphicContext(props: GraphicsProps) : GraphicContext {
+    propsDefaults(props);
     const canvas = props.canvas;
     const renderer = Renderer(props);
     const ratio = canvas.clientWidth / canvas.clientHeight;
-    const camera = new THREE.PerspectiveCamera(5, ratio, 1000, 100000);
+    const camera = new THREE.PerspectiveCamera(5, ratio, props.near, props.far);
     const scene = new THREE.Scene();
     const picker = GPUPicker(renderer, camera);
-    const controls = new MapControls(camera, canvas);
+    const controls = new MapControls(props, camera, canvas);
     const lights = Lights(scene);
     const navigation = Navigation(props, camera, controls);
     const loader = LoaderWorkerPool(props.loaderPath);
@@ -64,7 +73,7 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
         requestAnimationFrame(frame);
         controls.update();
         renderer.render(scene, camera);
-        //this.renderer.render(this.picker.pickingScene, this.camera);
+        //renderer.render(picker.pickingScene, camera);
     };
 
     const updateSize = (width: number, height: number) => {

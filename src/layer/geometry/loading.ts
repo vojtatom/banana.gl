@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { MaterialLibrary } from '../context/materials';
-import { Layer } from './layer';
-import { TileType } from './layout';
+import { MaterialLibrary } from '../../context/materials';
+import { Layer } from '../layer';
+import { TileConfig } from '../layout';
 
 
 function pulsingPlaceholder(position:THREE.Vector3, size: THREE.Vector3, matlib: MaterialLibrary) {
@@ -24,7 +24,7 @@ export interface LoadingAnimation {
     stop: () => void;
 }
 
-export function LoadingAnimation(tile: TileType, layer: Layer) {
+export function LoadingAnimation(tile: TileConfig, layer: Layer) {
     const { tileWidth, tileHeight } = layer.layout.tileDims;
 
     const position = new THREE.Vector3(tile.x * tileWidth, tile.y * tileHeight, 0);

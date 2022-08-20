@@ -3,7 +3,7 @@ import { MapControls } from './mapControls';
 
 export interface NavigationProps {
     target?: THREE.Vector3;
-    location?: THREE.Vector3;
+    position?: THREE.Vector3;
     offset?: number; 
 }
 
@@ -15,26 +15,26 @@ function parseVector(str: string) {
 
 function parseUrl() {
     const url = new URL(window.location.href);
-    const location = url.searchParams.get('location');
+    const position = url.searchParams.get('position');
     const target = url.searchParams.get('target');
-    if (location && target) {
+    if (position && target) {
         return {
-            location: parseVector(location),
+            position: parseVector(position),
             target: parseVector(target)
         };
     }
 
     return {
-        location: new THREE.Vector3(Infinity, Infinity, Infinity),
+        position: new THREE.Vector3(Infinity, Infinity, Infinity),
         target: new THREE.Vector3(Infinity, Infinity, Infinity)
     };
 }
 
-function updateURL(location: THREE.Vector3, target: THREE.Vector3) {
+function updateURL(position: THREE.Vector3, target: THREE.Vector3) {
     const url = new URL(window.location.href);
-    const loc = `${location.x},${location.y},${location.z}`;
+    const loc = `${position.x},${position.y},${position.z}`;
     const tar = `${target.x},${target.y},${target.z}`;
-    url.searchParams.set('location', loc);
+    url.searchParams.set('position', loc);
     url.searchParams.set('target', tar);
 
     window.history.pushState({}, '', url.href);
@@ -43,54 +43,58 @@ function updateURL(location: THREE.Vector3, target: THREE.Vector3) {
 
 export interface Navigation {
     update: () => void;
-    positionCameraIfNotSet: (target: THREE.Vector3, location?: THREE.Vector3 ) => void;
-    set onchange(f: (target: THREE.Vector3, location?: THREE.Vector3 ) => void);
-    get coordinates(): THREE.Vector3;
+    positionCameraIfNotSet: (target: THREE.Vector3, position?: THREE.Vector3 ) => void;
+    set onchange(f: (target: THREE.Vector3, position?: THREE.Vector3 ) => void);
+    get target(): THREE.Vector3;
+    get position(): THREE.Vector3;
 }
 
 export function Navigation(props: NavigationProps, camera: THREE.Camera, controls: MapControls) : Navigation {
-    let { location, target } = parseUrl();
+    let { position, target } = parseUrl();
     const onchangefs: CallableFunction[] = [];
 
-    if (props.target && props.location) {
+    if (props.target && props.position) {
         target = props.target;
-        location = props.location;
+        position = props.position;
     } 
     
-    positionCamera(target, location);
+    positionCamera(target, position);
 
     const update = () => {
         updateURL(camera.position, controls.target);
         onchangefs.forEach(f => f(controls.target, camera.position));
     };
     
-    const positionCameraIfNotSet = (target: THREE.Vector3, location?: THREE.Vector3) => {
+    const positionCameraIfNotSet = (target: THREE.Vector3, position?: THREE.Vector3) => {
         if (controls.target.equals(new THREE.Vector3(Infinity, Infinity, Infinity)))
-            positionCamera(target, location);
+            positionCamera(target, position);
     };
     
     return {
         update,
         positionCameraIfNotSet,
-        set onchange(f: (target: THREE.Vector3, location?: THREE.Vector3 ) => void) {
+        set onchange(f: (target: THREE.Vector3, position?: THREE.Vector3 ) => void) {
             onchangefs.push(f);
         },
-        get coordinates() {
+        get target() {
             return controls.target.clone();
+        },
+        get position() {
+            return camera.position.clone();
         }
     };
 
-    function positionCamera(target: THREE.Vector3, location?: THREE.Vector3) {
-        if (!location)
+    function positionCamera(target: THREE.Vector3, position?: THREE.Vector3) {
+        if (!position)
         {
-            location = target.clone();
+            position = target.clone();
             const o = props.offset ?? 8000;
             const offset = new THREE.Vector3(-o, o, o);
-            location.add(offset);
+            position.add(offset);
         }
 
         controls.target.copy(target);
-        camera.position.copy(location);
+        camera.position.copy(position);
         updateURL(camera.position, controls.target);
     }
 }

@@ -1,7 +1,7 @@
 import * as THREE from 'three';
-import { ParsedData, ParsedPoints } from '../loader/worker';
-import { CullableInstancedMesh } from './cullable';
-import { Layer } from './layer';
+import { ParsedData, ParsedPoints } from '../../loader/worker';
+import { CullableInstancedMesh } from '../cullable';
+import { Layer } from '../layer';
 
 
 function computeBoundingSphere(points: ParsedPoints) {
@@ -16,8 +16,9 @@ function computeBoundingSphere(points: ParsedPoints) {
 function InstancedPoints(points: ParsedPoints, layer: Layer, pointInstance: THREE.Mesh[]) {
     const matrix = new THREE.Matrix4();
     const bsphere = computeBoundingSphere(points);
+    let meshes: CullableInstancedMesh[] = [];
+    
     pointInstance.forEach(initInstance);
-
     function initInstance(mesh: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>) {
         const geometry = mesh.geometry.clone();
         const count = points.positions.length / 3;
@@ -27,7 +28,10 @@ function InstancedPoints(points: ParsedPoints, layer: Layer, pointInstance: THRE
             instancedMesh.setMatrixAt(i / 3, matrix);
         }
         layer.ctx.scene.add(instancedMesh);
+        meshes.push(instancedMesh);
     }
+
+    return meshes;
 
     function initInstanceMatrix(matrix: THREE.Matrix4, i: number) {
         matrix.identity();
@@ -42,6 +46,7 @@ function Points(points: ParsedPoints, layer: Layer) {
     geometry.setAttribute('idcolor', new THREE.BufferAttribute(points.ids, 3));
     const m = new THREE.Points(geometry, layer.materials.point);
     layer.ctx.scene.add(m);
+    return m;
 }
 
 export function PointsGeometry(data: ParsedData, layer: Layer, pointInstance?: THREE.Mesh[]) {
@@ -51,9 +56,9 @@ export function PointsGeometry(data: ParsedData, layer: Layer, pointInstance?: T
     const { points } = data;
 
     if (pointInstance) {
-        InstancedPoints(points, layer, pointInstance);
+        return InstancedPoints(points, layer, pointInstance);
     } else {
-        Points(points, layer);
+        return Points(points, layer);
     }
 }
 
