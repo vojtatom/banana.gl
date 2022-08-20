@@ -65,7 +65,8 @@ export function TileLODLoader(tile: Tile, layer: Layer, level: number) : TileLOD
         layer.ctx.loader.process({
             file: tileURL(layer.api, tile.config),
             objectsToLoad: tile.config.size,
-            styles: layer.styles
+            styles: layer.styles,
+            baseColor: layer.materials.baseColor
         }, (loadedData) => {
             animation.stop();
             data = loadedData;

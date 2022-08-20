@@ -1,4 +1,4 @@
-import { WorkerPool } from '../pool';
+import { WorkerPool } from './pool';
 import { ParsedData } from './worker';
 
 
@@ -6,6 +6,7 @@ type ProcessedData = {
     file: string, 
     objectsToLoad: number,
     styles: string[],
+    baseColor: number,
 };
 
 export interface LoaderWorkerPool {
@@ -20,7 +21,8 @@ export function LoaderWorkerPool(workerPath: string): LoaderWorkerPool  {
         pool.process({
             file: data.file,
             idOffset: idOffset,
-            styles: data.styles
+            styles: data.styles,
+            baseColor: data.baseColor,
         }, callback);
         idOffset += data.objectsToLoad;
     };

@@ -32,7 +32,7 @@ export interface ParsedMesh {
     positions: Float32Array;
     normals: Float32Array;
     ids: Float32Array;
-    colors: Float32Array;
+    colors?: Float32Array;
 } 
 
 export interface ParsedPoints {
@@ -55,13 +55,13 @@ interface Buffers {
 }
 
 
-function parse(group: THREE.Group, idOffset: number, styles: string[]): ParsedData {
+function parse(group: THREE.Group, idOffset: number, styles: string[], baseColor: number): ParsedData {
     const models = groupModelsByType(group);
     const metadata = assignMetadataIds(models, idOffset);
     const buffers = mergeGeometries(models);
     
     if (styles.length > 0) {
-        const color = applyStyle(styles, 0xffffff, buffers.meshes, metadata);
+        const color = applyStyle(styles, baseColor, buffers.meshes, metadata);
         if (color)
             buffers.meshes?.setAttribute('color', new THREE.BufferAttribute(color, 3));
     }
@@ -82,14 +82,14 @@ loader.setDRACOLoader( dracoLoader );
 function loadModel(message: MessageEvent) {
 
     const { jobID, data } = message.data;
-    const { file, idOffset, styles } = data;
+    const { file, idOffset, styles, baseColor } = data;
     
     const response: any = {
         jobID: jobID
     };
 
     loader.load(file, (gltf) => {
-        response.result = parse(gltf.scene, idOffset, styles);
+        response.result = parse(gltf.scene, idOffset, styles, baseColor);
         postMessage(response);
         (gltf as any) = null;
     }, undefined, (error) => {
