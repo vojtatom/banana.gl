@@ -45,6 +45,7 @@ function Points(points: ParsedPoints, layer: Layer) {
     geometry.setAttribute('position', new THREE.BufferAttribute(points.positions, 3));
     geometry.setAttribute('idcolor', new THREE.BufferAttribute(points.ids, 3));
     const m = new THREE.Points(geometry, layer.materials.point);
+    m.translateZ(1);
     layer.ctx.scene.add(m);
     return m;
 }

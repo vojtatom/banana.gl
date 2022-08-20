@@ -10,41 +10,65 @@ import { Tile } from "./tile";
 
 export interface TileLOD {
     get data(): ParsedData | undefined;
+    get dataRequested(): boolean;
+    set ondataload(fn: (data: ParsedData) => void);
     select: () => void;
     hide: () => void;
+}
+
+enum PoolingStatus{
+    WaitingForPooledData,
+    NotFound,
+    Found
+}
+
+
+function tileURL(api: string, tile: TileConfig) {
+    return `${api}/${tile.file}`;
 }
 
 export function TileLOD(tile: Tile, layer: Layer, level: number): TileLOD {
     let mesh: THREE.Mesh | undefined;
     let points: THREE.Points | CullableInstancedMesh[] | undefined;
     let data: ParsedData | undefined;
+    let ondataloadfns: ((data: ParsedData) => void)[] = [];
+    let dataRequested = false;
 
     const select = () => {
         if (!mesh && !points) {
-            loadGeometry();
+            if(!dataRequested) {
+                loadGeometry();
+                dataRequested = true;
+            }
         } else {
-            display();
+            displayLoaded();
         }
     };
 
     const hide = () => {
         if (mesh)
             mesh.visible = false;
-        if (points)
+        if (points){
             if (Array.isArray(points))
                 points.forEach(p => p.visible = false);
             else
                 points.visible = false;
+        }
     };
+            
 
     return {
         select,
         hide,
-        get data() { return data; }
+        get data() { return data; },
+        get dataRequested() { return dataRequested; },
+        set ondataload(fn: (data: ParsedData) => void) {
+            ondataloadfns.push(fn);
+        }
     };
 
 
-    function display() {
+    function displayLoaded() {
         if (mesh)
             mesh.visible = true;
         if (points)
@@ -56,12 +80,12 @@ export function TileLOD(tile: Tile, layer: Layer, level: number): TileLOD {
     }
 
     function loadGeometry() {
-        data = pollData();
-        if (!data) {
+        const poolStatus = pollData();
+        if (poolStatus === PoolingStatus.NotFound) {
             const animation = LoadingAnimation(tile.config, layer);
             loadGeometryData(animation);
-        } else {
-            dataToGeometry(data);
+        } if (poolStatus === PoolingStatus.Found) {
+            dataToGeometry(data!);
         }
     }
 
@@ -73,6 +97,8 @@ export function TileLOD(tile: Tile, layer: Layer, level: number): TileLOD {
             animation.stop();
             data = loadedData;
             dataToGeometry(loadedData);
+            ondataloadfns.forEach(fn => fn(loadedData));
+            ondataloadfns = [];
         });
     }
 
@@ -89,13 +115,20 @@ export function TileLOD(tile: Tile, layer: Layer, level: number): TileLOD {
     function pollData() {
         for (let i = 0; i < tile.LODs.length; i++) {
             const polledData = tile.LODs[i]?.data;
-            if (polledData)
-                return polledData;
+            if (polledData){
+                data = polledData;
+                return PoolingStatus.Found;
+            }
+                
+            if (tile.LODs[i]?.dataRequested){
+                tile.LODs[i]!.ondataload = (pooledData) => {
+                    data = pooledData;
+                    dataToGeometry(pooledData);
+                };
+                return PoolingStatus.WaitingForPooledData;
+            }
         }
-    }
-
-    function tileURL(api: string, tile: TileConfig) {
-        return `${api}/${tile.file}`;
+        return PoolingStatus.NotFound;
     }
 }
 

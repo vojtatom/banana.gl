@@ -48,7 +48,7 @@ export function Layout(props: LayerProps, onLoad: (layout: THREE.Vector3) => voi
     const tileDistanceSqr = (loc: THREE.Vector3, tile: TileConfig) => {
         const x = tile.x * layout.tileWidth + halfx - loc.x;
         const y = tile.y * layout.tileHeight + halfy - loc.y;
-        return x * x + y * y;
+        return x * x + y * y + loc.z * loc.z;
     };
 
     return {
