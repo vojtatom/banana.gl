@@ -5,6 +5,7 @@ import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 import * as THREE from 'three';
 import { mergeGeometries } from './geometries';
+import { applyStyle } from './style';
 
 
 function toResultForm(geometry?: THREE.BufferGeometry) {
@@ -20,18 +21,23 @@ function toResultForm(geometry?: THREE.BufferGeometry) {
         result.normals = geometry.attributes.normal.array;
     }
 
+    if (geometry.attributes.color) {
+        result.colors = geometry.attributes.color.array;
+    }
+
     return result;
 }
 
 export interface ParsedMesh {
-    positions: ArrayLike<number>;
-    normals: ArrayLike<number>;
-    ids: ArrayLike<number>;
+    positions: Float32Array;
+    normals: Float32Array;
+    ids: Float32Array;
+    colors: Float32Array;
 } 
 
 export interface ParsedPoints {
-    positions: ArrayLike<number>;
-    ids: ArrayLike<number>;
+    positions: Float32Array;
+    ids: Float32Array;
 }
 
 export interface ParsedData {
@@ -43,10 +49,24 @@ export interface ParsedData {
     points: ParsedPoints | undefined;
 }
 
-function parse(group: THREE.Group, idOffset: number): ParsedData {
+interface Buffers {
+    meshes: THREE.BufferGeometry | undefined;
+    points: THREE.BufferGeometry | undefined;
+}
+
+
+function parse(group: THREE.Group, idOffset: number, styles: string[]): ParsedData {
     const models = groupModelsByType(group);
     const metadata = assignMetadataIds(models, idOffset);
     const buffers = mergeGeometries(models);
+    
+    if (styles.length > 0) {
+        const color = applyStyle(styles, 0xffffff, buffers.meshes, metadata);
+        if (color)
+            buffers.meshes?.setAttribute('color', new THREE.BufferAttribute(color, 3));
+    }
+    
+    
     return {
         metadata,
         mesh: toResultForm(buffers.meshes),
@@ -62,15 +82,16 @@ loader.setDRACOLoader( dracoLoader );
 function loadModel(message: MessageEvent) {
 
     const { jobID, data } = message.data;
-    const { file, idOffset } = data;
+    const { file, idOffset, styles } = data;
     
     const response: any = {
         jobID: jobID
     };
 
     loader.load(file, (gltf) => {
-        response.result = parse(gltf.scene, idOffset);
+        response.result = parse(gltf.scene, idOffset, styles);
         postMessage(response);
+        (gltf as any) = null;
     }, undefined, (error) => {
         console.error(error);
     });

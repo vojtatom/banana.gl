@@ -1,5 +1,6 @@
 import { GraphicsProps, GraphicContext } from './context/context';
 import { LayerProps, Layer } from './layer/layer';
+import { Style } from './loader/style/style';
 
 interface BananaProps extends GraphicsProps {
     onClick?: (id: number) => void;
@@ -47,6 +48,9 @@ export function BananaGL(props: BananaProps) {
     };
 
     return {
-        loadLayer
+        loadLayer,
+        get style() {
+            return Style();
+        }
     };
 }

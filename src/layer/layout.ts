@@ -28,7 +28,7 @@ export interface Layout {
 export function Layout(props: LayerProps, onLoad: (layout: THREE.Vector3) => void): Layout {
     let layout: LayoutConfig;
     let halfx: number, halfy: number;
-    const radius = props.loadRadius ?? 2000;
+    const radius = props.loadRadius!;
     const path = layoutUrl(props.api);
 
     axios.get(path).then((response) => {

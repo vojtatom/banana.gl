@@ -1,12 +1,14 @@
-import { Style } from './styles';
-import { MetadataTable } from './types';
 import { Color } from 'three';
+import { MetadataTable } from '../layer/layer';
+import { Style } from './style/style';
 
 
-function computeColorTable(style: Style, metadataTable: MetadataTable) {
+function computeColorTable(styles: Style[], baseColor: number, metadataTable: MetadataTable) {
     const colorTable = new Map<number, Color>();
     for (const obj in metadataTable) {
-        const color = style.apply(metadataTable[obj]);
+        let color = baseColor;
+        for (let i = 0; i < styles.length; i++)
+            color = styles[i].apply(metadataTable[obj]) ?? color;
         colorTable.set(parseInt(obj), new Color().setHex(color));
     }
     return colorTable;
@@ -40,30 +42,15 @@ function computeColorBuffer(ids: Float32Array, colorTable: Map<number, Color>) {
 }
 
 
-function applyStyle(message: MessageEvent) {
-    
-    const { jobID, data } = message.data;
-    const { style, ids, metadata } = data;
+export function applyStyle(styles: string[], baseColor: number, geom: THREE.BufferGeometry | undefined, metadata: MetadataTable) {
+    if (!geom)
+        return;
 
-    const styleCls = Style.deserialize(style);
-    const colorTable = computeColorTable(styleCls, metadata);
+    const ids = geom.getAttribute('ids')?.array as Float32Array;
+    const stylesCls = [];
+    for (let i = 0; i < styles.length; i++)
+        stylesCls.push(Style().deserialize(styles[i]));
+    const colorTable = computeColorTable(stylesCls, baseColor, metadata);
     const colorBuffer = computeColorBuffer(ids, colorTable);
-
-    const response = {
-        jobID: jobID,
-        result: {
-            color: colorBuffer
-        }
-    };
-
-    postMessage(response);
+    return colorBuffer;
 }
-
-
-//eslint-disable-next-line no-restricted-globals
-self.onmessage = (message: MessageEvent) => {
-    applyStyle(message);
-};
-
-
-

@@ -1,6 +1,6 @@
-import { Layer } from "../layer";
-import { TileConfig } from "../layout";
-import { TileLOD } from "./lod";
+import { Layer } from '../layer';
+import { TileConfig } from '../layout';
+import { TileLOD } from './lod';
 
 
 export interface Tile {
@@ -11,7 +11,7 @@ export interface Tile {
 
 
 export function Tile(layer: Layer, config: TileConfig): Tile {
-    let LODs: (TileLOD | undefined)[] = [undefined, undefined];
+    const LODs: (TileLOD | undefined)[] = [undefined, undefined];
 
     const selectLOD = (camTar: THREE.Vector3, camPos: THREE.Vector3) => {
         const level = getLevel(camTar, camPos);

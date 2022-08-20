@@ -1,10 +1,10 @@
-import { Layer } from "../layer";
+import { Layer } from '../layer';
 import { ParsedData } from '../../loader/worker';
 import { MeshGeometry } from '../geometry/mesh';
 import { PointsGeometry } from '../geometry/points';
-import { CullableInstancedMesh } from "../cullable";
-import { Tile } from "./tile";
-import { TileLODLoader } from "./loader";
+import { CullableInstancedMesh } from '../geometry/cullable';
+import { Tile } from './tile';
+import { TileLODLoader } from './loader';
 
 
 
@@ -22,7 +22,9 @@ export function TileLOD(tile: Tile, layer: Layer, level: number): TileLOD {
 
     const select = () => {
         if (!mesh && !points) {
-            loader.request(dataToGeometry);
+            loader.request((data: ParsedData) => {
+                dataToGeometry(data);
+            });
         } else {
             setMeshVisibility(true);
             setPointsVisibility(true);
@@ -46,7 +48,7 @@ export function TileLOD(tile: Tile, layer: Layer, level: number): TileLOD {
         if (level == 0)
             points = PointsGeometry(data, layer);
         else
-        points = PointsGeometry(data, layer, layer.instance);
+            points = PointsGeometry(data, layer, layer.instance);
     }
 
     function setMeshVisibility(visible: boolean) {

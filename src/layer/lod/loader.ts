@@ -1,8 +1,8 @@
-import { Layer } from "../layer";
+import { Layer, MetadataTable } from '../layer';
 import { ParsedData } from '../../loader/worker';
 import { LoadingAnimation } from '../geometry/loading';
-import { Tile } from "./tile";
-import { TileConfig } from "../layout";
+import { Tile } from './tile';
+import { TileConfig } from '../layout';
 
 
 function tileURL(api: string, tile: TileConfig) {
@@ -24,7 +24,7 @@ export interface TileLODLoader {
 }
 
 export function TileLODLoader(tile: Tile, layer: Layer, level: number) : TileLODLoader {
-    let data: ParsedData | undefined;
+    let data: ParsedData | undefined; //TODO would be lovely to get rid of this
     let ondataloadfns: ((data: ParsedData) => void)[] = [];
     let dataRequested = false;
 
@@ -36,7 +36,7 @@ export function TileLODLoader(tile: Tile, layer: Layer, level: number) : TileLOD
         dataRequested = true;
         ondataloadfns.push(fn);
         loadGeometry();
-    }
+    };
 
     return {
         request,
@@ -64,10 +64,12 @@ export function TileLODLoader(tile: Tile, layer: Layer, level: number) : TileLOD
     function loadGeometryData(animation: LoadingAnimation) {
         layer.ctx.loader.process({
             file: tileURL(layer.api, tile.config),
-            objectsToLoad: tile.config.size
+            objectsToLoad: tile.config.size,
+            styles: layer.styles
         }, (loadedData) => {
             animation.stop();
             data = loadedData;
+            addMetadata(loadedData.metadata);
             yieldData(loadedData);
         });
     }
@@ -95,7 +97,16 @@ export function TileLODLoader(tile: Tile, layer: Layer, level: number) : TileLOD
     }
 
     function yieldData(loadedData: ParsedData) {
-        ondataloadfns.forEach(fn => fn(loadedData));
+        const l = ondataloadfns.length;
+        for (let i = 0; i < l; i++) {
+            ondataloadfns[i](loadedData);
+        }
         ondataloadfns = [];
+    }
+
+    function addMetadata(metadata: MetadataTable) {
+        for (const id in metadata) {
+            layer.metadata[id] = metadata[id];
+        }
     }
 }

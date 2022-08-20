@@ -14,25 +14,33 @@ export interface MaterialLibrary {
     line: LineMaterial;
     point: PointsMaterial;
     loading: MeshBasicMaterial;
+    baseColor: number;
 }
 
-export function MaterialLibrary(props?: MaterialLibraryProps): MaterialLibrary {
-    if (!props)
-        props = {};
+
+function propsDefaults(props: MaterialLibraryProps) {
+    props.baseColor = props.baseColor ?? 0xffffff;
+    props.lineColor = props.lineColor ?? 0x000000;
+    props.pointColor = props.pointColor ?? 0x000000;
+}
+
+export function MaterialLibrary(props: MaterialLibraryProps, useVertexColors?: boolean): MaterialLibrary {
+    propsDefaults(props);
 
     const mesh = new MeshPhysicalMaterial({
         side: THREE.DoubleSide,
-        color: props.baseColor ?? 0xffffff,
+        color: props.baseColor,
+        vertexColors: useVertexColors ?? false,
     });
 
     const line = new LineMaterial({
-        color: props.lineColor ?? 0xFFFFFF,
+        color: props.lineColor,
         linewidth: 5
     });
 
     const point = new PointsMaterial({
         size: 100,
-        color: props.pointColor ?? 0x000000,
+        color: props.pointColor,
         sizeAttenuation: true,
     });
 
@@ -46,5 +54,6 @@ export function MaterialLibrary(props?: MaterialLibraryProps): MaterialLibrary {
         line,
         point,
         loading,
+        baseColor: props.baseColor!,
     };
 }

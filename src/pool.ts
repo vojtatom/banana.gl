@@ -3,8 +3,37 @@ interface Job {
     jobID: number
 }
 
+interface QueueItem {
+    next: QueueItem | undefined,
+    value: Job
+}
+
+interface Queue  {
+    enqueue(value: any): void;
+    dequeue(): Job | undefined;
+    peek(): Job | undefined;
+}
+
 export interface WorkerPool {
     process(data: any, callback: (...output: any[]) => void): void;
+}
+
+function Queue(): Queue {
+    let head: QueueItem | undefined, tail: QueueItem;
+    return Object.freeze({     
+        enqueue(value: any) { 
+            const link = { value, next: undefined };
+            tail = head ? tail.next = link : head = link;
+        },
+        dequeue() {
+            if (head) {
+                const value = head.value;
+                head = head.next;
+                return value;
+            }
+        },
+        peek() { return head?.value; }
+    });
 }
 
 export function WorkerPool(workerPath: string, poolsize: number) {
@@ -12,19 +41,7 @@ export function WorkerPool(workerPath: string, poolsize: number) {
     const worker_busy: boolean[] = [];
     let jobIDs = 0;
     const resultMap = new Map<number, CallableFunction>();
-    const queue: Job[] = [];
-
-    const process = (data: any, callback: (...output: any[]) => void)  => {
-        const jobID = jobIDs++;
-        resultMap.set(jobID, callback);
-
-        queue.push({
-            data: data,
-            jobID: jobID
-        });
-
-        submit();
-    };
+    const queue = Queue();
 
     for (let i = 0; i < poolsize; ++i) {
         workers.push(new Worker(workerPath));
@@ -42,6 +59,18 @@ export function WorkerPool(workerPath: string, poolsize: number) {
         };
     }
 
+    const process = (data: any, callback: (...output: any[]) => void)  => {
+        const jobID = jobIDs++;
+        resultMap.set(jobID, callback);
+
+        queue.enqueue({
+            data: data,
+            jobID: jobID
+        });
+
+        submit();
+    };
+
     return {
         process
     };
@@ -51,7 +80,6 @@ export function WorkerPool(workerPath: string, poolsize: number) {
             if (!worker_busy[i])
                 return i;
         }
-        return undefined;
     }
 
     function submit() {
@@ -59,7 +87,7 @@ export function WorkerPool(workerPath: string, poolsize: number) {
         if (i === undefined)
             return;
 
-        const job = queue.shift();
+        const job = queue.dequeue();
         if (!job)
             return;
 

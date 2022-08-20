@@ -2,9 +2,12 @@ import { GraphicContext } from '../context/context';
 import { MaterialLibrary, MaterialLibraryProps } from '../context/materials';
 import { Layout } from './layout';
 import * as THREE from 'three';
-import { PointInstanceModel } from './instance';
+import { PointInstanceModel } from './geometry/instance';
 import { TileContainer } from './lod/container';
+import { Style } from '../loader/style/style';
 
+export type MetadataRecord = any;
+export type MetadataTable = {[id: number]: MetadataRecord}
 
 export interface Layer {
     materials: MaterialLibrary;
@@ -15,6 +18,9 @@ export interface Layer {
     api: string;
     lodLimits: number[];
     instance?: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>[];
+    metadata: MetadataTable;
+    get useVertexColors(): boolean;
+    styles: string[];
 }
 
 export interface LayerProps extends MaterialLibraryProps {
@@ -24,18 +30,23 @@ export interface LayerProps extends MaterialLibraryProps {
     pickable?: boolean;
     pointInstance?: string;
     lodLimits?: number[];
+    styles?: Style[];
 }
 
 function propsDefaults(props: LayerProps) {
     props.name = props.name ?? props.api;
     props.pickable = props.pickable ?? false;
     props.lodLimits = props.lodLimits ?? [20000];
+    props.loadRadius = props.loadRadius ?? 2000;
+    props.styles = props.styles ?? [];
 }
 
 export function Layer(ctx: GraphicContext, props: LayerProps) {
     propsDefaults(props);
-    const materials = MaterialLibrary(props);
+    const useVertexColors = props.styles!.length > 0;
+    const materials = MaterialLibrary(props, useVertexColors);
     const instance = props.pointInstance ? PointInstanceModel(props.pointInstance) : undefined;
+    const metadata = {};
     
     ctx.navigation.onchange = (target: THREE.Vector3) => {
         loadTiles(target);
@@ -46,15 +57,24 @@ export function Layer(ctx: GraphicContext, props: LayerProps) {
         loadTiles(ctx.navigation.target);
     });
 
+    const serialized = [];
+    const styles: Style[] = props.styles ?? [];
+    for (let i = 0; i < styles.length; i++)
+        serialized.push(styles[i].serialize());
+
+
     const layer: Layer = {
-        name: props.name!,
+        name: props.name ?? props.api,
         api: props.api,
-        pickable: props.pickable!,
-        lodLimits: props.lodLimits!,
+        pickable: props.pickable ?? false,
+        lodLimits: props.lodLimits ?? [],
         layout,
         materials,
         instance,
-        ctx
+        ctx,
+        metadata,
+        styles: serialized,
+        get useVertexColors() { return useVertexColors; }
     };
 
     const tileContainer = TileContainer(layer);

@@ -32,7 +32,6 @@ function Lights(scene: THREE.Scene) {
 export interface GraphicsProps extends NavigationProps, MapControlsProps {
     canvas: HTMLCanvasElement;
     loaderPath: string;
-    stylerPath: string;
     background?: number;
     near?: number;
     far?: number;
@@ -80,7 +79,7 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
         const ratio = width / height;
         camera.aspect = ratio;
         camera.updateProjectionMatrix();
-        renderer.setSize(width, height);
+        renderer.setSize(width, height);        
     };
 
     frame();

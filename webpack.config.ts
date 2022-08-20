@@ -55,17 +55,4 @@ const configLoader: Configuration = {
   ...common
 };
 
-const configStyler: Configuration = {
-  entry: {
-    styleWorker: './src/style.ts'
-  },
-  output: {
-    path: path.resolve(__dirname, "dist"),
-    filename: "[name].js",
-    library:'BananaGLStyler',
-    libraryTarget: 'umd'
-  },
-  ...common
-};
-
-export default [configMain, configLoader, configStyler];
+export default [configMain, configLoader];

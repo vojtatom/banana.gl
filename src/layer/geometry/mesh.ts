@@ -4,7 +4,7 @@ import { Layer } from '../layer';
 
 
 export function MeshGeometry(data: ParsedData, layer: Layer) {
-    if (!data.mesh) 
+    if (!data.mesh)
         return;
 
     const { mesh } = data;
@@ -12,12 +12,16 @@ export function MeshGeometry(data: ParsedData, layer: Layer) {
     geometry.setAttribute('position', new THREE.BufferAttribute(mesh.positions, 3));
     geometry.setAttribute('normal', new THREE.BufferAttribute(mesh.normals, 3));
     geometry.setAttribute('idcolor', new THREE.BufferAttribute(mesh.ids, 3));
+
+    if (mesh.colors)
+        geometry.setAttribute('color', new THREE.BufferAttribute(mesh.colors, 3));
+        
     const m = new THREE.Mesh(geometry, layer.materials.mesh);
-    layer.ctx.scene.add(m);
 
     if (layer.pickable) {
         layer.ctx.picker.addPickable(m);
     }
 
+    layer.ctx.scene.add(m);
     return m;
 }

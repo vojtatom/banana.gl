@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { ParsedData, ParsedPoints } from '../../loader/worker';
-import { CullableInstancedMesh } from '../cullable';
+import { CullableInstancedMesh } from './cullable';
 import { Layer } from '../layer';
 
 
@@ -16,7 +16,7 @@ function computeBoundingSphere(points: ParsedPoints) {
 function InstancedPoints(points: ParsedPoints, layer: Layer, pointInstance: THREE.Mesh[]) {
     const matrix = new THREE.Matrix4();
     const bsphere = computeBoundingSphere(points);
-    let meshes: CullableInstancedMesh[] = [];
+    const meshes: CullableInstancedMesh[] = [];
     
     pointInstance.forEach(initInstance);
     function initInstance(mesh: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>) {

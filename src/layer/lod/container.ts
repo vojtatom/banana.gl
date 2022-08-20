@@ -1,26 +1,27 @@
-import { Layer } from "../layer";
-import { TileConfig } from "../layout";
-import { Tile } from "./tile";
+import { Layer } from '../layer';
+import { TileConfig } from '../layout';
+import { Tile } from './tile';
 
 export interface TileContainer {
     load: (tconfigs: TileConfig[]) => void;
 }
 
 export function TileContainer(layer: Layer): TileContainer {
-    let tiles = new Map<string, Tile>();
+    const tiles = new Map<string, Tile>();
 
     const load = (tconfigs: TileConfig[]) => {
-        for (let tconfig of tconfigs)
-            prepareTile(tconfig);
         const camPos = layer.ctx.navigation.position;
         const camTar = layer.ctx.navigation.target;
-        for (let tile of tiles.values())
+        
+        for (const tconfig of tconfigs) {
+            const tile = prepareTile(tconfig);
             tile.selectLOD(camTar, camPos);
-    }
+        }
+    };
 
     return {
         load
-    }
+    };
 
     function prepareTile(tconfig: TileConfig) {
         const key = tileKey(tconfig);
@@ -29,6 +30,7 @@ export function TileContainer(layer: Layer): TileContainer {
             tile = Tile(layer, tconfig);
             tiles.set(key, tile);
         }
+        return tile;
     }
 
     function tileKey(tile: TileConfig) {

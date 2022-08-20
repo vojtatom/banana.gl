@@ -151,7 +151,6 @@
             const gl = new BananaGL.BananaGL({ 
                 canvas: canvas,
                 loaderPath: "../dist/loaderWorker.js",
-                stylerPath: "../dist/styleWorker.js",
                 background: 0x151d29,
                 //background: 0xd6e7f7,
             });
@@ -161,7 +160,7 @@
                 baseColor: 0xeeeeee,
                 lineColor: 0xfdbe56,
                 pickable: true,
-                /*styles: [
+                styles: [
                     gl.style.withAttributeRange("height", 20, 50).useColor([
                      0xAED6F1,
                      0x229954,
@@ -183,7 +182,7 @@
                     ]),
                     //gl.style.withAttributeRange("height", 0, 50).useColor([0x3333f3, 0xf33333 ]),
                     //gl.style.withAttributeRange("height", 0, 50).useColor([0x000000, 0xffffff]),
-                ]*/
+                ]
             });
 
             gl.loadLayer({
