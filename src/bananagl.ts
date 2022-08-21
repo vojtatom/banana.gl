@@ -1,59 +1,56 @@
-import { Vector3 } from 'three';
-import { Graphics, GraphicsProps } from './graphics';
-import { Layer } from './layer';
-import { LayerProps } from './types';
-import { LoaderWorkerPool } from './loader';
-import { Style, StylerWorkerPool } from './styles';
+import { GraphicsProps, GraphicContext } from './context/context';
+import { LayerProps, Layer } from './layer/layer';
+import { Style } from './loader/style/style';
 
-type BananaGLProps = {
-    graphics: GraphicsProps
-    loaderPath?: string;
-    stylerPath?: string;
-    location?: {
-        x: number;
-        y: number;
-        z: number;
-    };
+export interface BananaProps extends GraphicsProps {
+    onClick?: (id: number) => void;
 }
 
-export class BananaGL {
-    graphics: Graphics;
-    layers: Layer[] = [];
+export function BananaGL(props: BananaProps) {
+    const ctx = GraphicContext(props);
+    const canvas = props.canvas;
+    let mouseLastDownTime = 0;
 
-    constructor(props: BananaGLProps) {
-        this.graphics = new Graphics(props.graphics);
-        const nav = this.graphics.navigation;
+    canvas.onmousedown = (e) => {
+        mouseLastDownTime = Date.now();
+    };
 
-        if (props.loaderPath)
-            LoaderWorkerPool.workerPath = props.loaderPath;
+    canvas.onmouseup = (e) => {
+        const now = Date.now();
+        const duration = now - mouseLastDownTime;
 
-        if (props.stylerPath)
-            StylerWorkerPool.workerPath = props.stylerPath;
-
-        if (props.location) {
-            const position = new Vector3(props.location.x, props.location.y, props.location.z);
-            const target = new Vector3(props.location.x, props.location.y, 0);
-            nav.setLocation(position, target);
-            this.graphics.focus(position, target);
-        } else if (nav.isSet) {
-            this.graphics.focus(nav.location, nav.target);
+        if (duration < 200) {
+            const x = e.clientX;
+            const y = e.clientY;
+            const id = ctx.picker.pick(x, y);
+            console.log(id);
         }
 
-        nav.layers = this.layers;
+        ctx.navigation.update();
+    };
 
-        this.graphics.onClick = (x: number, y: number, id: number) => {
-            this.layers.forEach((layer) => {
-                layer.select(id);
-            });
-        };
 
-    }
+    let updateCall: any;
+    canvas.addEventListener('wheel', (e) => {
+        clearTimeout(updateCall);
+        updateCall = setTimeout(() => {
+            ctx.navigation.update();
+            //TODO calculate near and far to fit
+        }, 100);
+    });
 
-    loadLayer(props: LayerProps) {
-        this.layers.push(new Layer(props, this.graphics));
-    }
+    window.onresize = () => {
+        ctx.updateSize();
+    };
 
-    get style() {
-        return new Style();
-    }
+    const loadLayer = (props: LayerProps) => {
+        Layer(ctx, props);
+    };
+
+    return {
+        loadLayer,
+        get style() {
+            return Style();
+        }
+    };
 }

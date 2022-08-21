@@ -3,7 +3,6 @@
       "outDir": "types",
       "target": "ES6",
       "strict": true,
-      "allowJs": true,
       "esModuleInterop": true,
       "skipLibCheck": true,
       "declaration": true,
