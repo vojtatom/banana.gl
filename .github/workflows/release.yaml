@@ -1,14 +1,14 @@
-name: BananaGL CI
+name: BananaGL Release CI
 
 on:  
   push:
-    tags:
+    tags: 
       - 'v*'
 
 jobs:
-  build:
+  release:
     runs-on: ubuntu-latest
-    if: github.event_name == 'push' && contains(github.ref, 'main')
+    if: github.event_name == 'push' && contains(github.event.base_ref, 'main')
     steps:
     - uses: actions/checkout@v2
     - name: "Setup Node.js"
@@ -20,7 +20,7 @@ jobs:
         npm i
     - name: Build library
       run: |
-        npm run build-prod
+        npm run build
     - name: Create Release ZIP file
       run: |
         zip bananagl.zip dist/*

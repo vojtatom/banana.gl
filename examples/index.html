@@ -36,9 +36,9 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        #canvas {
+        #canvasContainer {
             width: 100%;
-            height: calc(100% - 3rem);
+            height: 100%;
         }
 
         #main {
@@ -130,7 +130,9 @@
 </head>
 <body>
     <div id="main">
-        <h1>Metacity <span class="post">Demo Project</span> <a href="mailto:hi@stdio.cz">Get in touch</a></h1>
+        <div id="canvasContainer">
+            <canvas id="canvas">Your browser does not support canvas</canvas>
+        </div>
         <div id="legend">
             <h2>Building Height</h2>
             <div id="map">
@@ -141,7 +143,6 @@
                 </div>
             </div>
         </div>
-        <canvas id="canvas">Your browser does not support canvas</canvas>
     </div>
     <script src="../dist/bananagl.js"></script>
     <script>
@@ -149,24 +150,19 @@
             const canvas = document.getElementById("canvas");
 
             const gl = new BananaGL.BananaGL({ 
-                graphics: {
-                    canvas: canvas, 
-                    background: 0xeeeeee
-                },
+                canvas: canvas,
                 loaderPath: "../dist/loaderWorker.js",
-                stylerPath: "../dist/styleWorker.js"
+                background: 0x151d29,
+                //background: 0xd6e7f7,
             });
 
             gl.loadLayer({
-                path: "./data/buildings",
-                material: {
-                    baseColor: 0xffffff,
-                    lineColor: 0xfdbe56,
-                },
+                api: "https://data.metacity.cc/buildings",
+                baseColor: 0xeeeeee,
+                lineColor: 0xfdbe56,
                 pickable: true,
                 styles: [
-                    gl.style.withAttributeRange("height", 20, 50).useColor([
-                    //gl.style.forAll().useColor([
+                    gl.style.withAttributeRangeExt("height", 20, 50).useColor([
                      0xAED6F1,
                      0x229954,
                      0x27AE60,
@@ -191,24 +187,19 @@
             });
 
             gl.loadLayer({
-                path: "./data/terrain",
-                material: {
-                    baseColor: 0xeeeeee,
-                }
+                api: "https://data.metacity.cc/terrain",
+                baseColor: 0xffffff,
             });
 
             gl.loadLayer({
-                path: "./data/bridges",
-                material: {
-                    baseColor: 0xeeeeee,
-                }
+                api: "https://data.metacity.cc/bridges",
+                baseColor: 0xeeeeee,
             });
 
             gl.loadLayer({
-                path: "./data/trees",
-                points: {
-                    instanceModel: "tree.glb"
-                }
+                api: "https://data.metacity.cc/trees",
+                pointInstance: "tree.glb",
+                pointColor: 0x008800,
             });
         }
     </script>
