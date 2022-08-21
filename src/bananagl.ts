@@ -11,11 +11,11 @@ export function BananaGL(props: BananaProps) {
     const canvas = props.canvas;
     let mouseLastDownTime = 0;
 
-    canvas.onmousedown = (e) => {
+    canvas.onpointerdown = (e) => {
         mouseLastDownTime = Date.now();
     };
 
-    canvas.onmouseup = (e) => {
+    canvas.onpointerup = (e) => {
         const now = Date.now();
         const duration = now - mouseLastDownTime;
 
