@@ -36,9 +36,9 @@
             -moz-osx-font-smoothing: grayscale;
         }
 
-        #canvas {
-            width: 100%;
-            height: 100%;
+        #canvasContainer {
+            width: 50%;
+            height: 50%;
         }
 
         #main {
@@ -130,7 +130,6 @@
 </head>
 <body>
     <div id="main">
-        
         <div id="legend">
             <h2>Building Height</h2>
             <div id="map">
@@ -141,7 +140,10 @@
                 </div>
             </div>
         </div>
-        <canvas id="canvas">Your browser does not support canvas</canvas>
+
+        <div id="canvasContainer">
+            <canvas id="canvas">Your browser does not support canvas</canvas>
+        </div>
     </div>
     <script src="../dist/bananagl.js"></script>
     <script>
@@ -161,7 +163,7 @@
                 lineColor: 0xfdbe56,
                 pickable: true,
                 styles: [
-                    gl.style.withAttributeRange("height", 20, 50).useColor([
+                    gl.style.withAttributeRangeExt("height", 20, 50).useColor([
                      0xAED6F1,
                      0x229954,
                      0x27AE60,

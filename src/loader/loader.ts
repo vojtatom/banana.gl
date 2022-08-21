@@ -2,7 +2,7 @@ import { WorkerPool } from './pool';
 import { ParsedData } from './worker';
 
 
-type ProcessedData = {
+export type ProcessedData = {
     file: string, 
     objectsToLoad: number,
     styles: string[],

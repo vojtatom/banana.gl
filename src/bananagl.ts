@@ -2,7 +2,7 @@ import { GraphicsProps, GraphicContext } from './context/context';
 import { LayerProps, Layer } from './layer/layer';
 import { Style } from './loader/style/style';
 
-interface BananaProps extends GraphicsProps {
+export interface BananaProps extends GraphicsProps {
     onClick?: (id: number) => void;
 }
 
@@ -40,7 +40,7 @@ export function BananaGL(props: BananaProps) {
     });
 
     window.onresize = () => {
-        ctx.updateSize(window.innerWidth, window.innerHeight);
+        ctx.updateSize();
     };
 
     const loadLayer = (props: LayerProps) => {

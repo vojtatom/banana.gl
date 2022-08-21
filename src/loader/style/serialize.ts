@@ -1,4 +1,4 @@
-import { StyleRule, StyleRuleAlways, StyleRuleAttributeEqualTo, StyleRuleAttributeRange } from './rule';
+import { StyleRule, StyleRuleAlways, StyleRuleAttributeEqualTo, StyleRuleAttributeRange, StyleRuleAttributeRangeExt } from './rule';
 
 
 export function serializeRule(rule: StyleRule) {
@@ -15,6 +15,8 @@ export function deserializeRule(rule: string) {
         return new StyleRuleAttributeEqualTo(rule_);
     case 'attributeRange':
         return new StyleRuleAttributeRange(rule_);
+    case 'attributeRangeExt':
+        return new StyleRuleAttributeRangeExt(rule_);
     default:
         throw new Error('Unknown rule type: ' + rule_.$type);
     }

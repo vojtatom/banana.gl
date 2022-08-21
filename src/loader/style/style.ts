@@ -1,6 +1,6 @@
 import { MetadataTable } from '../../layer/layer';
 import { sampleColor } from './color';
-import { StyleRule, StyleRuleAlways, StyleRuleAttributeEqualTo, StyleRuleAttributeRange } from './rule';
+import { StyleRule, StyleRuleAlways, StyleRuleAttributeEqualTo, StyleRuleAttributeRange, StyleRuleAttributeRangeExt } from './rule';
 import { deserializeRule, serializeRule } from './serialize';
 
 
@@ -10,6 +10,7 @@ export interface Style {
     forAll: () => Style;
     withAttributeEqualTo: (attribute: string, value: number) => Style;
     withAttributeRange: (attribute: string, min: number, max: number) => Style;
+    withAttributeRangeExt: (attribute: string, min: number, max: number) => Style;
     useColor: (color: number | number[]) => Style;
     apply: (metadata: MetadataTable) => number | undefined;
     serialize: () => string;
@@ -25,6 +26,7 @@ export function Style(): Style {
         forAll,
         withAttributeEqualTo,
         withAttributeRange,
+        withAttributeRangeExt,
         useColor,
         apply,
         serialize,
@@ -45,6 +47,11 @@ export function Style(): Style {
 
     function withAttributeRange(attribute: string, min: number, max: number) {
         rules.push(new StyleRuleAttributeRange({ attribute, min, max }));
+        return style;
+    }
+
+    function withAttributeRangeExt(attribute: string, min: number, max: number) {
+        rules.push(new StyleRuleAttributeRangeExt({ attribute, min, max }));
         return style;
     }
 

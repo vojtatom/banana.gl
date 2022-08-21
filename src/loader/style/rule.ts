@@ -52,6 +52,22 @@ export class StyleRuleAttributeRange extends StyleRule {
     apply(metadata: MetadataRecord) {
         if (Object.prototype.hasOwnProperty.call(metadata, this.attribute)) {
             const value = metadata[this.attribute];
+            return (value - this.min) / (this.max - this.min)
+        }
+        return -1;
+    }
+}
+
+export class StyleRuleAttributeRangeExt extends StyleRuleAttributeRange {
+    $type = 'attributeRangeExt';
+
+    constructor(props: { attribute: string, min: number, max: number }) {
+        super(props);
+    }
+
+    apply(metadata: MetadataRecord) {
+        if (Object.prototype.hasOwnProperty.call(metadata, this.attribute)) {
+            const value = metadata[this.attribute];
             return clamp((value - this.min) / (this.max - this.min), 0, 1);
         }
         return -1;

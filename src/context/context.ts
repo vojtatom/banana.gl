@@ -3,6 +3,7 @@ import { Navigation, NavigationProps } from './navigation';
 import { GPUPicker } from './gpuPicker';
 import { MapControls, MapControlsProps } from './mapControls';
 import { LoaderWorkerPool } from '../loader/loader';
+import { SourceLabel } from './label';
 
 
 function Renderer(props: GraphicsProps) {
@@ -11,7 +12,6 @@ function Renderer(props: GraphicsProps) {
         antialias: true,
         powerPreference: 'high-performance'
     });
-    renderer.setSize(props.canvas.clientWidth, props.canvas.clientHeight);
     renderer.setClearColor(props.background!, 1);
     renderer.setPixelRatio(window.devicePixelRatio);
 
@@ -43,7 +43,7 @@ export interface GraphicContext {
     scene: THREE.Scene;
     picker: GPUPicker;
     loader: LoaderWorkerPool;
-    updateSize: (width: number, height: number) => void;
+    updateSize: () => void;
     get resolution(): THREE.Vector2;
 }
 
@@ -67,6 +67,7 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
     const lights = Lights(scene);
     const navigation = Navigation(props, camera, controls);
     const loader = LoaderWorkerPool(props.loaderPath);
+    const container = SourceLabel(props);
 
     const frame = () => {
         requestAnimationFrame(frame);
@@ -75,13 +76,29 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
         //renderer.render(picker.pickingScene, camera);
     };
 
-    const updateSize = (width: number, height: number) => {
+    const updateSize = () => {
+        let width, height;
+        
+        if (container?.parentNode) {
+            let parent = container.parentNode as HTMLElement;
+            width = parent.clientWidth;
+            height = parent.clientHeight;
+        } else {
+            width = window.innerWidth;
+            height = window.innerHeight;
+        }
+
         const ratio = width / height;
         camera.aspect = ratio;
         camera.updateProjectionMatrix();
-        renderer.setSize(width, height);        
+        renderer.setSize(width, height);
+        if (container) {
+            container.style.width = width + 'px';
+            container.style.height = height + 'px';    
+        }
     };
 
+    updateSize();
     frame();
 
     return {
