@@ -1,4 +1,17 @@
 #!/bin/bash
+
+git checkout main
+if [ $? -ne 0 ]; then
+    echo "Failed to checkout main"
+    exit 1
+fi
+git pull
+if [ $? -ne 0 ]; then
+    echo "Failed to pull main"
+    exit 1
+fi
+
+
 echo "Releasing new version of BananaGL 🍌"
 echo "--------------------------------"
 GIT_VERSION=$(git describe --tags --abbrev=0)
@@ -17,17 +30,6 @@ done
 
 VERSION=$version
 TAG_VERSION="v$VERSION"
-
-git checkout main
-if [ $? -ne 0 ]; then
-    echo "Failed to checkout main"
-    exit 1
-fi
-git pull
-if [ $? -ne 0 ]; then
-    echo "Failed to pull main"
-    exit 1
-fi
 
 sed -i '' "s/${CURRENT_VERSION}/${VERSION}/" package.json
 

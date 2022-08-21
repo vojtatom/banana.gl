@@ -41,9 +41,9 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
-    "@types/three": "^0.1.1.1",
+    "@types/three": "^0.141.0",
     "axios": "^0.27.2",
-    "three": "^0.1.1.1",
+    "three": "^0.141.0",
     "typedoc": "^0.23.10"
   }
 }
