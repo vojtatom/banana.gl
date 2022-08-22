@@ -18,23 +18,24 @@ function Renderer(props: GraphicsProps) {
     return renderer;
 }
 
-
-function Lights(scene: THREE.Scene) {
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.5);
-    scene.add(ambientLight);
-
-    const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-    directionalLight.position.set(0, 0, 1);
-    scene.add(directionalLight);
-    return [ambientLight, directionalLight];
-}
-
 export interface GraphicsProps extends NavigationProps, MapControlsProps {
     canvas: HTMLCanvasElement;
     loaderPath: string;
     background?: number;
     near?: number;
     far?: number;
+    lightIntensity?: number;
+}
+
+function Lights(props: GraphicsProps, scene: THREE.Scene) {
+    const ambientLight = new THREE.AmbientLight(0xffffff, props.lightIntensity);
+    scene.add(ambientLight);
+
+    const directionalLight = new THREE.DirectionalLight(0xffffff, props.lightIntensity);
+    directionalLight.position.set(0, 0, 10);
+    directionalLight.target.position.set(0, 0, 0);
+    scene.add(directionalLight);
+    return [ambientLight, directionalLight];
 }
 
 
@@ -52,6 +53,7 @@ function propsDefaults(props: GraphicsProps) {
     props.near = props.near ?? 1000;
     props.far = props.far ?? 100000;
     props.background = props.background ?? 0xffffff;
+    props.lightIntensity = props.lightIntensity ?? 0.5;
 }
 
 
@@ -64,7 +66,7 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
     const scene = new THREE.Scene();
     const picker = GPUPicker(renderer, camera);
     const controls = new MapControls(props, camera, canvas);
-    const lights = Lights(scene);
+    const lights = Lights(props, scene);
     const navigation = Navigation(props, camera, controls);
     const loader = LoaderWorkerPool(props.loaderPath);
     const container = SourceLabel(props);

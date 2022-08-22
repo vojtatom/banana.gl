@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2JEFEN33D7"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-2JEFEN33D7');
+    </script>
+
+
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+            line-height: 20px;
+            color: #333333;
+            background-color: #ffffff;
+
+            /* font antialiasing */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        #canvasContainer {
+            width: 100%;
+            height: 100%;
+        }
+
+        #main {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-family: 'RhetorikSansRegular', sans-serif;
+            line-height: 1rem;
+            font-size: 1em;
+            margin: 1em;
+            padding: 0;
+            color: #333333;
+        }
+
+        h1 .post {
+            color: #AAA;
+        }
+
+        a {
+            color: #008800;
+            text-decoration: none;
+            padding: 0.5rem;
+            background-color: #DDFFDD;
+            border-radius: 0.5rem;
+            margin-left: 0.2rem;
+        }
+    </style>
+
+    <title>Testing Project</title>
+</head>
+<body>
+    <div id="main">
+        <div id="canvasContainer">
+            <canvas id="canvas">Your browser does not support canvas</canvas>
+        </div>
+    </div>
+    <script src="../dist/bananagl.js"></script>
+    <script>
+        window.onload = () => {
+            const canvas = document.getElementById("canvas");
+
+            const gl = new BananaGL.BananaGL({ 
+                canvas: canvas,
+                loaderPath: "../dist/loaderWorker.js",
+                background: 0xffffff,
+                target: [-740950.069802194, -1044736.5634868914, 4.564565178873129e-15],
+                lightIntensity: 0.8
+            });
+
+            gl.loadLayer({
+                api: "https://data.metacity.cc/utilization",
+                baseColor: 0xeeeeee,
+                pickable: true,
+                styles: [
+                    gl.style.withAttributeEqualTo("KOD", "VN")  .useColor(0xA8A8A8), //významné ulice, silnice
+                    gl.style.withAttributeEqualTo("KOD", "VM")  .useColor(0xA8A8A8), //ulice, silnice
+                    gl.style.withAttributeEqualTo("KOD", "VPP") .useColor(0xA8A8A8), //pěšiny
+                    gl.style.withAttributeEqualTo("KOD", "VPN") .useColor(0xA8A8A8), //pěší prostranství
+                    gl.style.withAttributeEqualTo("KOD", "DHO") .useColor(0xA8A8A8), //plochy a zařízení hromadné dopravy
+                    gl.style.withAttributeEqualTo("KOD", "HY")  .useColor(0x4488ff), //hydro
+                    gl.style.withAttributeEqualTo("KOD", "ZL")  .useColor(0x3FA814), //louky, pastviny, travnatá lada
+                    gl.style.withAttributeEqualTo("KOD", "ZSV") .useColor(0x3FA814), //vinice
+                    gl.style.withAttributeEqualTo("KOD", "ZA")  .useColor(0x3FA814), //zahradnictví
+                    gl.style.withAttributeEqualTo("KOD", "ZSP") .useColor(0x3FA814), //sady produkční
+                    gl.style.withAttributeEqualTo("KOD", "ZSO") .useColor(0x3FA814), //sady opuštěné
+                    gl.style.withAttributeEqualTo("KOD", "RV")  .useColor(0x3FA814), //rekreační areály vzdělávací - ZOO, botanické zahrady"
+                    gl.style.withAttributeEqualTo("KOD", "ND")  .useColor(0x3FA814), //doprovodná vegetace
+                    gl.style.withAttributeEqualTo("KOD", "ZHB") .useColor(0x3FA814), //zahrady rodinných domů
+                    gl.style.withAttributeEqualTo("KOD", "ZSZ") .useColor(0x3FA814), //zahrady
+                    gl.style.withAttributeEqualTo("KOD", "ZHV") .useColor(0x3FA814), //zahrady a hřiště občanské vybavenosti
+                    gl.style.withAttributeEqualTo("KOD", "RPU") .useColor(0x068C38), //parkově upravené plochy
+                    gl.style.withAttributeEqualTo("KOD", "RPP") .useColor(0x026A16), //parkové plochy zahradní
+                    gl.style.withAttributeEqualTo("KOD", "LRO") .useColor(0x026A16), //lesy
+                    gl.style.withAttributeEqualTo("KOD", "LRR") .useColor(0x026A16), //lesoparky
+                    gl.style.withAttributeEqualTo("KOD", "PLP") .useColor(0xAA9988), //pole produkční
+                    gl.style.withAttributeEqualTo("KOD", "DZO") .useColor(0xa1a1e3), //plochy s objekty železnice
+                    gl.style.withAttributeEqualTo("KOD", "DZP") .useColor(0xa1a1e3), //plochy železnice
+                    gl.style.withAttributeEqualTo("KOD", "OZN") .useColor(0xFF9999), //nemocnice
+                    gl.style.withAttributeEqualTo("KOD", "DPV") .useColor(0xAA9988), //parkoviště vybraná
+                    gl.style.withAttributeEqualTo("KOD", "OBA") .useColor(0xAA9988), //armáda
+                    gl.style.withAttributeEqualTo("KOD", "RPH") .useColor(0xA8A8A8), //hřbitovy
+                    gl.style.withAttributeEqualTo("KOD", "XD")  .useColor(0x999999), //devastovaná území, deponie bez staveb, deponie
+                    gl.style.withAttributeEqualTo("KOD", "BD")  .useColor(0xAA9988), //bytové domy
+                    gl.style.withAttributeEqualTo("KOD", "BQ")  .useColor(0xAA9988), //polyfunkční rodinné a bytové domy
+                    gl.style.withAttributeEqualTo("KOD", "SQ")  .useColor(0xAA9988), //polyfunkční občanské vybavení
+                ]
+            });
+
+            gl.loadLayer({
+                api: "https://data.metacity.cc/buildingsflatsimple",
+                baseColor: 0xffffff,
+                pickable: true,
+                styles: [
+                    //gl.style.withAttributeRangeExt("height", 20, 50).useColor([0x666699, 0xff66ff]),
+                    gl.style.withAttributeRangeExt("height", 20, 50).useColor([0x6666AA, 0xff66ff]),
+                    //gl.style.withAttributeRangeExt("height", 20, 50).useColor([0x8686d9, 0xff66ff]),
+                    //gl.style.withAttributeRangeExt("height", 20, 50).useColor([0xa1a1e3, 0xfc9ffc]),
+                ]
+            });
+
+            gl.loadLayer({
+                api: "https://data.metacity.cc/treesflat",
+                pointInstance: "tree.glb",
+                pointColor: 0x00BB00,
+            });
+        }
+    </script>
+
+</body>
+</html>

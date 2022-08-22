@@ -11,7 +11,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 
-
 echo "Releasing new version of BananaGL 🍌"
 echo "--------------------------------"
 GIT_VERSION=$(git describe --tags --abbrev=0)

@@ -21,6 +21,7 @@ export interface Layer {
     metadata: MetadataTable;
     get useVertexColors(): boolean;
     styles: string[];
+    getMetadata(id: number): MetadataRecord;
 }
 
 export interface LayerProps extends MaterialLibraryProps {
@@ -41,12 +42,12 @@ function propsDefaults(props: LayerProps) {
     props.styles = props.styles ?? [];
 }
 
-export function Layer(ctx: GraphicContext, props: LayerProps) {
+export function Layer(ctx: GraphicContext, props: LayerProps): Layer {
     propsDefaults(props);
     const useVertexColors = props.styles!.length > 0;
     const materials = MaterialLibrary(props, useVertexColors);
     const instance = props.pointInstance ? PointInstanceModel(props.pointInstance) : undefined;
-    const metadata = {};
+    const metadata: MetadataTable = {};
     
     ctx.navigation.onchange = (target: THREE.Vector3) => {
         loadTiles(target);
@@ -74,7 +75,10 @@ export function Layer(ctx: GraphicContext, props: LayerProps) {
         ctx,
         metadata,
         styles: serialized,
-        get useVertexColors() { return useVertexColors; }
+        get useVertexColors() { return useVertexColors; },
+        getMetadata(id: number) {
+            return metadata[id];
+        }
     };
 
     const tileContainer = TileContainer(layer);
@@ -83,4 +87,6 @@ export function Layer(ctx: GraphicContext, props: LayerProps) {
         const tiles = layout.getTilesToLoad(target.x, target.y);
         tileContainer.load(tiles);
     } 
+
+    return layer;
 }

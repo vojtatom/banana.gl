@@ -2,8 +2,8 @@ import * as THREE from 'three';
 import { MapControls } from './mapControls';
 
 export interface NavigationProps {
-    target?: THREE.Vector3;
-    position?: THREE.Vector3;
+    target?: [number, number, number];
+    position?: [number, number, number];
     offset?: number; 
 }
 
@@ -53,9 +53,12 @@ export function Navigation(props: NavigationProps, camera: THREE.Camera, control
     let { position, target } = parseUrl();
     const onchangefs: CallableFunction[] = [];
 
-    if (props.target && props.position) {
-        target = props.target;
-        position = props.position;
+    if (props.target && position.equals(new THREE.Vector3(Infinity, Infinity, Infinity))) {
+        target = new THREE.Vector3(...props.target);
+        if (props.position)
+            position = new THREE.Vector3(...props.position);
+        else 
+            position = null as any;
     } 
     
     positionCamera(target, position);
@@ -85,6 +88,7 @@ export function Navigation(props: NavigationProps, camera: THREE.Camera, control
     };
 
     function positionCamera(target: THREE.Vector3, position?: THREE.Vector3) {
+        console.log('positionCamera', target, position);
         if (!position)
         {
             position = target.clone();

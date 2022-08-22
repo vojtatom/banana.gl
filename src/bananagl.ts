@@ -10,6 +10,21 @@ export function BananaGL(props: BananaProps) {
     const ctx = GraphicContext(props);
     const canvas = props.canvas;
     let mouseLastDownTime = 0;
+    let layers: Layer[] = [];
+
+    const loadLayer = (props: LayerProps) => {
+        let layer = Layer(ctx, props);
+        layers.push(layer);
+    };
+
+    const getMetadata = (id: number) => {
+        for (let i = 0; i < layers.length; i++) {
+            const layer = layers[i];
+            if (layer.metadata[id])
+                return layer.metadata[id];
+        }
+        return undefined;
+    };
 
     canvas.onpointerdown = (e) => {
         mouseLastDownTime = Date.now();
@@ -24,6 +39,7 @@ export function BananaGL(props: BananaProps) {
             const y = e.clientY;
             const id = ctx.picker.pick(x, y);
             console.log(id);
+            console.log(getMetadata(id));
         }
 
         ctx.navigation.update();
@@ -41,10 +57,6 @@ export function BananaGL(props: BananaProps) {
 
     window.onresize = () => {
         ctx.updateSize();
-    };
-
-    const loadLayer = (props: LayerProps) => {
-        Layer(ctx, props);
     };
 
     return {
