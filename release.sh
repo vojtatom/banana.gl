@@ -38,10 +38,6 @@ if [ $? -ne 0 ]; then
     exit 1
 fi
 git commit -m "Release ${TAG_VERSION}"
-if [ $? -ne 0 ]; then
-    echo "Failed to commit package.json"
-    exit 1
-fi
 git push origin main
 if [ $? -ne 0 ]; then
     echo "Failed to push package.json"
