@@ -1,4 +1,5 @@
 #!/bin/bash
+
 git checkout main
 if [ $? -ne 0 ]; then
     echo "Failed to checkout main"
