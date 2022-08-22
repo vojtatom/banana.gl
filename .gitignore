@@ -214,7 +214,6 @@ $RECYCLE.BIN/
 # End of https://www.toptal.com/developers/gitignore/api/node,macos,linux,windows
 
 data
-examples
 build
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudiocode

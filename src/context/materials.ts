@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { MeshBasicMaterial, MeshPhysicalMaterial, PointsMaterial } from 'three';
+import { MeshBasicMaterial, MeshLambertMaterial, MeshPhysicalMaterial, PointsMaterial } from 'three';
 import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 
 
@@ -10,7 +10,7 @@ export interface MaterialLibraryProps {
 }
 
 export interface MaterialLibrary {
-    mesh: MeshPhysicalMaterial;
+    mesh: MeshLambertMaterial;
     line: LineMaterial;
     point: PointsMaterial;
     loading: MeshBasicMaterial;
@@ -27,7 +27,7 @@ function propsDefaults(props: MaterialLibraryProps) {
 export function MaterialLibrary(props: MaterialLibraryProps, useVertexColors?: boolean): MaterialLibrary {
     propsDefaults(props);
 
-    const mesh = new MeshPhysicalMaterial({
+    const mesh = new MeshLambertMaterial({
         side: THREE.DoubleSide,
         color: props.baseColor,
         vertexColors: useVertexColors ?? false,
