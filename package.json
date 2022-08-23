@@ -8,7 +8,8 @@
     "build": "webpack --mode production",
     "types": "tsc src/index.ts --declaration --allowJs --emitDeclarationOnly --outDir dist",
     "lint": "eslint --ext .js,.ts src",
-    "lintfix": "eslint --ext .js,.ts --fix src"
+    "lintfix": "eslint --ext .js,.ts --fix src",
+    "server": "http-server"
   },
   "keywords": [
     "urban data",
@@ -34,8 +35,10 @@
     "babel-loader": "^8.2.5",
     "eslint": "^8.17.0",
     "fork-ts-checker-webpack-plugin": "^7.2.11",
+    "http-server": "^14.1.1",
     "ts-loader": "^9.3.0",
     "ts-node": "^10.8.1",
+    "typedoc": "^0.23.10",
     "typescript": "^4.7.3",
     "webpack": "^5.73.0",
     "webpack-cli": "^4.9.2"
@@ -43,7 +46,6 @@
   "dependencies": {
     "@types/three": "^0.141.0",
     "axios": "^0.27.2",
-    "three": "^0.141.0",
-    "typedoc": "^0.23.10"
+    "three": "^0.141.0"
   }
 }

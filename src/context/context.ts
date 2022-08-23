@@ -3,19 +3,28 @@ import { Navigation, NavigationProps } from './navigation';
 import { GPUPicker } from './gpuPicker';
 import { MapControls, MapControlsProps } from './mapControls';
 import { LoaderWorkerPool } from '../loader/loader';
-import { SourceLabel } from './label';
+import { SourceLabel } from './copyright';
+import { CSS2DRenderer } from 'three/examples/jsm/renderers/CSS2DRenderer';
 
 
-function Renderer(props: GraphicsProps) {
+function Renderer(props: GraphicsProps, container: HTMLElement) {
     const renderer = new THREE.WebGLRenderer({
         canvas: props.canvas,
-        antialias: true,
+        antialias: false,
         powerPreference: 'high-performance'
     });
     renderer.setClearColor(props.background!, 1);
     renderer.setPixelRatio(window.devicePixelRatio);
 
-    return renderer;
+    const labelRenderer = new CSS2DRenderer();
+    labelRenderer.domElement.style.position = 'absolute';
+    labelRenderer.domElement.style.pointerEvents = 'none';
+    container.prepend(labelRenderer.domElement);
+
+    return {
+        renderer,
+        labelRenderer
+    }
 }
 
 export interface GraphicsProps extends NavigationProps, MapControlsProps {
@@ -60,7 +69,11 @@ function propsDefaults(props: GraphicsProps) {
 export function GraphicContext(props: GraphicsProps) : GraphicContext {
     propsDefaults(props);
     const canvas = props.canvas;
-    const renderer = Renderer(props);
+    const container = SourceLabel(props);
+    if (!container)
+        throw new Error('Cannot initialize renderer');
+
+    const { renderer, labelRenderer } = Renderer(props, container);
     const ratio = canvas.clientWidth / canvas.clientHeight;
     const camera = new THREE.PerspectiveCamera(5, ratio, props.near, props.far);
     const scene = new THREE.Scene();
@@ -69,12 +82,12 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
     const lights = Lights(props, scene);
     const navigation = Navigation(props, camera, controls);
     const loader = LoaderWorkerPool(props.loaderPath);
-    const container = SourceLabel(props);
 
     const frame = () => {
         requestAnimationFrame(frame);
         controls.update();
         renderer.render(scene, camera);
+        labelRenderer.render(scene, camera);
         //renderer.render(picker.pickingScene, camera);
     };
 
@@ -94,6 +107,7 @@ export function GraphicContext(props: GraphicsProps) : GraphicContext {
         camera.aspect = ratio;
         camera.updateProjectionMatrix();
         renderer.setSize(width, height);
+        labelRenderer.setSize(width, height);
         if (container) {
             container.style.width = width + 'px';
             container.style.height = height + 'px';    

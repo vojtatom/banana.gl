@@ -30,7 +30,9 @@ done
 VERSION=$version
 TAG_VERSION="v$VERSION"
 
-sed -i '' "s/${CURRENT_VERSION}/${VERSION}/" package.json
+mv package.json temp.json
+jq -r ".version |= \"${VERSION}\"" temp.json > package.json
+rm temp.json
 
 git add package.json
 if [ $? -ne 0 ]; then
