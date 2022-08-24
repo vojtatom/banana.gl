@@ -1,9 +1,10 @@
 import { GraphicsProps, GraphicContext } from './context/context';
-import { LayerProps, Layer } from './layer/layer';
+import { LayerProps, Layer, MetadataRecord } from './layer/layer';
 import { Style } from './loader/style/style';
+import { Labels } from './context/text';
 
 export interface BananaProps extends GraphicsProps {
-    onClick?: (id: number) => void;
+    onClick?: (id: number, metadata: MetadataRecord) => string;
 }
 
 export function BananaGL(props: BananaProps) {
@@ -11,6 +12,7 @@ export function BananaGL(props: BananaProps) {
     const canvas = props.canvas;
     let mouseLastDownTime = 0;
     let layers: Layer[] = [];
+    const labels = Labels(ctx);
 
     const loadLayer = (props: LayerProps) => {
         let layer = Layer(ctx, props);
@@ -38,8 +40,11 @@ export function BananaGL(props: BananaProps) {
             const x = e.clientX;
             const y = e.clientY;
             const id = ctx.picker.pick(x, y);
-            console.log(id);
-            console.log(getMetadata(id));
+            const data = getMetadata(id);
+            console.log(id, data);
+            if (data && data.bbox && props.onClick) {
+                labels.labelForBBox(data.bbox, props.onClick(id, data), id);
+            }
         }
 
         ctx.navigation.update();

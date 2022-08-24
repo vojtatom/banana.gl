@@ -2,6 +2,7 @@ import { GraphicsProps } from "./context";
 
 export function SourceLabel(props: GraphicsProps) {
     const container = document.createElement('div');
+    container.id = "BananaGLContainer";
     const parent = props.canvas.parentElement;
     if (!parent)
     return;

@@ -153,7 +153,12 @@
                 canvas: canvas,
                 loaderPath: "../../dist/loaderWorker.js",
                 background: 0x151d29,
-                //background: 0xd6e7f7,
+                lightIntensity: 0.5,
+                onClick: (id, metadata) => {
+                    if (!metadata.height)
+                        return "no height"
+                    return "~" + metadata.height.toFixed(0) + " m";
+                }
             });
 
             gl.loadLayer({
@@ -199,7 +204,7 @@
             gl.loadLayer({
                 api: "https://data.metacity.cc/trees",
                 pointInstance: "tree.glb",
-                pointColor: 0x008800,
+                pointColor: 0xdddddd,
             });
         }
     </script>

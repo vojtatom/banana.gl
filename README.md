@@ -1,4 +1,4 @@
-# BananaGL 🍌
+# 🗺 BananaGL 
 
 ![BananaGL](./title.png)
 
