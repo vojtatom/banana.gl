@@ -157,7 +157,7 @@
                 onClick: (id, metadata) => {
                     if (!metadata.height)
                         return "no height"
-                    return "~" + metadata.height.toFixed(2) + " m";
+                    return "~" + metadata.height.toFixed(0) + " m";
                 }
             });
 

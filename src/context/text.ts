@@ -11,12 +11,13 @@ function Label(ctx: GraphicContext, x: number, y: number, z: number, text: strin
     const elm = document.createElement( 'div' ) as HTMLDivElement;
     elm.className = 'label';
     elm.textContent = text;
-    elm.style.background = '#ffffff';
+    elm.style.background = 'rgba(255, 255, 255, 0.7)';
     elm.style.color = '#000000';
     elm.style.fontSize = '1em';
     elm.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
     elm.style.borderRadius = '0.3em';
     elm.style.padding = '0 0.5em';
+
 
     //text.style.zIndex = '3';
 
