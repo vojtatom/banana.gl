@@ -37,7 +37,7 @@ function updateURL(position: THREE.Vector3, target: THREE.Vector3) {
     url.searchParams.set('position', loc);
     url.searchParams.set('target', tar);
 
-    window.history.pushState({}, '', url.href);
+    window.history.replaceState({}, '', url.href);
 }
 
 

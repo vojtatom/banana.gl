@@ -93,25 +93,8 @@
             margin: 0;
             border-radius: 0.25rem;
             background: linear-gradient(to right,
-                     #AED6F1,
-                     #AED6F1,
-                     #229954,
-                     #27AE60,
-                     #2ECC71,
-                     #58D68D,
-                     #82E0AA,
-                     #ABEBC6,
-                     #D5F5E3,
-                     #FCF3CF,
-                     #F9E79F,
-                     #F7DC6F,
-                     #FAD7A0,
-                     #F8C471,
-                     #F0B27A,
-                     #E67E22,
-                     #D35400,
-                     #CB4335,
-                     #CB4335);
+                     #0088FF,
+                     #FF0088);
         }
 
         #legend #labels {
@@ -144,16 +127,16 @@
             </div>
         </div>
     </div>
-    <script src="../../dist/bananagl.js"></script>
+    <script src="./dist/bananagl.js"></script>
     <script>
         window.onload = () => {
             const canvas = document.getElementById("canvas");
 
             const gl = new BananaGL.BananaGL({ 
                 canvas: canvas,
-                loaderPath: "../../dist/loaderWorker.js",
+                loaderPath: "./dist/loaderWorker.js",
                 background: 0x151d29,
-                lightIntensity: 0.5,
+                lightIntensity: 0.8,
                 onClick: (id, metadata) => {
                     if (!metadata.height)
                         return "no height"
@@ -168,23 +151,8 @@
                 pickable: true,
                 styles: [
                     gl.style.withAttributeRangeExt("height", 20, 50).useColor([
-                     0xAED6F1,
-                     0x229954,
-                     0x27AE60,
-                     0x2ECC71,
-                     0x58D68D,
-                     0x82E0AA,
-                     0xABEBC6,
-                     0xD5F5E3,
-                     0xFCF3CF,
-                     0xF9E79F,
-                     0xF7DC6F,
-                     0xFAD7A0,
-                     0xF8C471,
-                     0xF0B27A,
-                     0xE67E22,
-                     0xD35400,
-                     0xCB4335
+                     0x0088FF,
+                     0xFF0088
                     ]),
                     //gl.style.withAttributeRange("height", 0, 50).useColor([0x3333f3, 0xf33333 ]),
                     //gl.style.withAttributeRange("height", 0, 50).useColor([0x000000, 0xffffff]),
@@ -193,18 +161,18 @@
 
             gl.loadLayer({
                 api: "https://data.metacity.cc/terrain",
-                baseColor: 0xffffff,
+                baseColor: 0x122133,
             });
 
             gl.loadLayer({
                 api: "https://data.metacity.cc/bridges",
-                baseColor: 0xeeeeee,
+                baseColor: 0x223143,
             });
 
             gl.loadLayer({
                 api: "https://data.metacity.cc/trees",
                 pointInstance: "tree.glb",
-                pointColor: 0xdddddd,
+                pointColor: 0x8888FF,
             });
         }
     </script>
