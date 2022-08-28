@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <!-- Global site tag (gtag.js) - Google Analytics -->
+    <script async src="https://www.googletagmanager.com/gtag/js?id=G-2JEFEN33D7"></script>
+    <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js', new Date());
+
+    gtag('config', 'G-2JEFEN33D7');
+    </script>
+
+
+    <style>
+        @font-face {
+            font-family: 'RhetorikSansRegular';
+            src: url('./assets/RhetorikSans-Regular.woff2') format('woff2'),
+                 url('./assets/RhetorikSans-Regular.otf') format('opentype');
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-size: 14px;
+            line-height: 20px;
+            color: #333333;
+            background-color: #ffffff;
+
+            /* font antialiasing */
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        #canvasContainer {
+            width: 100%;
+            height: 100%;
+        }
+
+        #main {
+            width: 100vw;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        h1 {
+            font-family: 'RhetorikSansRegular', sans-serif;
+            line-height: 1rem;
+            font-size: 1em;
+            margin: 1em;
+            padding: 0;
+            color: #333333;
+        }
+
+        h1 .post {
+            color: #AAA;
+        }
+
+        a {
+            color: #008800;
+            text-decoration: none;
+            padding: 0.5rem;
+            background-color: #DDFFDD;
+            border-radius: 0.5rem;
+            margin-left: 0.2rem;
+        }
+
+        #legend {
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            position: absolute;
+            bottom: 1rem;
+            left: 1rem;
+            background: #fff;
+            border-radius: 0.5rem;
+            padding: 0 1em;
+        }
+
+        #legend h2 {
+            line-height: 1rem;
+            font-size: 1em;
+            margin: 1em 0 1em;
+            padding: 0;
+            color: #333333;
+        }
+
+        #legend #colormap {
+            width: 15rem;
+            height: 0.5rem;
+            margin: 0;
+            border-radius: 0.25rem;
+            background: linear-gradient(to right,
+            #ff7700,
+            #fca832,	
+            #fad661,
+            #c6ff75,
+            #6dff50,
+            #00ff22)
+        }
+
+        #legend #labels {
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            font-size: 0.8em;
+        }
+
+        #legend #labels div {
+            margin: 0.5em 0;
+        }
+    </style>
+
+    <title>Testing Project</title>
+</head>
+<body>
+    <div id="main">
+        <div id="canvasContainer">
+            <canvas id="canvas">Your browser does not support canvas</canvas>
+        </div>
+        <div id="legend">
+            <h2>Bridge Condition</h2>
+            <div id="map">
+                <div id="colormap"></div>
+                <div id="labels">
+                    <div>critical</div>
+                    <div>good</div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script src="../../dist/bananagl.js"></script>
+    <script>
+        window.onload = () => {
+            const canvas = document.getElementById("canvas");
+
+            const gl = new BananaGL.BananaGL({ 
+                canvas: canvas,
+                loaderPath: "../../dist/loaderWorker.js",
+                background: 0xc1d1db,
+                lightIntensity: 0.8,
+                onClick: (id, metadata) => {
+                    if (!metadata.STATUS)
+                        return "no data"
+                    //console.log("Metadata", metadata)
+                    return metadata.NAME+", grade: " + metadata.STATUS.toFixed(0) + "/6";
+                }
+            });
+
+            gl.loadLayer({
+                    api: "https://data.metacity.cc/terrain",
+                    baseColor: 0x002e4a, 
+            });
+
+            
+            gl.loadLayer({
+                api: "https://data.metacity.cc/buildings",
+                baseColor: 0x002e4a,
+            });
+
+    
+            gl.loadLayer({
+                api: "../../data/grid_mosty",
+                baseColor: 0xbebebe,
+                pickable: true,
+                styles: [   
+                    gl.style.withAttributeEqualTo("STATUS", 6).useColor(0xff7700),
+                    gl.style.withAttributeEqualTo("STATUS", 5).useColor(0xfca832),
+                    gl.style.withAttributeEqualTo("STATUS", 4).useColor(0xfad661),
+                    gl.style.withAttributeEqualTo("STATUS", 3).useColor(0xc6ff75),
+                    gl.style.withAttributeEqualTo("STATUS", 2).useColor(0x6dff50),
+                    gl.style.withAttributeEqualTo("STATUS", 1).useColor(0x00ff22)
+                ]
+            });
+
+            /*
+            gl.loadLayer({
+                api: "https://data.metacity.cc/utilization",
+                baseColor: 0xddc0aa,
+                //pickable: true,
+                styles: [
+                    gl.style.withAttributeEqualTo("KOD", "HY")  .useColor(0x4974a5), //hydro
+                ]
+            });
+            */
+
+            
+            
+        }
+    </script>
+
+</body>
+</html>
