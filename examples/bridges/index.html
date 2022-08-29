@@ -93,6 +93,8 @@
             margin: 0;
             border-radius: 0.25rem;
             background: linear-gradient(to right,
+            #ff0000,
+            #ff3300,
             #ff7700,
             #fca832,	
             #fad661,
@@ -145,7 +147,7 @@
                     if (!metadata.STATUS)
                         return "no data"
                     //console.log("Metadata", metadata)
-                    return metadata.NAME+", grade: " + metadata.STATUS.toFixed(0) + "/6";
+                    return metadata.NAME+", stav: " + metadata.S_DESC;
                 }
             });
 
@@ -162,10 +164,12 @@
 
     
             gl.loadLayer({
-                api: "../../data/grid_mosty",
+                api: "../../data/grid_mosty_update",
                 baseColor: 0xbebebe,
                 pickable: true,
                 styles: [   
+                    gl.style.withAttributeEqualTo("STATUS", 8).useColor(0xff0000),
+                    gl.style.withAttributeEqualTo("STATUS", 7).useColor(0xff3300),
                     gl.style.withAttributeEqualTo("STATUS", 6).useColor(0xff7700),
                     gl.style.withAttributeEqualTo("STATUS", 5).useColor(0xfca832),
                     gl.style.withAttributeEqualTo("STATUS", 4).useColor(0xfad661),
@@ -185,9 +189,6 @@
                 ]
             });
             */
-
-            
-            
         }
     </script>
 
