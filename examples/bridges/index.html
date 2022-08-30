@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
@@ -8,28 +9,24 @@
     <!-- Global site tag (gtag.js) - Google Analytics -->
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-2JEFEN33D7"></script>
     <script>
-    window.dataLayer = window.dataLayer || [];
-    function gtag(){dataLayer.push(arguments);}
-    gtag('js', new Date());
+        window.dataLayer = window.dataLayer || [];
+        function gtag() { dataLayer.push(arguments); }
+        gtag('js', new Date());
 
-    gtag('config', 'G-2JEFEN33D7');
+        gtag('config', 'G-2JEFEN33D7');
     </script>
 
 
     <style>
-        @font-face {
-            font-family: 'RhetorikSansRegular';
-            src: url('./assets/RhetorikSans-Regular.woff2') format('woff2'),
-                 url('./assets/RhetorikSans-Regular.otf') format('opentype');
-        }
-
-        body, html {
+        body,
+        html {
             margin: 0;
             padding: 0;
             font-size: 14px;
             line-height: 20px;
             color: #333333;
             background-color: #ffffff;
+            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
 
             /* font antialiasing */
             -webkit-font-smoothing: antialiased;
@@ -47,60 +44,31 @@
             overflow: hidden;
         }
 
-        h1 {
-            font-family: 'RhetorikSansRegular', sans-serif;
-            line-height: 1rem;
-            font-size: 1em;
-            margin: 1em;
-            padding: 0;
-            color: #333333;
-        }
-
-        h1 .post {
-            color: #AAA;
-        }
-
-        a {
-            color: #008800;
-            text-decoration: none;
-            padding: 0.5rem;
-            background-color: #DDFFDD;
-            border-radius: 0.5rem;
-            margin-left: 0.2rem;
-        }
-
         #legend {
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
             position: absolute;
-            bottom: 1rem;
-            left: 1rem;
-            background: #fff;
+            bottom: 0rem;
+            left: 0rem;
+            background: #181818;
+            color: #FFF;
             border-radius: 0.5rem;
-            padding: 0 1em;
+            margin: 1rem;
+            padding: 1em;
+            max-width: 20rem;
         }
 
         #legend h2 {
             line-height: 1rem;
             font-size: 1em;
-            margin: 1em 0 1em;
+            margin: 0.5em 0;
             padding: 0;
-            color: #333333;
         }
 
         #legend #colormap {
-            width: 15rem;
+            min-width: 15rem;
             height: 0.5rem;
             margin: 0;
             border-radius: 0.25rem;
-            background: linear-gradient(to right,
-            #ff0000,
-            #ff3300,
-            #ff7700,
-            #fca832,	
-            #fad661,
-            #c6ff75,
-            #6dff50,
-            #00ff22)
+            background: linear-gradient(to left, #00ff00, #ff8800, #ff0000, #8800ff)
         }
 
         #legend #labels {
@@ -113,10 +81,25 @@
         #legend #labels div {
             margin: 0.5em 0;
         }
+
+        #legend p {
+            max-width: 25rem;
+            line-height: 1.5rem;
+            font-size: 0.8em;
+            margin: 0.5em 0 1em;
+            padding: 0;
+        }
+
+        #legend a {
+            color: inherit;
+            text-decoration: none;
+            border-bottom: 1px solid #FFF;
+        }
     </style>
 
     <title>Testing Project</title>
 </head>
+
 <body>
     <div id="main">
         <div id="canvasContainer">
@@ -124,6 +107,7 @@
         </div>
         <div id="legend">
             <h2>Bridge Condition</h2>
+            <p>The <a href="http://bms.clevera.cz/Public">scraped data</a> has been mapped to bridge geometry. The accuracy of the mapping is limited by the format of the source data.</p>
             <div id="map">
                 <div id="colormap"></div>
                 <div id="labels">
@@ -138,59 +122,52 @@
         window.onload = () => {
             const canvas = document.getElementById("canvas");
 
-            const gl = new BananaGL.BananaGL({ 
+            const gl = new BananaGL.BananaGL({
                 canvas: canvas,
                 loaderPath: "../../dist/loaderWorker.js",
-                background: 0xc1d1db,
-                lightIntensity: 0.8,
+                //background: 0xc1d1db,
+                background: 0x222222,
+                ambientLightIntensity: 0.8,
+                directionalLightIntensity: 0.3,
+                invertCopyrightColor: true,
+                target: [-742977.5887998058, -1043265.9983578172, 0],
                 onClick: (id, metadata) => {
                     if (!metadata.STATUS)
                         return "no data"
                     //console.log("Metadata", metadata)
-                    return metadata.NAME+", stav: " + metadata.S_DESC;
+                    return metadata.NAME + ", stav: " + metadata.S_DESC;
                 }
             });
 
             gl.loadLayer({
-                    api: "https://data.metacity.cc/terrain",
-                    baseColor: 0x002e4a, 
+                api: "https://data.metacity.cc/terrain",
+                baseColor: 0x222222,
             });
 
-            
+
             gl.loadLayer({
                 api: "https://data.metacity.cc/buildings",
-                baseColor: 0x002e4a,
+                baseColor: 0x555555,
             });
 
-    
+            gl.loadLayer({
+                api: "https://data.metacity.cc/trees",
+                pointColor: 0x777777,
+            });
+
+
             gl.loadLayer({
                 api: "https://data.metacity.cc/bridgeconditions",
-                baseColor: 0xbebebe,
+                baseColor: 0x444444,
                 pickable: true,
-                styles: [   
-                    gl.style.withAttributeEqualTo("STATUS", 8).useColor(0xff0000),
-                    gl.style.withAttributeEqualTo("STATUS", 7).useColor(0xff3300),
-                    gl.style.withAttributeEqualTo("STATUS", 6).useColor(0xff7700),
-                    gl.style.withAttributeEqualTo("STATUS", 5).useColor(0xfca832),
-                    gl.style.withAttributeEqualTo("STATUS", 4).useColor(0xfad661),
-                    gl.style.withAttributeEqualTo("STATUS", 3).useColor(0xc6ff75),
-                    gl.style.withAttributeEqualTo("STATUS", 2).useColor(0x6dff50),
-                    gl.style.withAttributeEqualTo("STATUS", 1).useColor(0x00ff22)
-                ]
-            });
-
-            /*
-            gl.loadLayer({
-                api: "https://data.metacity.cc/utilization",
-                baseColor: 0xddc0aa,
-                //pickable: true,
                 styles: [
-                    gl.style.withAttributeEqualTo("KOD", "HY")  .useColor(0x4974a5), //hydro
+                    gl.style.withAttributeRangeExt("STATUS", 1, 8).useColor([
+                        0x00ff00, 0xff8800, 0xff0000, 0x8800ff]),
                 ]
             });
-            */
         }
     </script>
 
 </body>
+
 </html>

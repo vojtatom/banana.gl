@@ -34,13 +34,16 @@ export interface GraphicsProps extends NavigationProps, MapControlsProps {
     near?: number;
     far?: number;
     lightIntensity?: number;
+    ambientLightIntensity?: number;
+    directionalLightIntensity?: number;
+    invertCopyrightColor?: boolean;
 }
 
 function Lights(props: GraphicsProps, scene: THREE.Scene) {
-    const ambientLight = new THREE.AmbientLight(0xffffff, props.lightIntensity);
+    const ambientLight = new THREE.AmbientLight(0xffffff, props.ambientLightIntensity);
     scene.add(ambientLight);
 
-    const directionalLight = new THREE.DirectionalLight(0xffffff, props.lightIntensity);
+    const directionalLight = new THREE.DirectionalLight(0xffffff, props.directionalLightIntensity);
     directionalLight.position.set(0, 0, 10);
     directionalLight.target.position.set(0, 0, 0);
     scene.add(directionalLight);
@@ -62,7 +65,12 @@ function propsDefaults(props: GraphicsProps) {
     props.near = props.near ?? 1000;
     props.far = props.far ?? 100000;
     props.background = props.background ?? 0xffffff;
-    props.lightIntensity = props.lightIntensity ?? 0.5;
+    props.ambientLightIntensity = props.ambientLightIntensity ?? 0.5;
+    props.directionalLightIntensity = props.directionalLightIntensity ?? 0.5;
+    if (props.lightIntensity) {
+        props.ambientLightIntensity = props.lightIntensity;
+        props.directionalLightIntensity = props.lightIntensity;
+    }
 }
 
 
