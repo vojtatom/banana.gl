@@ -64,7 +64,7 @@
         }
     </style>
 
-    <title>Testing Project</title>
+    <title>Metacity - Prague: Area Utilization</title>
 </head>
 <body>
     <div id="main">
@@ -72,14 +72,14 @@
             <canvas id="canvas">Your browser does not support canvas</canvas>
         </div>
     </div>
-    <script src="../../dist/bananagl.js"></script>
+    <script src="../dist/bananagl.js"></script>
     <script>
         window.onload = () => {
             const canvas = document.getElementById("canvas");
 
             const gl = new BananaGL.BananaGL({ 
                 canvas: canvas,
-                loaderPath: "../../dist/loaderWorker.js",
+                loaderPath: "../dist/loaderWorker.js",
                 background: 0xffffff,
                 target: [-740950.069802194, -1044736.5634868914, 4.564565178873129e-15],
                 lightIntensity: 0.8
