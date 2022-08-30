@@ -68,7 +68,17 @@
             height: 0.5rem;
             margin: 0;
             border-radius: 0.25rem;
-            background: linear-gradient(to left, #00ff00, #ff8800, #ff0000, #8800ff)
+            background: linear-gradient(to left, #00ff00, #ff8800, #ff0000, #8800ff);
+            display: flex;
+            flex-direction: row;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+        }
+
+        #colormap .marker {
+            height: 1rem;
+            font-size: 0.8em;
+            padding-top: 0.5rem;
         }
 
         #legend #labels {
@@ -86,7 +96,7 @@
             max-width: 25rem;
             line-height: 1.5rem;
             font-size: 0.8em;
-            margin: 0.5em 0 1em;
+            margin: 0.5em 0;
             padding: 0;
         }
 
@@ -106,14 +116,23 @@
             <canvas id="canvas">Your browser does not support canvas</canvas>
         </div>
         <div id="legend">
-            <h2>Prague: Bridge Conditions</h2>
-            <p>The <a href="http://bms.clevera.cz/Public">scraped data</a> has been mapped to bridge geometry. The validity of the mapping is limited by the accuracy of the source data.</p>
+            <h2>Prague: Bridge Conditions in 2022</h2>
             <div id="map">
-                <div id="colormap"></div>
+                <div id="colormap">
+                    <div class="marker">8</div>
+                    <div class="marker">7</div>
+                    <div class="marker">6</div>
+                    <div class="marker">5</div>
+                    <div class="marker">4</div>
+                    <div class="marker">3</div>
+                    <div class="marker">2</div>
+                    <div class="marker">1</div>
+                </div>
                 <div id="labels">
                     <div>critical</div>
                     <div>good</div>
                 </div>
+                <p>The <a href="http://bms.clevera.cz/Public">scraped data</a> containing the condition of the contructions has been mapped to bridge geometry. The validity of the mapping is limited by the accuracy of the source data.</p>
             </div>
         </div>
     </div>
