@@ -20,11 +20,10 @@ export function linearInterpolateColor(colorHexMap: number[], index: number) {
     if (colorHexMap.length == 1) {
         return colorHexMap[0];
     }
-
     const index0 = Math.floor(index * (colorHexMap.length - 1));
     const index1 = Math.min(index0 + 1, colorHexMap.length - 1);
-    const fade = index - index0 / (colorHexMap.length - 1);
-
+    const F = 1 / (colorHexMap.length - 1);
+    const fade = (index - index0 * F) / F;
     return lerpColor(colorHexMap[index0], colorHexMap[index1], fade);
 
 }
