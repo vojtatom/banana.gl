@@ -23,7 +23,6 @@ function Label(ctx: GraphicContext, x: number, y: number, z: number, text: strin
 
     const label = new CSS2DObject( elm );
     label.position.set(x, y, z);
-    console.log(x, y, z);
     ctx.scene.add( label );
     return label;
 }

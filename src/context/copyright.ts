@@ -16,8 +16,8 @@ export function SourceLabel(props: GraphicsProps) {
     label.style.position = 'absolute';
     label.style.bottom = '0';
     label.style.right = '10px';
-    label.style.background = '#ffffff';
-    label.style.color = '#000000';
+    label.style.background = props.invertCopyrightColor ? '#111111' : '#ffffff';
+    label.style.color = props.invertCopyrightColor ? '#FFFFFF' : '#000000';
     label.style.fontSize = '10px';
     label.style.fontFamily = '-apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue", sans-serif';
     label.style.borderRadius = '5px 5px 0 0';

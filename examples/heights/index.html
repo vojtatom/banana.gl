@@ -109,7 +109,7 @@
         }
     </style>
 
-    <title>Testing Project</title>
+    <title>Metacity - Prague: Building Heights</title>
 </head>
 <body>
     <div id="main">
@@ -117,7 +117,7 @@
             <canvas id="canvas">Your browser does not support canvas</canvas>
         </div>
         <div id="legend">
-            <h2>Building Height</h2>
+            <h2>Prague: Building Heights</h2>
             <div id="map">
                 <div id="colormap"></div>
                 <div id="labels">
@@ -137,6 +137,7 @@
                 loaderPath: "./dist/loaderWorker.js",
                 background: 0x151d29,
                 lightIntensity: 0.8,
+                target: [ -742977.5887998058, -1043265.9983578172, 0],
                 onClick: (id, metadata) => {
                     if (!metadata.height)
                         return "no height"

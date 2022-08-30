@@ -88,17 +88,22 @@ export function Navigation(props: NavigationProps, camera: THREE.Camera, control
     };
 
     function positionCamera(target: THREE.Vector3, position?: THREE.Vector3) {
-        console.log('positionCamera', target, position);
+
         if (!position)
         {
             position = target.clone();
             const o = props.offset ?? 8000;
-            const offset = new THREE.Vector3(-o, o, o);
+            const offset = southNorthIsoView(o);
             position.add(offset);
         }
 
         controls.target.copy(target);
         camera.position.copy(position);
         updateURL(camera.position, controls.target);
+
+    }
+
+    function southNorthIsoView(o: number) {
+        return new THREE.Vector3(0, -o, o);
     }
 }

@@ -7,6 +7,7 @@ export interface MaterialLibraryProps {
     baseColor?: number;
     lineColor?: number;
     pointColor?: number;
+    loadindColor?: number;
 }
 
 export interface MaterialLibrary {
@@ -22,6 +23,7 @@ function propsDefaults(props: MaterialLibraryProps) {
     props.baseColor = props.baseColor ?? 0xffffff;
     props.lineColor = props.lineColor ?? 0x000000;
     props.pointColor = props.pointColor ?? 0x000000;
+    props.loadindColor = props.loadindColor ?? 0x88ff88;
 }
 
 export function MaterialLibrary(props: MaterialLibraryProps, useVertexColors?: boolean): MaterialLibrary {
@@ -29,13 +31,13 @@ export function MaterialLibrary(props: MaterialLibraryProps, useVertexColors?: b
 
     const mesh = new MeshLambertMaterial({
         side: THREE.DoubleSide,
-        color: props.baseColor,
+        color: useVertexColors ? undefined : props.baseColor,
         vertexColors: useVertexColors ?? false,
     });
 
     const line = new LineMaterial({
         color: props.lineColor,
-        linewidth: 5
+        linewidth: 5,
     });
 
     const point = new PointsMaterial({
@@ -46,7 +48,7 @@ export function MaterialLibrary(props: MaterialLibraryProps, useVertexColors?: b
 
     const loading = new MeshBasicMaterial({
         side: THREE.DoubleSide,
-        color: 0x88ff88,
+        color: props.loadindColor,
     });
 
     return {
