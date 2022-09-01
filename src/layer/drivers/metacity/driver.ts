@@ -38,7 +38,7 @@ export class MetacityDriver implements Driver<MetacityDriverProps> {
         }, this.layer));
     }
 
-    async loadTiles(target: THREE.Vector3, position: THREE.Vector3) {
+    async updateView(target: THREE.Vector3, position: THREE.Vector3) {
         const tilesToLoad = this.tiles.filter((tile) => tile.dist(target.x, target.y) < this.loadRadius);
         await Promise.all(tilesToLoad.map((tile) => tile.load(target, position)));
     }

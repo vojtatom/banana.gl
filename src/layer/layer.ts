@@ -44,8 +44,8 @@ export class Layer {
 
         await this.driver.init();
         this.ctx.navigation.positionCameraIfNotSet(this.driver.center);
-        this.ctx.navigation.onchange = (target, position) => this.driver.loadTiles(target, position);  
-        this.driver.loadTiles(this.ctx.navigation.target, this.ctx.navigation.position);
+        this.ctx.navigation.onchange = (target, position) => this.driver.updateView(target, position);  
+        this.driver.updateView(this.ctx.navigation.target, this.ctx.navigation.position);
     }
 
     selectDriver(props: LayerProps) {

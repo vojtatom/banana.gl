@@ -73,20 +73,24 @@ export class MetacityTileLOD {
     
     private afterload(data: ParsedData) {
         this.state = State.Loaded;
-        for(let i = 0; i < this.onload_.length; i++)
-            this.onload_[i](data);
-        //cache the data for other lods
-        this.data = data;
-        this.onload_ = [];
+        this.cacheAndYield(data);
+        this.setupModels(data);
 
-        //setup models
+        //setup metadata
+        for (const id in data.metadata) {
+            this.layer.metadata[id] = data.metadata[id];
+        }
+
+    }
+
+    private setupModels(data: ParsedData) {
         if (data.mesh) {
-            const mesh = new MeshModel(data.mesh, this.layer.materials)
+            const mesh = new MeshModel(data.mesh, this.layer.materials);
             this.models.push(mesh);
             if (this.layer.pickable)
                 this.layer.ctx.picker.addPickable(mesh);
         }
-        
+
         //The only actual LOD difference for now
         if (data.points) {
             if (this.lod === 1 && this.layer.pointInstance) {
@@ -97,17 +101,17 @@ export class MetacityTileLOD {
             }
         }
 
-        for(let i = 0; i < this.models.length; i++)
-        {
+        for (let i = 0; i < this.models.length; i++) {
             this.models[i].visible = this.visible_;
             this.layer.ctx.scene.add(this.models[i]);
         }
+    }
 
-        //setup metadata
-        for (const id in data.metadata) {
-            this.layer.metadata[id] = data.metadata[id];
-        }
-
+    private cacheAndYield(data: ParsedData) {
+        for (let i = 0; i < this.onload_.length; i++)
+            this.onload_[i](data);
+        this.data = data;
+        this.onload_ = [];
     }
 }
 
