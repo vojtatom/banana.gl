@@ -69,13 +69,8 @@ function toResultForm(geometry?: THREE.BufferGeometry) {
 }
 
 import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
-
 
 const loader = new GLTFLoader();
-const dracoLoader = new DRACOLoader();
-loader.setDRACOLoader(dracoLoader);
-
 
 function loadGLTF(file: string, callback: (gltf: GLTF) => void) {
     loader.load(file, callback);

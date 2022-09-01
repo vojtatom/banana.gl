@@ -4,9 +4,6 @@ import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 
 const loader = new GLTFLoader();
-const dracoLoader = new DRACOLoader();
-loader.setDRACOLoader(dracoLoader);
-
 
 function loadGLTF(model: string) {
     const models = new Promise<GLTF>(resolve => loader.load(model, resolve));
