@@ -1,4 +1,4 @@
-import { MetadataRecord } from '../../layer/layer';
+import { MetadataRecord } from '../../../layer/layer';
 
 export abstract class StyleRule {
     $type?: string;

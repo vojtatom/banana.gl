@@ -143,8 +143,7 @@
 
             const gl = new BananaGL.BananaGL({
                 canvas: canvas,
-                loaderPath: "../../dist/loaderWorker.js",
-                //background: 0xc1d1db,
+                metacityLoader: "../../dist/metacityWorker.js",
                 background: 0x222222,
                 ambientLightIntensity: 0.8,
                 directionalLightIntensity: 0.3,
@@ -171,7 +170,7 @@
 
             gl.loadLayer({
                 api: "https://data.metacity.cc/trees",
-                pointColor: 0x777777,
+                baseColor: 0x777777,
             });
 
 

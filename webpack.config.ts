@@ -42,17 +42,17 @@ const configMain: Configuration = {
   ...common
 };
 
-const configLoader: Configuration = {
+const configMTCTW: Configuration = {
   entry: {
-    loaderWorker: './src/loader/worker.ts'
+    metacityWorker: './src/workers/metacity/worker.ts'
   },
   output: {
     path: path.resolve(__dirname, "dist"),
     filename: "[name].js",
-    library:'BananaGLLoader',
+    library:'MetacityWorker',
     libraryTarget: 'umd'
   },
   ...common
 };
 
-export default [configMain, configLoader];
+export default [configMain, configMTCTW];

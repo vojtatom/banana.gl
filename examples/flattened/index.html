@@ -72,17 +72,18 @@
             <canvas id="canvas">Your browser does not support canvas</canvas>
         </div>
     </div>
-    <script src="../dist/bananagl.js"></script>
+    <script src="../../dist/bananagl.js"></script>
     <script>
         window.onload = () => {
             const canvas = document.getElementById("canvas");
 
             const gl = new BananaGL.BananaGL({ 
                 canvas: canvas,
-                loaderPath: "../dist/loaderWorker.js",
+                metacityLoader: "../../dist/metacityWorker.js",
                 background: 0xffffff,
                 target: [-740950.069802194, -1044736.5634868914, 4.564565178873129e-15],
-                lightIntensity: 0.8
+                ambientLightIntensity: 0.9,
+                directionalLightIntensity: 0.6,
             });
 
             gl.loadLayer({
@@ -127,19 +128,12 @@
             gl.loadLayer({
                 api: "https://data.metacity.cc/buildingsflatsimple",
                 baseColor: 0xF8F8F8,
-                //pickable: true,
-                styles: [
-                    //gl.style.withAttributeRangeExt("height", 20, 50).useColor([0x666699, 0xff66ff]),
-                    //gl.style.withAttributeRangeExt("height", 20, 50).useColor([0x999999, 0xFFFFFE])
-                    //gl.style.withAttributeRangeExt("height", 20, 50).useColor([0x8686d9, 0xff66ff]),
-                    //gl.style.withAttributeRangeExt("height", 20, 50).useColor([0xa1a1e3, 0xfc9ffc]),
-                ]
             });
 
             gl.loadLayer({
                 api: "https://data.metacity.cc/treesflat",
                 pointInstance: "tree.glb",
-                pointColor: 0x00BB00,
+                baseColor: 0x00BB00,
             });
         }
     </script>

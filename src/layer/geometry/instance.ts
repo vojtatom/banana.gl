@@ -1,45 +1,43 @@
 import * as THREE from 'three';
-import { GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
+import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
 import { DRACOLoader } from 'three/examples/jsm/loaders/DRACOLoader';
 
 
 const loader = new GLTFLoader();
 const dracoLoader = new DRACOLoader();
-loader.setDRACOLoader( dracoLoader );
+loader.setDRACOLoader(dracoLoader);
 
 
-function recursiveExtractMeshes(object: THREE.Object3D, meshes: THREE.Mesh[]) {
-    if (object instanceof THREE.Group || object instanceof THREE.Mesh) {
-        object.children.forEach((child) => {
-            recursiveExtractMeshes(child, meshes);
-        });
+function loadGLTF(model: string) {
+    const models = new Promise<GLTF>(resolve => loader.load(model, resolve));
+    return models;
+}
+
+
+export class PointInstance {
+    models: THREE.Mesh[] = [];
+    path: string;
+    constructor(path: string) {
+        this.path = path;
     }
     
-    if (object instanceof THREE.Mesh) {
-        object.children = [];
-        meshes.push(object);
+    async load() {
+        const gltf = await loadGLTF(this.path);
+        this.recursiveExtractMeshes(gltf.scene);
+    }
+
+    private recursiveExtractMeshes(object: THREE.Object3D) {
+        if (object instanceof THREE.Group || object instanceof THREE.Mesh) {
+            for (let i = 0; i < object.children.length; i++)
+                this.recursiveExtractMeshes(object.children[i]);
+        }
+    
+        if (object instanceof THREE.Mesh) {
+            object.children = [];
+            this.models.push(object);
+        }
     }
 }
 
-function loadGLTF(model: string, callback: (model: THREE.Mesh[]) => void) {
-    loader.load(model, (gltf) => {
-        const meshes: THREE.Mesh[] = [];
-        recursiveExtractMeshes(gltf.scene, meshes);
-        callback(meshes);
-    }, undefined, (error) => {
-        console.error(error);
-    });
-}
 
-export function PointInstanceModel(path: string) {
-    const instanceModels: THREE.Mesh[] = [];
-
-    loadGLTF(path, (meshes) => {
-        meshes.forEach((mesh) => {
-            instanceModels.push(mesh);
-        });
-    });
-
-    return instanceModels;
-}
 

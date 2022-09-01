@@ -1,6 +1,10 @@
-import { GraphicsProps } from "./context";
 
-export function SourceLabel(props: GraphicsProps) {
+export interface CopyrightProps {
+    invertCopyrightColor: boolean;
+    canvas: HTMLCanvasElement;
+}
+
+export function createCopyrightLabel(props: CopyrightProps) {
     const container = document.createElement('div');
     container.id = "BananaGLContainer";
     const parent = props.canvas.parentElement;
@@ -23,8 +27,6 @@ export function SourceLabel(props: GraphicsProps) {
     label.style.borderRadius = '5px 5px 0 0';
     label.style.padding = '2px 5px';
     const year = new Date().getFullYear();
-
-
 
     const sources = document.createElement('a');
     sources.href = 'https://api.metacity.cc';

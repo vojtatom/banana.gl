@@ -1,27 +1,25 @@
 import * as THREE from 'three';
-import { ParsedData } from '../../loader/worker';
-import { Layer } from '../layer';
+import { MaterialLibrary } from '../materials';
 
 
-export function MeshGeometry(data: ParsedData, layer: Layer) {
-    if (!data.mesh)
-        return;
+export interface MeshData {
+    positions: Float32Array;
+    normals: Float32Array;
+    ids: Float32Array;
+    colors?: Float32Array;
+} 
 
-    const { mesh } = data;
-    const geometry = new THREE.BufferGeometry();
-    geometry.setAttribute('position', new THREE.BufferAttribute(mesh.positions, 3));
-    geometry.setAttribute('normal', new THREE.BufferAttribute(mesh.normals, 3));
-    geometry.setAttribute('idcolor', new THREE.BufferAttribute(mesh.ids, 3));
 
-    if (mesh.colors)
-        geometry.setAttribute('color', new THREE.BufferAttribute(mesh.colors, 3));
-        
-    const m = new THREE.Mesh(geometry, layer.materials.mesh);
+export class MeshModel extends THREE.Mesh {
+    constructor(data: MeshData, materials: MaterialLibrary) {
+        const geometry = new THREE.BufferGeometry();
+        geometry.setAttribute('position', new THREE.BufferAttribute(data.positions, 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(data.normals, 3));
+        geometry.setAttribute('idcolor', new THREE.BufferAttribute(data.ids, 3));
 
-    if (layer.pickable) {
-        layer.ctx.picker.addPickable(m);
+        if (data.colors)
+            geometry.setAttribute('color', new THREE.BufferAttribute(data.colors, 3));
+
+        super(geometry, materials.mesh);
     }
-
-    layer.ctx.scene.add(m);
-    return m;
 }

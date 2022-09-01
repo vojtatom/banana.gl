@@ -17,12 +17,6 @@
 
 
     <style>
-        @font-face {
-            font-family: 'RhetorikSansRegular';
-            src: url('./assets/RhetorikSans-Regular.woff2') format('woff2'),
-                 url('./assets/RhetorikSans-Regular.otf') format('opentype');
-        }
-
         body, html {
             margin: 0;
             padding: 0;
@@ -127,14 +121,15 @@
             </div>
         </div>
     </div>
-    <script src="./dist/bananagl.js"></script>
+    <script src="../../dist/bananagl.js"></script>
     <script>
         window.onload = () => {
             const canvas = document.getElementById("canvas");
 
             const gl = new BananaGL.BananaGL({ 
                 canvas: canvas,
-                loaderPath: "./dist/loaderWorker.js",
+                metacityLoader: "../../dist/metacityWorker.js",
+
                 background: 0x151d29,
                 lightIntensity: 0.8,
                 target: [ -742977.5887998058, -1043265.9983578172, 0],
@@ -173,7 +168,7 @@
             gl.loadLayer({
                 api: "https://data.metacity.cc/trees",
                 pointInstance: "tree.glb",
-                pointColor: 0x8888FF,
+                baseColor: 0x8888FF,
             });
         }
     </script>

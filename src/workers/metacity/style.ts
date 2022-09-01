@@ -1,5 +1,5 @@
 import { Color } from 'three';
-import { MetadataTable } from '../layer/layer';
+import { MetadataTable } from '../../layer/layer';
 import { Style } from './style/style';
 
 
@@ -42,14 +42,11 @@ function computeColorBuffer(ids: Float32Array, colorTable: Map<number, Color>) {
 }
 
 
-export function applyStyle(styles: string[], baseColor: number, geom: THREE.BufferGeometry | undefined, metadata: MetadataTable) {
-    if (!geom)
-        return;
-
+export function applyStyle(styles: string[], baseColor: number, geom: THREE.BufferGeometry, metadata: MetadataTable) {
     const ids = geom.getAttribute('ids')?.array as Float32Array;
     const stylesCls = [];
     for (let i = 0; i < styles.length; i++)
-        stylesCls.push(Style().deserialize(styles[i]));
+        stylesCls.push(Style.deserialize(styles[i]));
     const colorTable = computeColorTable(stylesCls, baseColor, metadata);
     const colorBuffer = computeColorBuffer(ids, colorTable);
     return colorBuffer;
