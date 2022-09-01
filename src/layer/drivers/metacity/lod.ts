@@ -17,7 +17,7 @@ enum State {
 export class MetacityTileLOD {
     state: State = State.Uninitialized;
     private models: THREE.Object3D[] = [];
-    private data: ParsedData | undefined;
+    private cache: ParsedData | undefined;
     private onload_: CallableFunction[] = [];
     private visible_: boolean = false;
 
@@ -37,8 +37,8 @@ export class MetacityTileLOD {
     }
 
     set onload(callback: (data: ParsedData) => void) {
-        if (this.state === State.Loaded && this.data) {
-            callback(this.data);
+        if (this.state === State.Loaded && this.cache) {
+            callback(this.cache);
         } else {
             this.onload_.push(callback);
         }
@@ -110,7 +110,7 @@ export class MetacityTileLOD {
     private cacheAndYield(data: ParsedData) {
         for (let i = 0; i < this.onload_.length; i++)
             this.onload_[i](data);
-        this.data = data;
+        this.cache = data;
         this.onload_ = [];
     }
 }

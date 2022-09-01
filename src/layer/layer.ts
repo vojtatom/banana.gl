@@ -48,7 +48,7 @@ export class Layer {
         this.driver.updateView(this.ctx.navigation.target, this.ctx.navigation.position);
     }
 
-    selectDriver(props: LayerProps) {
+    private selectDriver(props: LayerProps) {
         if (props.api.endsWith('.json'))
             throw Error('GeoJSON API not implemented');
         else

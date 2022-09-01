@@ -82,13 +82,15 @@
                 metacityLoader: "../../dist/metacityWorker.js",
                 background: 0xffffff,
                 target: [-740950.069802194, -1044736.5634868914, 4.564565178873129e-15],
-                ambientLightIntensity: 0.85,
-                directionalLightIntensity: 0.6,
+                ambientLightIntensity: 0.8,
+                directionalLightIntensity: 0.7,
             });
 
             gl.loadLayer({
                 api: "https://data.metacity.cc/utilization",
                 baseColor: 0xeeeeee,
+                placeholderColor: 0x00FF00,
+                placeholderOpacity: 0.1,
                 //pickable: true,
                 styles: [
                     gl.style.withAttributeEqualTo("KOD", "VN")  .useColor(0xA8A8A8), //významné ulice, silnice

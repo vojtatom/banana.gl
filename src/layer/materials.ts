@@ -6,6 +6,7 @@ import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
 export interface MaterialLibraryProps {
     baseColor?: number;
     placeholderColor?: number;
+    placeholderOpacity?: number;
     loadindColor?: number;
 }
 
@@ -30,9 +31,10 @@ export class MaterialLibrary {
         this.placeholder = new MeshLambertMaterial({
             side: THREE.DoubleSide,
             color: props.placeholderColor ?? 0xaaaaaa,
-            opacity: 0.01,
+            opacity: props.placeholderOpacity ?? 0.01,
             transparent: true,
         });
+        console.log(this.placeholder);
 
         this.line = new LineMaterial({
             color: this.baseColor,
