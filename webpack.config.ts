@@ -2,7 +2,6 @@ import path from "path";
 import { Configuration } from "webpack";
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
-
 const common = {
   module: {
     rules: [

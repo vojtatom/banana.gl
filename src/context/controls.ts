@@ -27,7 +27,7 @@ export class MapControls extends OrbitControls {
         this.screenSpacePanning = false; // pan orthogonal to world-space direction camera.up
         this.mouseButtons.LEFT = THREE.MOUSE.PAN;
         this.mouseButtons.MIDDLE = THREE.MOUSE.ROTATE;
-        this.mouseButtons.RIGHT = THREE.MOUSE.DOLLY;
+        this.mouseButtons.RIGHT = THREE.MOUSE.ROTATE;
         this.touches.ONE = THREE.TOUCH.PAN;
         this.touches.TWO = THREE.TOUCH.DOLLY_ROTATE;
         this.zoomSpeed = props.zoomSpeed ?? 1;
