@@ -1,7 +1,7 @@
 {
     "compilerOptions": {
       "outDir": "types",
-      "target": "ES6",
+      "target": "ES2018",
       "strict": true,
       "esModuleInterop": true,
       "skipLibCheck": true,

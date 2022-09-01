@@ -11,7 +11,6 @@ export class PointModel extends THREE.Points {
     constructor(points: PointData, materials: MaterialLibrary) {
         const geometry = new THREE.BufferGeometry();
         geometry.setAttribute('position', new THREE.BufferAttribute(points.positions, 3));
-        geometry.setAttribute('idcolor', new THREE.BufferAttribute(points.ids, 3));
         super(geometry, materials.point);
         this.translateZ(1);
     }

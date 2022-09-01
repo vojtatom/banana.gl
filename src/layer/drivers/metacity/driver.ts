@@ -15,6 +15,7 @@ export interface MetacityDriverProps {
 export class MetacityDriver implements Driver<MetacityDriverProps> {
     readonly api: string;
     private loadRadius: number;
+    private loadRadiusSqr: number;
     private lodLimits: number[];
     private tileWidth: number = 0;
     private tileHeight: number = 0;
@@ -23,6 +24,7 @@ export class MetacityDriver implements Driver<MetacityDriverProps> {
     constructor(props: MetacityDriverProps, private layer: Layer) {
         this.api = props.api;
         this.loadRadius = props.loadRadius ?? 2000;
+        this.loadRadiusSqr = Math.pow(this.loadRadius, 2);
         this.lodLimits = props.lodLimits ?? [20000];
     }
 
@@ -39,8 +41,10 @@ export class MetacityDriver implements Driver<MetacityDriverProps> {
     }
 
     async updateView(target: THREE.Vector3, position: THREE.Vector3) {
-        const tilesToLoad = this.tiles.filter((tile) => tile.dist(target.x, target.y) < this.loadRadius);
-        await Promise.all(tilesToLoad.map((tile) => tile.load(target, position)));
+        const tilesToLoad = this.tiles.filter((tile) => tile.distRect(target.x, target.y) < this.loadRadius);
+        for (const tile of tilesToLoad) {
+            tile.load(target, position);
+        }
     }
 
     get center() {

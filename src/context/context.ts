@@ -14,6 +14,7 @@ export interface GraphicsProps extends NavigationProps, RendererProps, LightProp
 export class GraphicContext {
     readonly renderer: Renderer;
     readonly scene: THREE.Scene;
+    readonly labelScene: THREE.Scene;
     readonly navigation: Navigation;
     readonly lights: Lights;
     readonly picker: GPUPicker;
@@ -31,6 +32,7 @@ export class GraphicContext {
 
         this.renderer = new Renderer(props, container);
         this.scene = new THREE.Scene();
+        this.labelScene = new THREE.Scene();
         this.navigation = new Navigation(props);
         this.picker = new GPUPicker(this.renderer.renderer, this.navigation.camera);
         this.lights = new Lights(props, this.scene);
@@ -43,11 +45,11 @@ export class GraphicContext {
         this.frame();
     }
 
-    frame() {
-        requestAnimationFrame(() => this.frame());
+    async frame() {
         this.navigation.controls.update();
         this.renderer.renderer.render(this.scene, this.navigation.camera);
-        this.renderer.labelRenderer.render(this.scene, this.navigation.camera);
+        this.renderer.labelRenderer.render(this.labelScene, this.navigation.camera);
+        requestAnimationFrame(async () => this.frame());
         //renderer.render(picker.pickingScene, camera);
     };
 

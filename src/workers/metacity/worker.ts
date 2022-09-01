@@ -28,7 +28,7 @@ self.onmessage = (message: MessageEvent) => {
     loadModel(message);
 };
 
-async function loadModel(message: MessageEvent<MessageType<InputData>>) {
+function loadModel(message: MessageEvent<MessageType<InputData>>) {
     const { jobID, data } = message.data;
     const { file, idOffset, styles, baseColor } = data;
     loadGLTF(file, (gltf) => {
@@ -45,11 +45,13 @@ async function loadModel(message: MessageEvent<MessageType<InputData>>) {
         postMessage({
             jobID: jobID,
             result: {
-                metadata,
+                metadata: metadata,
                 mesh: toResultForm(buffers.meshes),
                 points: toResultForm(buffers.points),
             }
         });
+
+        (gltf as any) = null;
     });
 }
 

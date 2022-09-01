@@ -34,7 +34,6 @@ export class MaterialLibrary {
             opacity: props.placeholderOpacity ?? 0.01,
             transparent: true,
         });
-        console.log(this.placeholder);
 
         this.line = new LineMaterial({
             color: this.baseColor,

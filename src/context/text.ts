@@ -5,7 +5,9 @@ import { GraphicContext } from "./context";
 export class Labels {
     private labels = new Map<number, CSS2DObject>();
     
-    constructor(private ctx: GraphicContext) {}
+    constructor(private ctx: GraphicContext) {
+
+    }
 
     label(x: number, y: number, z: number, text: string, objectID?: number) {
         if (!objectID)
@@ -23,10 +25,14 @@ export class Labels {
         this.label(center[0], center[1], center[2], text, objectID);
     }
 
+    get size() {
+        return this.labels.size;
+    }
+
     private removeLabel(objectID: number) {
         const label = this.labels.get(objectID);
         if (label) {
-            this.ctx.scene.remove(label);
+            this.ctx.labelScene.remove(label);
             this.labels.delete(objectID);
             return true;
         }
@@ -37,7 +43,7 @@ export class Labels {
         const elm = this.createLabelElement(text);
         const label = new CSS2DObject(elm);
         label.position.set(x, y, z);
-        this.ctx.scene.add(label);
+        this.ctx.labelScene.add(label);
         return label;
     }
 

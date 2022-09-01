@@ -25,6 +25,9 @@ export class MetacityTile {
 
     private placeholder: THREE.Mesh | undefined;
     
+    readonly cx: number;
+    readonly cy: number;
+
     constructor(props: MetacityTileProps, layer: Layer) {
         this.x = props.x;
         this.y = props.y;
@@ -33,6 +36,8 @@ export class MetacityTile {
         this.height = props.tileHeight;
         this.lodLimits = props.lodLimits;
         this.url = `${layer.api}/${props.file}`;
+        this.cx = (this.x + 0.5) * this.width;
+        this.cy = (this.y + 0.5) * this.height;
 
         for(let i = 0; i < this.lodLimits.length + 1; i++)
             this.lods.push(new MetacityTileLOD(this, layer, i));
@@ -51,25 +56,24 @@ export class MetacityTile {
         this.toggleLOD(lodIndex);
     }
 
-    dist(x: number, y: number, z?: number) {
-        const dx = (this.x + 0.5) * this.width - x;
-        const dy = (this.y + 0.5) * this.height - y;
+    distSqr(x: number, y: number, z?: number) {
+        const dx = this.cx - x;
+        const dy = this.cy - y;
         const dz = z ? z : 0;
-        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+        return dx * dx + dy * dy + dz * dz;
     }
 
-    get cx() {
-        return (this.x + 0.5) * this.width;
+    distRect(x: number, y: number) {
+        const dx = Math.abs(this.cx - x);
+        const dy = Math.abs(this.cy - y);
+        return Math.max(dx, dy);
     }
 
-    get cy() {
-        return (this.y + 0.5) * this.height;
-    }
 
     //higher distance => lower LOD, the limits have to be sorted from the lowest to the highest
     private computeLOD(target: THREE.Vector3, position: THREE.Vector3) {
-        const dist = this.dist(position.x, position.y, position.z);
-        const lod = this.lodLimits.findIndex((limit) => dist < limit);
+        const dist = this.distSqr(position.x, position.y, position.z);
+        const lod = this.lodLimits.findIndex((limit) => dist < limit * limit);
         if (lod === -1)
             return 0;
         return lod + 1;
