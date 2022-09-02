@@ -8,7 +8,7 @@ import { Lights, LightProps } from './lights';
 
 
 export interface GraphicsProps extends NavigationProps, RendererProps, LightProps, CopyrightProps {
-    metacityLoader: string;
+    metacityWorker: string;
 }
 
 export class GraphicContext {
@@ -38,7 +38,7 @@ export class GraphicContext {
         this.lights = new Lights(props, this.scene);
 
         this.loaders = {
-            metacity: new MetacityLoaderWorkerPool(props.metacityLoader),
+            metacity: new MetacityLoaderWorkerPool(props.metacityWorker),
         };
 
         const frame = async () => {
