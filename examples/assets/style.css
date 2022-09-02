@@ -3,6 +3,7 @@
     --color-text: #444;
     --color-text-dim: #666;
     --underline-text: #DDD;
+    --background-item: #F5F5F5;
     --content-margin: 2rem;
     --content-width: 1000px;
 }
@@ -99,9 +100,9 @@ a.dim {
 
 .project {
     width: calc(33% - 0.5rem);
-    border: 1px dashed var(--underline-text);
     border-radius: 5px;
     margin: 0 0 1rem;
+    background: var(--background-item);
 }
 
 @media (max-width: 700px) {
