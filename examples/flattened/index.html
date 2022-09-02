@@ -72,14 +72,14 @@
             <canvas id="canvas">Your browser does not support canvas</canvas>
         </div>
     </div>
-    <script src="../../dist/bananagl.js"></script>
+    <script src="../dist/bananagl.js"></script>
     <script>
         window.onload = () => {
             const canvas = document.getElementById("canvas");
 
             const gl = new BananaGL.BananaGL({ 
                 canvas: canvas,
-                metacityWorker: "../../dist/metacityWorker.js",
+                metacityWorker: "../dist/metacityWorker.js",
                 background: 0xffffff,
                 target: [-740950.069802194, -1044736.5634868914, 4.564565178873129e-15],
                 ambientLightIntensity: 0.8,
