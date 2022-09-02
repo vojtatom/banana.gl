@@ -1,5 +1,5 @@
-import { InputData, ParsedData } from './metacity/data';
 import { WorkerPool } from './pool';
+import { InputData, ParsedData } from './metacity/worker';
 
 
 export type TileRequestData = {
@@ -14,7 +14,7 @@ export class MetacityLoaderWorkerPool extends WorkerPool<InputData, ParsedData> 
     idOffset = 0; 
     
     constructor(workerPath: string)  {
-        super(workerPath, 4);
+        super(workerPath, 5);
     }
 
     load(data: TileRequestData, callback: (output: ParsedData) => void) {

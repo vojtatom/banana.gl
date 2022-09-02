@@ -1,22 +1,21 @@
-
-import { MetadataTable } from '../../layer/metadata';
-import { colorHex } from '../../style/color';
-import { Style } from '../../style/style';
+import { Color } from 'three';
+import { MetadataTable } from '../../layer/layer';
+import { Style } from './style/style';
 
 
 function computeColorTable(styles: Style[], baseColor: number, metadataTable: MetadataTable) {
-    const colorTable = new Map<number, number[]>();
+    const colorTable = new Map<number, Color>();
     for (const obj in metadataTable) {
         let color = baseColor;
         for (let i = 0; i < styles.length; i++)
             color = styles[i].apply(metadataTable[obj]) ?? color;
-        colorTable.set(parseInt(obj), colorHex(color));
+        colorTable.set(parseInt(obj), new Color().setHex(color));
     }
     return colorTable;
 }
 
 
-function computeColorBuffer(ids: Float32Array, colorTable: Map<number, number[]>) {
+function computeColorBuffer(ids: Float32Array, colorTable: Map<number, Color>) {
     const colorBuffer = new Float32Array(ids.length);
     const idBuffer = new Uint8Array(4);
     const view = new DataView(idBuffer.buffer);
@@ -34,16 +33,17 @@ function computeColorBuffer(ids: Float32Array, colorTable: Map<number, number[]>
         id = idToNumber(offset);
         color = colorTable.get(id);
         if (color) {
-            colorBuffer[offset] = color[0];
-            colorBuffer[offset + 1] = color[1];
-            colorBuffer[offset + 2] = color[2];
+            colorBuffer[offset] = color.r;
+            colorBuffer[offset + 1] = color.g;
+            colorBuffer[offset + 2] = color.b;
         }
     }
     return colorBuffer;
 }
 
 
-export function applyStyle(styles: string[], baseColor: number, ids: Float32Array, metadata: MetadataTable) {
+export function applyStyle(styles: string[], baseColor: number, geom: THREE.BufferGeometry, metadata: MetadataTable) {
+    const ids = geom.getAttribute('ids')?.array as Float32Array;
     const stylesCls = [];
     for (let i = 0; i < styles.length; i++)
         stylesCls.push(Style.deserialize(styles[i]));

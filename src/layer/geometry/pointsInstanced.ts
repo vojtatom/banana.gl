@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { CullableInstancedMesh } from './cullable';
-import { MaterialLibrary } from '../layer/materials';
-import { PointData } from './data';
+import { MaterialLibrary } from '../materials';
+import { PointData } from './points';
 
 export class InstancedPointModel extends THREE.Group {
     private bsphere: THREE.Sphere = new THREE.Sphere();
@@ -12,7 +12,6 @@ export class InstancedPointModel extends THREE.Group {
         this.computeBoundingSphere(points);
         for(let i = 0; i < pointInstance.length; i++)
             this.initInstance(pointInstance[i], points, materials);
-        this.matrixAutoUpdate = false;
     }
 
     private initInstance(mesh: THREE.Mesh, points: PointData, materials: MaterialLibrary) {

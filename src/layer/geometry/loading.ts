@@ -1,5 +1,5 @@
 import * as THREE from 'three';
-import { MaterialLibrary } from '../layer/materials';
+import { MaterialLibrary } from '../materials';
 
 
 

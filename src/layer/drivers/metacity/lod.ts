@@ -1,10 +1,10 @@
+import { ParsedData } from "../../../workers/metacity/worker";
 import { InstancedPointModel } from "../../geometry/pointsInstanced";
 import { MeshModel } from "../../geometry/mesh";
-import { Layer } from "../../layer/layer";
+import { Layer } from "../../layer";
 import { MetacityTile } from "./tile";
 import { PointModel } from "../../geometry/points";
 import { LoadingMeshModel } from "../../geometry/loading";
-import { ParsedData } from "../../workers/metacity/data";
 
 
 enum State {
@@ -20,7 +20,6 @@ export class MetacityTileLOD {
     private cache: ParsedData | undefined;
     private onload_: CallableFunction[] = [];
     private visible_: boolean = false;
-    private animation_: LoadingMeshModel | undefined;
 
     constructor(private tile: MetacityTile, private layer: Layer, readonly lod: number) { }
 
@@ -46,9 +45,6 @@ export class MetacityTileLOD {
     }
 
     private async init() {
-        if (this.state === State.Loading)
-            return;
-
         this.state = State.Loading;
         for (let lod of this.tile.lods) {
             if (lod === this || lod.state === State.Uninitialized)
@@ -57,25 +53,25 @@ export class MetacityTileLOD {
             return;
         }
 
-        this.animation_ = new LoadingMeshModel(this.tile.cx, this.tile.cy, this.tile.width, this.tile.height, this.layer.materials);
-        this.layer.ctx.scene.add(this.animation_);
-        this.load();
+        const animation = new LoadingMeshModel(this.tile.cx, this.tile.cy, this.tile.width, this.tile.height, this.layer.materials);
+        this.layer.ctx.scene.add(animation);
+        const data = await this.load();
+        this.afterload(data);
+        this.layer.ctx.scene.remove(animation);
     }
     
     private load() {
-        this.layer.ctx.loaders.metacity.load({
+        return new Promise<ParsedData>(resolve => {
+            this.layer.ctx.loaders.metacity.load({
                 file: this.tile.url,
                 objectsToLoad: this.tile.size,
                 styles: this.layer.styles,
                 baseColor: this.layer.materials.baseColor,
-            }, (data) => this.afterload(data));
+            }, resolve)
+        });
     }
     
-    private async afterload(data: ParsedData) {
-        if (this.animation_){
-            this.layer.ctx.scene.remove(this.animation_);
-            this.animation_ = undefined;
-        }
+    private afterload(data: ParsedData) {
         this.state = State.Loaded;
         this.cacheAndYield(data);
         this.setupModels(data);
@@ -84,6 +80,7 @@ export class MetacityTileLOD {
         for (const id in data.metadata) {
             this.layer.metadata[id] = data.metadata[id];
         }
+
     }
 
     private setupModels(data: ParsedData) {

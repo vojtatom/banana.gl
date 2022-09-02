@@ -36,6 +36,16 @@ class Queue<JobType> {
     peek() { return this.head?.value; }
 }
 
+export interface MessageType<InputType> {
+    jobID: number;
+    data: InputType;
+}
+
+export interface OutputType<ResultType> {
+    jobID: number;
+    result: ResultType;
+}
+
 export class WorkerPool<InputType, ResultType> {
     workers: Worker[];
     worker_busy: boolean[];
@@ -66,10 +76,12 @@ export class WorkerPool<InputType, ResultType> {
     private initWorker(i: number) {
         this.workers[i] = new Worker(this.workerPath);
         this.workers[i].onmessage = (message) => {
-            const callback = this.resultMap.get(message.data.jobID);
+            const { data } = message;
+            const { result, jobID } = data;
+            const callback = this.resultMap.get(jobID);
             if (callback) {
-                callback(message.data.result);
-                this.resultMap.delete(message.data.jobID);
+                callback(result);
+                this.resultMap.delete(jobID);
             }
             this.worker_busy[i] = false;
             this.submit();
