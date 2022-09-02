@@ -1,4 +1,4 @@
-import { MeshData, PointData } from "../../geometry/data";
+import { MeshData, PointData } from "../../geometry/dataInterface";
 
 export interface InputData {
     file: string;

@@ -1,4 +1,4 @@
-import { InputData, ParsedData } from './metacity/data';
+import { InputData, ParsedData } from '../workers/metacity/data';
 import { WorkerPool } from './pool';
 
 

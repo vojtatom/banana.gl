@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { CullableInstancedMesh } from './cullable';
 import { MaterialLibrary } from '../layer/materials';
-import { PointData } from './data';
+import { PointData } from './dataInterface';
 
 export class InstancedPointModel extends THREE.Group {
     private bsphere: THREE.Sphere = new THREE.Sphere();

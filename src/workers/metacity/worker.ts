@@ -1,6 +1,6 @@
 import { load }  from '@loaders.gl/core';
 import { GLTFLoader } from '@loaders.gl/gltf';
-import { MessageType } from '../interface';
+import { MessageType } from '../../pools/messageInterface';
 import { mergeGeometries } from './geometry';
 import { groupBuffersByType } from './group';
 import { InputData } from './data';

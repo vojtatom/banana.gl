@@ -1,7 +1,7 @@
 import * as THREE from 'three';
 import { Navigation, NavigationProps } from './navigation';
 import { GPUPicker } from './gpuPicker';
-import { MetacityLoaderWorkerPool } from '../workers/poolMetacity';
+import { MetacityLoaderWorkerPool } from '../pools/metacityPool';
 import { createCopyrightLabel, CopyrightProps } from './copyright';
 import { Renderer, RendererProps } from './renderer';
 import { Lights, LightProps } from './lights';

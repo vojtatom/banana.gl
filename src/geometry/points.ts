@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { MaterialLibrary } from '../layer/materials';
-import { PointData } from './data';
+import { PointData } from './dataInterface';
 
 
 export class PointModel extends THREE.Points {

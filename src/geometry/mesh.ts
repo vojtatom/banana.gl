@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { MaterialLibrary } from '../layer/materials';
-import { MeshData } from './data';
+import { MeshData } from './dataInterface';
 
 
 export class MeshModel extends THREE.Mesh {
