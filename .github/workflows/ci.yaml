@@ -45,6 +45,7 @@ jobs:
         npm run build
     - name: Create Release ZIP file
       run: |
+        zip examples.zip -r examples
         mv examples/dist dist/ 
         zip bananagl.zip dist/*
     - uses: rickstaa/action-create-tag@v1
@@ -52,7 +53,7 @@ jobs:
         tag: ${{ env.CURRENT_VERSION }}
     - uses: ncipollo/release-action@v1
       with:
-        artifacts: "bananagl.zip"
+        artifacts:  "bananagl.zip,examples.zip"
         token: ${{ secrets.GITHUB_TOKEN }}
         generateReleaseNotes: true
         tag: ${{ env.CURRENT_VERSION }}
