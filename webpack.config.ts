@@ -33,7 +33,7 @@ const configMain: Configuration = {
     bananagl: "./src/bananagl.ts"
   },
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "examples/dist"),
     filename: "[name].js",
     library:'BananaGL',
     libraryTarget: 'window',
@@ -46,7 +46,7 @@ const configMTCTW: Configuration = {
     metacityWorker: './src/workers/metacity/worker.ts'
   },
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "examples/dist"),
     filename: "[name].js",
     library:'MetacityWorker',
     libraryTarget: 'umd'

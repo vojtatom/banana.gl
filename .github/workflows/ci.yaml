@@ -45,6 +45,7 @@ jobs:
         npm run build
     - name: Create Release ZIP file
       run: |
+        mv examples/dist dist/ 
         zip bananagl.zip dist/*
     - uses: rickstaa/action-create-tag@v1
       with:
