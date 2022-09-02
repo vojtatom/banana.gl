@@ -1,5 +1,5 @@
+import { InputData, ParsedData } from './metacity/data';
 import { WorkerPool } from './pool';
-import { InputData, ParsedData } from './metacity-threejs/worker';
 
 
 export type TileRequestData = {

@@ -1,10 +1,10 @@
-import { ParsedData } from "../../workers/metacity-threejs/worker";
 import { InstancedPointModel } from "../../geometry/pointsInstanced";
 import { MeshModel } from "../../geometry/mesh";
 import { Layer } from "../../layer/layer";
 import { MetacityTile } from "./tile";
 import { PointModel } from "../../geometry/points";
 import { LoadingMeshModel } from "../../geometry/loading";
+import { ParsedData } from "../../workers/metacity/data";
 
 
 enum State {

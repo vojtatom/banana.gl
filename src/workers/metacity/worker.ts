@@ -1,28 +1,12 @@
 import { load }  from '@loaders.gl/core';
 import { GLTFLoader } from '@loaders.gl/gltf';
-import { MeshData, PointData } from '../../geometry/data';
 import { MessageType } from '../interface';
 import { mergeGeometries } from './geometry';
 import { groupBuffersByType } from './group';
+import { InputData } from './data';
 import { assignMetadataIds } from './metadata';
 import { applyStyle } from './style';
 
-
-export interface InputData {
-    file: string;
-    idOffset: number;
-    styles: string[];
-    baseColor: number;
-}
-
-export interface ParsedData {
-    metadata: {
-        id: number;
-        [id: number]: any;
-    };
-    mesh: MeshData | undefined;
-    points: PointData | undefined;
-}
 
 //eslint-disable-next-line no-restricted-globals
 self.onmessage = (message: MessageEvent) => {

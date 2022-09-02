@@ -1,5 +1,3 @@
-
-
 export interface PointData {
     positions: Float32Array;
     ids: Float32Array;
