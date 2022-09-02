@@ -1,16 +1,84 @@
 import * as THREE from 'three';
-import { MapControls } from './mapControls';
+import { MapControls, MapControlsProps } from './controls';
 
-export interface NavigationProps {
+
+export interface NavigationProps extends MapControlsProps {
     target?: [number, number, number];
     position?: [number, number, number];
     offset?: number; 
+    canvas: HTMLCanvasElement;
+}
+
+
+export class Navigation {
+    private onchange_: CallableFunction[] = [];
+    readonly controls: MapControls;
+    private offset: number;
+
+    constructor(props: NavigationProps) {
+        let { position, target } = parseUrl();
+        this.controls = new MapControls(props, props.canvas);
+        this.offset = props.offset ?? 8000;
+
+        target = target || props.target || [Infinity, Infinity, Infinity];        
+        position = position || props.position || this.isoPosition(target);
+        
+        this.set(new THREE.Vector3(...target), new THREE.Vector3(...position));
+    }
+
+    set onchange(f: (target: THREE.Vector3, position: THREE.Vector3 ) => void) {
+        this.onchange_.push(f);
+    }
+
+    get target() {
+        return this.controls.target.clone();
+    }
+
+    get position() {
+        return this.controls.camera.position.clone();
+    }
+
+    private get target_() {
+        return this.controls.target;
+    }
+
+    private get position_() {
+        return this.controls.camera.position;
+    }
+
+    get camera() {
+        return this.controls.camera;
+    } 
+
+    update() {
+        updateURL(this.controls.camera.position, this.controls.target);
+        for(let i = 0; i < this.onchange_.length; i++)
+            this.onchange_[i](this.target, this.position);
+    };
+    
+    positionCameraIfNotSet(target: THREE.Vector3) {
+        if (this.target_.equals(new THREE.Vector3(Infinity, Infinity, Infinity)))
+            this.set(target, new THREE.Vector3(...this.isoPosition(target.toArray())));
+    };
+
+    private isoPosition(target: number[]) {
+        const position = [...target];
+        position[1] -= this.offset;
+        position[2] += this.offset;
+        return position;
+    }
+
+    private set(target: THREE.Vector3, position: THREE.Vector3) {
+        this.controls.target.copy(target);
+        this.controls.camera.position.copy(position);
+        updateURL(this.position_, this.target_);
+    }
 }
 
 
 function parseVector(str: string) {
     const [x, y, z] = str.split(',');
-    return new THREE.Vector3(parseFloat(x), parseFloat(y), parseFloat(z));
+    return [ parseFloat(x), parseFloat(y), parseFloat(z) ];
 }
 
 function parseUrl() {
@@ -25,8 +93,8 @@ function parseUrl() {
     }
 
     return {
-        position: new THREE.Vector3(Infinity, Infinity, Infinity),
-        target: new THREE.Vector3(Infinity, Infinity, Infinity)
+        position: undefined,
+        target: undefined
     };
 }
 
@@ -36,74 +104,5 @@ function updateURL(position: THREE.Vector3, target: THREE.Vector3) {
     const tar = `${target.x},${target.y},${target.z}`;
     url.searchParams.set('position', loc);
     url.searchParams.set('target', tar);
-
     window.history.replaceState({}, '', url.href);
-}
-
-
-export interface Navigation {
-    update: () => void;
-    positionCameraIfNotSet: (target: THREE.Vector3, position?: THREE.Vector3 ) => void;
-    set onchange(f: (target: THREE.Vector3, position?: THREE.Vector3 ) => void);
-    get target(): THREE.Vector3;
-    get position(): THREE.Vector3;
-}
-
-export function Navigation(props: NavigationProps, camera: THREE.Camera, controls: MapControls) : Navigation {
-    let { position, target } = parseUrl();
-    const onchangefs: CallableFunction[] = [];
-
-    if (props.target && position.equals(new THREE.Vector3(Infinity, Infinity, Infinity))) {
-        target = new THREE.Vector3(...props.target);
-        if (props.position)
-            position = new THREE.Vector3(...props.position);
-        else 
-            position = null as any;
-    } 
-    
-    positionCamera(target, position);
-
-    const update = () => {
-        updateURL(camera.position, controls.target);
-        onchangefs.forEach(f => f(controls.target, camera.position));
-    };
-    
-    const positionCameraIfNotSet = (target: THREE.Vector3, position?: THREE.Vector3) => {
-        if (controls.target.equals(new THREE.Vector3(Infinity, Infinity, Infinity)))
-            positionCamera(target, position);
-    };
-    
-    return {
-        update,
-        positionCameraIfNotSet,
-        set onchange(f: (target: THREE.Vector3, position?: THREE.Vector3 ) => void) {
-            onchangefs.push(f);
-        },
-        get target() {
-            return controls.target.clone();
-        },
-        get position() {
-            return camera.position.clone();
-        }
-    };
-
-    function positionCamera(target: THREE.Vector3, position?: THREE.Vector3) {
-
-        if (!position)
-        {
-            position = target.clone();
-            const o = props.offset ?? 8000;
-            const offset = southNorthIsoView(o);
-            position.add(offset);
-        }
-
-        controls.target.copy(target);
-        camera.position.copy(position);
-        updateURL(camera.position, controls.target);
-
-    }
-
-    function southNorthIsoView(o: number) {
-        return new THREE.Vector3(0, -o, o);
-    }
 }

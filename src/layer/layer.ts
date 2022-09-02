@@ -1,92 +1,54 @@
 import { GraphicContext } from '../context/context';
-import { MaterialLibrary, MaterialLibraryProps } from '../context/materials';
-import { Layout } from './layout';
-import * as THREE from 'three';
-import { PointInstanceModel } from './geometry/instance';
-import { TileContainer } from './lod/container';
-import { Style } from '../loader/style/style';
+import { MaterialLibrary, MaterialLibraryProps } from './materials';
+import { Style } from '../style/style';
+import { PointInstance } from '../geometry/instance';
+import { Driver, DriverProps } from '../drivers/driver';
+import { MetacityDriver, MetacityDriverProps } from '../drivers/metacity/driver';
+import { MetadataTable } from './metadata';
 
-export type MetadataRecord = any;
-export type MetadataTable = {[id: number]: MetadataRecord}
 
-export interface Layer {
-    materials: MaterialLibrary;
+export interface LayerProps extends MaterialLibraryProps, MetacityDriverProps {
+    api: string;
     pickable: boolean;
-    ctx: GraphicContext;
-    name: string;
-    layout: Layout;
-    api: string;
-    lodLimits: number[];
-    instance?: THREE.Mesh<THREE.BufferGeometry, THREE.Material | THREE.Material[]>[];
-    metadata: MetadataTable;
-    get useVertexColors(): boolean;
-    styles: string[];
-    getMetadata(id: number): MetadataRecord;
+    pointInstance: string;
+    styles: Style[];
 }
 
-export interface LayerProps extends MaterialLibraryProps {
-    api: string;
-    loadRadius?: number;
-    name?: string;
-    pickable?: boolean;
-    pointInstance?: string;
-    lodLimits?: number[];
-    styles?: Style[];
-}
+export class Layer {
+    readonly api: string;
+    readonly materials: MaterialLibrary;
+    readonly metadata: MetadataTable;
+    readonly styles: string[] = [];
+    readonly pointInstance: PointInstance | undefined;
+    readonly pickable: boolean;
+    readonly driver: Driver<DriverProps>;
 
-function propsDefaults(props: LayerProps) {
-    props.name = props.name ?? props.api;
-    props.pickable = props.pickable ?? false;
-    props.lodLimits = props.lodLimits ?? [20000];
-    props.loadRadius = props.loadRadius ?? 2000;
-    props.styles = props.styles ?? [];
-}
+    constructor(props: LayerProps, readonly ctx: GraphicContext) {
+        props.styles = props.styles ?? [];
+        const useVertexColors = props.styles.length > 0;
+        this.materials = new MaterialLibrary(props, useVertexColors);
+        this.api = props.api;
+        this.pickable = props.pickable ?? false;
+        this.pointInstance = props.pointInstance ? new PointInstance(props.pointInstance) : undefined;
+        this.metadata = {};
+        this.styles = props.styles.map(s => s.serialize());
+        this.driver = this.selectDriver(props);
+    }
 
-export function Layer(ctx: GraphicContext, props: LayerProps): Layer {
-    propsDefaults(props);
-    const useVertexColors = props.styles!.length > 0;
-    const materials = MaterialLibrary(props, useVertexColors);
-    const instance = props.pointInstance ? PointInstanceModel(props.pointInstance) : undefined;
-    const metadata: MetadataTable = {};
-    
-    ctx.navigation.onchange = (target: THREE.Vector3) => {
-        loadTiles(target);
-    }; 
+    async load() {
+        if (this.pointInstance)
+            await this.pointInstance.load();
 
-    const layout = Layout(props, (center) => {
-        ctx.navigation.positionCameraIfNotSet(center);
-        loadTiles(ctx.navigation.target);
-    });
+        await this.driver.init();
+        this.ctx.navigation.positionCameraIfNotSet(this.driver.center);
+        this.ctx.navigation.onchange = (target, position) => this.driver.updateView(target, position);  
+        this.driver.updateView(this.ctx.navigation.target, this.ctx.navigation.position);
+    }
 
-    const serialized = [];
-    const styles: Style[] = props.styles ?? [];
-    for (let i = 0; i < styles.length; i++)
-        serialized.push(styles[i].serialize());
-
-
-    const layer: Layer = {
-        name: props.name ?? props.api,
-        api: props.api,
-        pickable: props.pickable ?? false,
-        lodLimits: props.lodLimits ?? [],
-        layout,
-        materials,
-        instance,
-        ctx,
-        metadata,
-        styles: serialized,
-        get useVertexColors() { return useVertexColors; },
-        getMetadata(id: number) {
-            return metadata[id];
-        }
-    };
-
-    const tileContainer = TileContainer(layer);
-
-    function loadTiles(target: THREE.Vector3) {
-        const tiles = layout.getTilesToLoad(target.x, target.y);
-        tileContainer.load(tiles);
-    } 
-
-    return layer;
+    private selectDriver(props: LayerProps) {
+        if (props.api.endsWith('.json'))
+            throw Error('GeoJSON API not implemented');
+        else
+            return new MetacityDriver(props, this);
+    }
 }

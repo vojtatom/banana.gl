@@ -2,7 +2,6 @@ import path from "path";
 import { Configuration } from "webpack";
 import ForkTsCheckerWebpackPlugin from 'fork-ts-checker-webpack-plugin';
 
-
 const common = {
   module: {
     rules: [
@@ -34,7 +33,7 @@ const configMain: Configuration = {
     bananagl: "./src/bananagl.ts"
   },
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "examples/dist"),
     filename: "[name].js",
     library:'BananaGL',
     libraryTarget: 'window',
@@ -42,17 +41,17 @@ const configMain: Configuration = {
   ...common
 };
 
-const configLoader: Configuration = {
+const configMTCTW: Configuration = {
   entry: {
-    loaderWorker: './src/loader/worker.ts'
+    metacityWorker: './src/workers/metacity/worker.ts'
   },
   output: {
-    path: path.resolve(__dirname, "dist"),
+    path: path.resolve(__dirname, "examples/dist"),
     filename: "[name].js",
-    library:'BananaGLLoader',
+    library:'MetacityWorker',
     libraryTarget: 'umd'
   },
   ...common
 };
 
-export default [configMain, configLoader];
+export default [configMain, configMTCTW];
