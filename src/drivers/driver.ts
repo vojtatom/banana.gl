@@ -1,4 +1,4 @@
-import { Layer } from "../layer";
+import { Layer } from "../layer/layer";
 import * as THREE from "three";
 
 export interface DriverProps {

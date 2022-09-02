@@ -1,13 +1,6 @@
 import * as THREE from 'three';
-import { MaterialLibrary } from '../materials';
-
-
-export interface MeshData {
-    positions: Float32Array;
-    normals: Float32Array;
-    ids: Float32Array;
-    colors?: Float32Array;
-} 
+import { MaterialLibrary } from '../layer/materials';
+import { MeshData } from './data';
 
 
 export class MeshModel extends THREE.Mesh {
@@ -17,9 +10,11 @@ export class MeshModel extends THREE.Mesh {
         geometry.setAttribute('normal', new THREE.BufferAttribute(data.normals, 3));
         geometry.setAttribute('idcolor', new THREE.BufferAttribute(data.ids, 3));
 
-        if (data.colors)
+        if (data.colors){
             geometry.setAttribute('color', new THREE.BufferAttribute(data.colors, 3));
+        }
 
         super(geometry, materials.mesh);
+        this.matrixAutoUpdate = false;
     }
 }

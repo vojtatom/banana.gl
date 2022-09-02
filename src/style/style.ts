@@ -1,4 +1,4 @@
-import { MetadataTable } from '../../../layer/layer';
+import { MetadataTable } from '../layer/metadata';
 import { sampleColor } from './color';
 import { StyleRule, StyleRuleAlways, StyleRuleAttributeEqualTo, StyleRuleAttributeRange, StyleRuleAttributeRangeExt } from './rule';
 import { deserializeRule, serializeRule } from './serialize';

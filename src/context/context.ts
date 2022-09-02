@@ -41,17 +41,17 @@ export class GraphicContext {
             metacity: new MetacityLoaderWorkerPool(props.metacityLoader),
         };
 
-        this.updateSize();
-        this.frame();
-    }
+        const frame = async () => {
+            this.navigation.controls.update();
+            this.renderer.renderer.render(this.scene, this.navigation.camera);
+            this.renderer.labelRenderer.render(this.labelScene, this.navigation.camera);
+            requestAnimationFrame(frame);
+            //renderer.render(picker.pickingScene, camera);
+        };
 
-    async frame() {
-        this.navigation.controls.update();
-        this.renderer.renderer.render(this.scene, this.navigation.camera);
-        this.renderer.labelRenderer.render(this.labelScene, this.navigation.camera);
-        requestAnimationFrame(async () => this.frame());
-        //renderer.render(picker.pickingScene, camera);
-    };
+        this.updateSize();
+        frame();
+    }
 
     updateSize() {
         let width, height;

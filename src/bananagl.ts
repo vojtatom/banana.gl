@@ -1,11 +1,14 @@
 import { GraphicsProps, GraphicContext } from './context/context';
-import { LayerProps, Layer, MetadataRecord } from './layer/layer';
-import { Style } from './workers/metacity/style/style';
+import { LayerProps, Layer } from './layer/layer';
+import { Style } from './style/style';
 import { Labels } from './context/text';
+import { MetadataRecord } from './layer/metadata';
+
 
 export interface BananaProps extends GraphicsProps {
     onClick?: (id: number, metadata: MetadataRecord) => string;
 }
+
 
 export class BananaGL {
     ctx: GraphicContext;
