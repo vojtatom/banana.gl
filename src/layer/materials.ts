@@ -7,7 +7,7 @@ export interface MaterialLibraryProps {
     baseColor?: number;
     placeholderColor?: number;
     placeholderOpacity?: number;
-    loadindColor?: number;
+    loadingColor?: number;
 }
 
 export class MaterialLibrary {
@@ -48,7 +48,7 @@ export class MaterialLibrary {
 
         this.loading = new MeshBasicMaterial({
             side: THREE.DoubleSide,
-            color: props.loadindColor ?? 0x88ff88,
+            color: props.loadingColor ?? 0x88ff88,
         });
     }
 }
