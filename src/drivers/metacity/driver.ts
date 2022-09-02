@@ -1,7 +1,7 @@
 import axios from 'axios';
 import * as THREE from "three";
 
-import { Layer } from "../../layer";
+import { Layer } from "../../layer/layer";
 import { Driver } from '../driver';
 import { MetacityTile, MetacityTileProps } from "./tile";
 

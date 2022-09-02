@@ -1,5 +1,5 @@
 import { PlaceholderMeshModel } from "../../geometry/placeholder";
-import { Layer } from "../../layer";
+import { Layer } from "../../layer/layer";
 import { MetacityTileLOD } from "./lod";
 
 

@@ -1,33 +1,48 @@
-import * as THREE from 'three';
-
-
-export interface ModelGroups {
-    points: THREE.Points[], 
-    meshes: THREE.Mesh[]
+export interface Model {
+    positions: Float32Array,
+    meta: any,
+    bbox: any,
+    ids?: Float32Array
+    normals?: Float32Array,
 }
 
 
-export function groupModelsByType(object: THREE.Object3D) : ModelGroups {
-    const points: THREE.Points[] = [];
-    const meshes: THREE.Mesh[] = [];
+export interface ModelGroups {
+    points: Model[], 
+    meshes: Model[]
+}
 
-    const sort = (object: THREE.Object3D) => {
-        if (object instanceof THREE.Group) {
-            for (let i = 0; i < object.children.length; i++)
-                sort(object.children[i]);
-        } else if (object instanceof THREE.Mesh) {
-            meshes.push(object);
-        } else if (object instanceof THREE.Points) {
-            points.push(object);
-        } else {
-            console.error(`Unknown child type ${object.type}`);
+
+export function groupBuffersByType(gltf: any) : ModelGroups {
+    const groups: ModelGroups = {
+        points: [],
+        meshes: []
+    };
+
+    for(let i = 0; i < gltf.meshes.length; i++) {
+        const model = gltf.meshes[i];
+        const positions = model.primitives[0].attributes.POSITION;
+        const buffer = positions.value;
+        const meta = model.extras;
+        const type = model.primitives[0].mode;
+        const bbox = [positions.min, positions.max];
+
+        if (type === 0) {
+            groups.points.push({
+                positions: buffer,
+                meta,
+                bbox,
+            });
         }
-    };
 
-    sort(object);
-
-    return {
-        points,
-        meshes
-    };
+        if (type === 4) {
+            groups.meshes.push({
+                positions: buffer,
+                meta,
+                bbox,
+            });
+        }
+    }
+    
+    return groups;
 }

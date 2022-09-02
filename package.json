@@ -44,6 +44,8 @@
     "webpack-cli": "^4.9.2"
   },
   "dependencies": {
+    "@loaders.gl/core": "^3.2.8",
+    "@loaders.gl/gltf": "^3.2.8",
     "@types/three": "^0.141.0",
     "axios": "^0.27.2",
     "three": "^0.141.0"

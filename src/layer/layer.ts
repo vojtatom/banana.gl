@@ -1,13 +1,10 @@
 import { GraphicContext } from '../context/context';
 import { MaterialLibrary, MaterialLibraryProps } from './materials';
-import { Style } from '../workers/metacity/style/style';
-import { PointInstance } from './geometry/instance';
-import { Driver, DriverProps } from './drivers/driver';
-import { MetacityDriver, MetacityDriverProps } from './drivers/metacity/driver';
-
-
-export type MetadataRecord = any;
-export type MetadataTable = { [id: number]: MetadataRecord }
+import { Style } from '../style/style';
+import { PointInstance } from '../geometry/instance';
+import { Driver, DriverProps } from '../drivers/driver';
+import { MetacityDriver, MetacityDriverProps } from '../drivers/metacity/driver';
+import { MetadataTable } from './metadata';
 
 
 export interface LayerProps extends MaterialLibraryProps, MetacityDriverProps {

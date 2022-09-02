@@ -1,5 +1,3 @@
-
-
 function lerpColor(a: number, b: number, fade: number) {
     const ar = a >> 16,
         ag = a >> 8 & 0xff,
@@ -33,4 +31,11 @@ export function sampleColor(color: number | number[], indicator: number) {
         return linearInterpolateColor(color, indicator);
     }
     return color;
+}
+
+export function colorHex(hex: number) {
+    const r = ( hex >> 16 & 255 ) / 255;
+    const g = ( hex >> 8 & 255 ) / 255;
+    const b = ( hex & 255 ) / 255;
+    return [r, g, b];
 }

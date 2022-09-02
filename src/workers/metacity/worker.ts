@@ -1,11 +1,12 @@
-import { groupModelsByType } from './group';
+import { load }  from '@loaders.gl/core';
+import { GLTFLoader } from '@loaders.gl/gltf';
+import { MeshData, PointData } from '../../geometry/data';
+import { MessageType } from '../interface';
+import { mergeGeometries } from './geometry';
+import { groupBuffersByType } from './group';
 import { assignMetadataIds } from './metadata';
-import * as THREE from 'three';
-import { mergeGeometries } from './geometries';
 import { applyStyle } from './style';
-import { MessageType } from '../pool';
-import { PointData } from '../../layer/geometry/points';
-import { MeshData } from '../../layer/geometry/mesh';
+
 
 export interface InputData {
     file: string;
@@ -28,52 +29,36 @@ self.onmessage = (message: MessageEvent) => {
     loadModel(message);
 };
 
-function loadModel(message: MessageEvent<MessageType<InputData>>) {
+async function loadModel(message: MessageEvent<MessageType<InputData>>) {
     const { jobID, data } = message.data;
     const { file, idOffset, styles, baseColor } = data;
-    loadGLTF(file, (gltf) => {
-        const group = gltf.scene;
-        const models = groupModelsByType(group);
-        const metadata = assignMetadataIds(models, idOffset);
-        const buffers = mergeGeometries(models);
+    const gltf = await load(file, GLTFLoader);
+    const groups = groupBuffersByType(gltf);
+    const metadata = assignMetadataIds(groups, idOffset);
+    const models = mergeGeometries(groups);
 
-        if (styles.length > 0 && buffers.meshes) {
-            const color = applyStyle(styles, baseColor, buffers.meshes, metadata);
-            buffers.meshes.setAttribute('color', new THREE.BufferAttribute(color, 3));
+    let meshColors: Float32Array | undefined;
+    if (styles.length > 0 && models.mesh && models.mesh.ids) {
+        meshColors = applyStyle(styles, baseColor, models.mesh.ids, metadata);
+    }
+
+    postMessage({
+        jobID: jobID,
+        result: {
+            metadata: metadata,
+            mesh: {
+                positions: models.mesh?.positions,
+                ids: models.mesh?.ids,
+                normals: models.mesh?.normals,
+                colors: meshColors,
+            },
+            points: {
+                positions: models.point?.positions,
+                ids: models.point?.ids,
+            },
         }
-
-        postMessage({
-            jobID: jobID,
-            result: {
-                metadata: metadata,
-                mesh: toResultForm(buffers.meshes),
-                points: toResultForm(buffers.points),
-            }
-        });
-
-        (gltf as any) = null;
     });
-}
 
-
-function toResultForm(geometry?: THREE.BufferGeometry) {
-    if (!geometry)
-        return;
-
-    return {
-        positions: geometry.attributes.position.array,
-        ids: geometry.attributes.ids.array,
-        normals: geometry.attributes.normal ? geometry.attributes.normal.array : undefined,
-        colors: geometry.attributes.color ? geometry.attributes.color.array : undefined,
-    };
-}
-
-import { GLTF, GLTFLoader } from 'three/examples/jsm/loaders/GLTFLoader';
-
-const loader = new GLTFLoader();
-
-function loadGLTF(file: string, callback: (gltf: GLTF) => void) {
-    loader.load(file, callback);
 }
 
 
