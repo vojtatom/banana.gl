@@ -6,7 +6,7 @@ export interface DriverProps {
 }
 
 
-export abstract class Driver<DriverProps> {
+export abstract class Driver<Props extends DriverProps> {
     constructor(props: DriverProps, layer: Layer) {}
     abstract init(): Promise<void>;
     abstract updateView(target: THREE.Vector3, position: THREE.Vector3): Promise<void>;

@@ -1,5 +1,6 @@
 import { PlaceholderMeshModel } from "../../geometry/placeholder";
 import { Layer } from "../../layer/layer";
+import { MetacityDriver } from "./driver";
 import { MetacityTileLOD } from "./lod";
 
 
@@ -35,7 +36,7 @@ export class MetacityTile {
         this.width = props.tileWidth;
         this.height = props.tileHeight;
         this.lodLimits = props.lodLimits;
-        this.url = `${layer.api}/${props.file}`;
+        this.url = `${(layer.driver as MetacityDriver).api}/${props.file}`;
         this.cx = (this.x + 0.5) * this.width;
         this.cy = (this.y + 0.5) * this.height;
 

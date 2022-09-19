@@ -1,13 +1,16 @@
 import axios from 'axios';
 import * as THREE from "three";
+import { PointInstance } from '../../geometry/instance';
 
 import { Layer } from "../../layer/layer";
-import { Driver } from '../driver';
+import { Style } from '../../style/style';
+import { Driver, DriverProps } from '../driver';
 import { MetacityTile, MetacityTileProps } from "./tile";
 
 
-export interface MetacityDriverProps {
-    api: string;
+export interface MetacityDriverProps extends DriverProps {
+    pointInstance: string;
+    styles: Style[];
     loadRadius: number;
     lodLimits: number[];
 }
@@ -20,15 +23,24 @@ export class MetacityDriver implements Driver<MetacityDriverProps> {
     private tileWidth: number = 0;
     private tileHeight: number = 0;
     private tiles: MetacityTile[] = [];
+    
+    readonly styles: string[] = [];
+    readonly pointInstance: PointInstance | undefined;
 
     constructor(props: MetacityDriverProps, private layer: Layer) {
         this.api = props.api;
         this.loadRadius = props.loadRadius ?? 2000;
         this.loadRadiusSqr = Math.pow(this.loadRadius, 2);
         this.lodLimits = props.lodLimits ?? [20000];
+
+        this.pointInstance = props.pointInstance ? new PointInstance(props.pointInstance) : undefined;
+        this.styles = props.styles.map(s => s.serialize());
     }
 
     async init() {
+        if (this.pointInstance)
+            await this.pointInstance.load();
+
         const config = await axios.get(layoutUrl(this.api));
         this.tileWidth = config.data.tileWidth;
         this.tileHeight = config.data.tileHeight;

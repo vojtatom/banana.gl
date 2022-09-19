@@ -5,6 +5,7 @@ import { MetacityTile } from "./tile";
 import { PointModel } from "../../geometry/points";
 import { LoadingMeshModel } from "../../geometry/loading";
 import { ParsedData } from "../../workers/metacity/data";
+import { MetacityDriver } from "./driver";
 
 
 enum State {
@@ -66,7 +67,7 @@ export class MetacityTileLOD {
         this.layer.ctx.loaders.metacity.load({
                 file: this.tile.url,
                 objectsToLoad: this.tile.size,
-                styles: this.layer.styles,
+                styles: (this.layer.driver as MetacityDriver).styles,
                 baseColor: this.layer.materials.baseColor,
             }, (data) => this.afterload(data));
     }
@@ -96,9 +97,10 @@ export class MetacityTileLOD {
 
         //The only actual LOD difference for now
         if (data.points) {
-            if (this.lod === 1 && this.layer.pointInstance) {
+            const driver = this.layer.driver as MetacityDriver;
+            if (this.lod === 1 && driver.pointInstance) {
                 this.models.push(new InstancedPointModel(
-                    data.points, this.layer.materials, this.layer.pointInstance.models));
+                    data.points, this.layer.materials, driver.pointInstance.models));
             } else {
                 this.models.push(new PointModel(data.points, this.layer.materials));
             }
