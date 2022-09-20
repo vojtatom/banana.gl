@@ -1,6 +1,7 @@
-import axios from 'axios';
+import axios from "axios";
 import * as THREE from "three";
 import { Layer } from '../../layer/layer';
+import { NetworkData } from "../../workers/flux/dataInterface";
 import { Driver, DriverProps } from '../driver';
 import { FluxNetwork } from './network';
 
@@ -10,14 +11,15 @@ export interface FluxDriverProps extends DriverProps {
 
 
 export class FluxDriver implements Driver<FluxDriverProps> {
-    private networkAPI: string;
-    private metricsAPI: string;
-    private landuseAPI: string;
-    private tripsAPI: string;
+    readonly networkAPI: string;
+    readonly metricsAPI: string;
+    readonly landuseAPI: string;
+    readonly tripsAPI: string;
 
     private network: FluxNetwork | undefined;
+    private center_: THREE.Vector3 | undefined;
 
-    constructor(props: FluxDriverProps, layer: Layer) {
+    constructor(props: FluxDriverProps, readonly layer: Layer) {
         this.networkAPI = props.api + '/network';
         this.metricsAPI = props.api + '/metrics';
         this.landuseAPI = props.api + '/landuse';
@@ -25,9 +27,9 @@ export class FluxDriver implements Driver<FluxDriverProps> {
     }
 
     async init() {
+        //init center - is supposed to be around 0, 0
         //init network
-        const network = await axios.get(this.networkAPI);
-        this.network = new FluxNetwork(network.data);
+        this.network = new FluxNetwork(this);
         //init landuse
         //init trips
         //init metrics
@@ -38,7 +40,6 @@ export class FluxDriver implements Driver<FluxDriverProps> {
     }
 
     get center(): THREE.Vector3 {
-        //TODO
-        return new THREE.Vector3(0, 0, 0);
+        return this.center_ ?? new THREE.Vector3(0, 0, 0);
     }
 }

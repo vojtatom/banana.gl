@@ -50,7 +50,9 @@ function segment(resolution: number = 5) {
 const SEGMENT_INSTANCE = new Float32Array(segment());
 
 
-export class LineModel extends THREE.InstancedMesh {
+export class InstancedLineModel extends THREE.InstancedMesh {
+    ids: Float32Array;
+
     constructor(data: LineData, materials: MaterialLibrary) {
         const geometry = new THREE.InstancedBufferGeometry();
         geometry.instanceCount = data.segmentEndpoints.length / 6;
@@ -61,7 +63,11 @@ export class LineModel extends THREE.InstancedMesh {
         geometry.setAttribute('lineEnd', new THREE.InterleavedBufferAttribute(
             new THREE.InstancedInterleavedBuffer(data.segmentEndpoints, 6, 1), 3, 3));
 
+        geometry.setAttribute('color', new THREE.InstancedBufferAttribute(data.colors, 3, false, 1));
+
         super(geometry, materials.line, data.segmentEndpoints.length / 6);
+        
+        this.ids = new Float32Array(data.ids);
         this.matrixAutoUpdate = false;
         this.frustumCulled = false; //this one was a big pain to figure out...
     }

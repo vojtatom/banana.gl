@@ -1,6 +1,5 @@
 import { InstancedPointModel } from "../../geometry/pointsInstanced";
 import { MeshModel } from "../../geometry/mesh";
-import { Layer } from "../../layer/layer";
 import { MetacityTile } from "./tile";
 import { PointModel } from "../../geometry/points";
 import { LoadingMeshModel } from "../../geometry/loading";
@@ -23,7 +22,7 @@ export class MetacityTileLOD {
     private visible_: boolean = false;
     private animation_: LoadingMeshModel | undefined;
 
-    constructor(private tile: MetacityTile, private layer: Layer, readonly lod: number) { }
+    constructor(private tile: MetacityTile, private driver: MetacityDriver, readonly lod: number) { }
 
     set visible(visible: boolean) {
         if (visible && this.state === State.Uninitialized) {
@@ -58,23 +57,23 @@ export class MetacityTileLOD {
             return;
         }
 
-        this.animation_ = new LoadingMeshModel(this.tile.cx, this.tile.cy, this.tile.width, this.tile.height, this.layer.materials);
-        this.layer.ctx.scene.add(this.animation_);
+        this.animation_ = new LoadingMeshModel(this.tile.cx, this.tile.cy, this.tile.width, this.tile.height, this.driver.layer.materials);
+        this.driver.layer.ctx.scene.add(this.animation_);
         this.load();
     }
     
     private load() {
-        this.layer.ctx.workers.metacity.load({
+        this.driver.layer.ctx.workers.metacity.load({
                 file: this.tile.url,
                 objectsToLoad: this.tile.size,
-                styles: (this.layer.driver as MetacityDriver).styles,
-                baseColor: this.layer.materials.baseColor,
+                styles: this.driver.styles,
+                baseColor: this.driver.layer.materials.baseColor,
             }, (data) => this.afterload(data));
     }
     
     private async afterload(data: ParsedData) {
         if (this.animation_){
-            this.layer.ctx.scene.remove(this.animation_);
+            this.driver.layer.ctx.scene.remove(this.animation_);
             this.animation_ = undefined;
         }
         this.state = State.Loaded;
@@ -83,32 +82,32 @@ export class MetacityTileLOD {
 
         //setup metadata
         for (const id in data.metadata) {
-            this.layer.metadata[id] = data.metadata[id];
+            this.driver.layer.metadata[id] = data.metadata[id];
         }
     }
 
     private setupModels(data: ParsedData) {
         if (data.mesh) {
-            const mesh = new MeshModel(data.mesh, this.layer.materials);
+            const mesh = new MeshModel(data.mesh, this.driver.layer.materials);
             this.models.push(mesh);
-            if (this.layer.pickable)
-                this.layer.ctx.picker.addPickable(mesh);
+            if (this.driver.layer.pickable)
+                this.driver.layer.ctx.picker.addPickable(mesh);
         }
 
         //The only actual LOD difference for now
         if (data.points) {
-            const driver = this.layer.driver as MetacityDriver;
+            const driver = this.driver.layer.driver as MetacityDriver;
             if (this.lod === 1 && driver.pointInstance) {
                 this.models.push(new InstancedPointModel(
-                    data.points, this.layer.materials, driver.pointInstance.models));
+                    data.points, this.driver.layer.materials, driver.pointInstance.models));
             } else {
-                this.models.push(new PointModel(data.points, this.layer.materials));
+                this.models.push(new PointModel(data.points, this.driver.layer.materials));
             }
         }
 
         for (let i = 0; i < this.models.length; i++) {
             this.models[i].visible = this.visible_;
-            this.layer.ctx.scene.add(this.models[i]);
+            this.driver.layer.ctx.scene.add(this.models[i]);
         }
     }
 

@@ -54,4 +54,17 @@ const configMTCTW: Configuration = {
   ...common
 };
 
-export default [configMain, configMTCTW];
+const configFLXW: Configuration = {
+  entry: {
+    fluxWorker: './src/workers/flux/worker.ts'
+  },
+  output: {
+    path: path.resolve(__dirname, "examples/dist"),
+    filename: "[name].js",
+    library:'FluxWorker',
+    libraryTarget: 'umd'
+  },
+  ...common
+};
+
+export default [configMain, configMTCTW, configFLXW];

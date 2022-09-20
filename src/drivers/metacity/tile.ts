@@ -1,5 +1,4 @@
 import { PlaceholderMeshModel } from "../../geometry/placeholder";
-import { Layer } from "../../layer/layer";
 import { MetacityDriver } from "./driver";
 import { MetacityTileLOD } from "./lod";
 
@@ -29,22 +28,22 @@ export class MetacityTile {
     readonly cx: number;
     readonly cy: number;
 
-    constructor(props: MetacityTileProps, layer: Layer) {
+    constructor(props: MetacityTileProps, driver: MetacityDriver) {
         this.x = props.x;
         this.y = props.y;
         this.size = props.size;
         this.width = props.tileWidth;
         this.height = props.tileHeight;
         this.lodLimits = props.lodLimits;
-        this.url = `${(layer.driver as MetacityDriver).api}/${props.file}`;
+        this.url = `${driver.api}/${props.file}`;
         this.cx = (this.x + 0.5) * this.width;
         this.cy = (this.y + 0.5) * this.height;
 
         for(let i = 0; i < this.lodLimits.length + 1; i++)
-            this.lods.push(new MetacityTileLOD(this, layer, i));
+            this.lods.push(new MetacityTileLOD(this, driver, i));
 
-        this.placeholder = new PlaceholderMeshModel(this.cx, this.cy, this.width, this.height, layer.materials);
-        layer.ctx.scene.add(this.placeholder);
+        this.placeholder = new PlaceholderMeshModel(this.cx, this.cy, this.width, this.height, driver.layer.materials);
+        driver.layer.ctx.scene.add(this.placeholder);
     }
 
     async load(target: THREE.Vector3, position: THREE.Vector3) {
@@ -69,7 +68,6 @@ export class MetacityTile {
         const dy = Math.abs(this.cy - y);
         return Math.max(dx, dy);
     }
-
 
     //higher distance => lower LOD, the limits have to be sorted from the lowest to the highest
     private computeLOD(target: THREE.Vector3, position: THREE.Vector3) {

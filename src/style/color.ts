@@ -39,3 +39,12 @@ export function colorHex(hex: number) {
     const b = ( hex & 255 ) / 255;
     return [r, g, b];
 }
+
+export function colorStrToHex(color: string) {
+    return parseInt(color.replace('#', ''), 16);
+}
+
+export function colorStrToArr(str: string): number[] {
+    const hex = colorStrToHex(str);
+    return colorHex(hex);
+}

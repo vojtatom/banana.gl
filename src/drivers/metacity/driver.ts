@@ -18,7 +18,6 @@ export interface MetacityDriverProps extends DriverProps {
 export class MetacityDriver implements Driver<MetacityDriverProps> {
     readonly api: string;
     private loadRadius: number;
-    private loadRadiusSqr: number;
     private lodLimits: number[];
     private tileWidth: number = 0;
     private tileHeight: number = 0;
@@ -27,10 +26,10 @@ export class MetacityDriver implements Driver<MetacityDriverProps> {
     readonly styles: string[] = [];
     readonly pointInstance: PointInstance | undefined;
 
-    constructor(props: MetacityDriverProps, private layer: Layer) {
+    constructor(props: MetacityDriverProps, readonly layer: Layer) {
         this.api = props.api;
         this.loadRadius = props.loadRadius ?? 2000;
-        this.loadRadiusSqr = Math.pow(this.loadRadius, 2);
+        //this.loadRadiusSqr = Math.pow(this.loadRadius, 2);
         this.lodLimits = props.lodLimits ?? [20000];
 
         this.pointInstance = props.pointInstance ? new PointInstance(props.pointInstance) : undefined;
@@ -49,7 +48,7 @@ export class MetacityDriver implements Driver<MetacityDriverProps> {
             tileWidth: this.tileWidth,
             tileHeight: this.tileHeight,
             lodLimits: this.lodLimits
-        }, this.layer));
+        }, this));
     }
 
     async updateView(target: THREE.Vector3, position: THREE.Vector3) {
