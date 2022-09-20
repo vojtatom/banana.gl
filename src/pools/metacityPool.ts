@@ -1,13 +1,5 @@
-import { InputData, ParsedData } from '../workers/metacity/data';
+import { InputData, ParsedData, TileRequestData } from '../workers/metacity/dataInterface';
 import { WorkerPool } from './pool';
-
-
-export type TileRequestData = {
-    file: string, 
-    objectsToLoad: number,
-    styles: string[],
-    baseColor: number,
-};
 
 
 export class MetacityLoaderWorkerPool extends WorkerPool<InputData, ParsedData> {

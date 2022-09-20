@@ -3,7 +3,7 @@ import { GLTFLoader } from '@loaders.gl/gltf';
 import { MessageType } from '../../pools/messageInterface';
 import { mergeGeometries } from './geometry';
 import { groupBuffersByType } from './group';
-import { InputData } from './data';
+import { InputData } from './dataInterface';
 import { assignMetadataIds } from './metadata';
 import { applyStyle } from './style';
 
