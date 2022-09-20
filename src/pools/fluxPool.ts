@@ -2,7 +2,7 @@ import { InputData, ParsedData } from '../workers/flux/dataInterface';
 import { WorkerPool } from './pool';
 
 
-export class MetacityLoaderWorkerPool extends WorkerPool<InputData, ParsedData> {    
+export class FluxWorkerPool extends WorkerPool<InputData, ParsedData> {    
     constructor(workerPath: string)  {
         super(workerPath, 4);
     }

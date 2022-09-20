@@ -64,7 +64,7 @@ export class MetacityTileLOD {
     }
     
     private load() {
-        this.layer.ctx.loaders.metacity.load({
+        this.layer.ctx.workers.metacity.load({
                 file: this.tile.url,
                 objectsToLoad: this.tile.size,
                 styles: (this.layer.driver as MetacityDriver).styles,

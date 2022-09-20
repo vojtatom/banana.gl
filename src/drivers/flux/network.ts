@@ -29,6 +29,6 @@ export interface FluxNetworkProps {
 
 export class FluxNetwork {
     constructor (props: FluxNetworkProps) {
-        //TODO
+        console.log(props);
     }
 }

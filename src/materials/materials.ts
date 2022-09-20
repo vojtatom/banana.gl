@@ -1,6 +1,5 @@
 import * as THREE from 'three';
-import { MeshBasicMaterial, MeshLambertMaterial, PointsMaterial } from 'three';
-import { LineMaterial } from 'three/examples/jsm/lines/LineMaterial';
+import { lineMaterial } from './lineMaterial';
 
 
 export interface MaterialLibraryProps {
@@ -11,42 +10,39 @@ export interface MaterialLibraryProps {
 }
 
 export class MaterialLibrary {
-    readonly mesh: MeshLambertMaterial;
-    readonly placeholder: MeshLambertMaterial;
-    readonly line: LineMaterial;
-    readonly point: PointsMaterial;
-    readonly loading: MeshBasicMaterial;
+    readonly mesh: THREE.MeshLambertMaterial;
+    readonly placeholder: THREE.MeshLambertMaterial;
+    readonly line: THREE.ShaderMaterial;
+    readonly point: THREE.PointsMaterial;
+    readonly loading: THREE.MeshBasicMaterial;
     readonly baseColor: number;
 
     constructor(props: MaterialLibraryProps, useVertexColors?: boolean) {
 
         this.baseColor = props.baseColor ?? 0xffffff;
 
-        this.mesh = new MeshLambertMaterial({
+        this.mesh = new THREE.MeshLambertMaterial({
             side: THREE.DoubleSide,
             color: useVertexColors ? undefined : this.baseColor,
             vertexColors: useVertexColors ?? false,
         });
 
-        this.placeholder = new MeshLambertMaterial({
+        this.placeholder = new THREE.MeshLambertMaterial({
             side: THREE.DoubleSide,
             color: props.placeholderColor ?? 0xaaaaaa,
             opacity: props.placeholderOpacity ?? 0.01,
             transparent: true,
         });
 
-        this.line = new LineMaterial({
-            color: this.baseColor,
-            linewidth: 5,
-        });
+        this.line = lineMaterial();
 
-        this.point = new PointsMaterial({
+        this.point = new THREE.PointsMaterial({
             size: 100,
             color: this.baseColor,
             sizeAttenuation: true,
         });
 
-        this.loading = new MeshBasicMaterial({
+        this.loading = new THREE.MeshBasicMaterial({
             side: THREE.DoubleSide,
             color: props.loadingColor ?? 0x88ff88,
         });

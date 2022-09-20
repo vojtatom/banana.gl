@@ -2,6 +2,7 @@ import axios from 'axios';
 import * as THREE from "three";
 import { Layer } from '../../layer/layer';
 import { Driver, DriverProps } from '../driver';
+import { FluxNetwork } from './network';
 
 export interface FluxDriverProps extends DriverProps {
     api: string;
@@ -14,6 +15,7 @@ export class FluxDriver implements Driver<FluxDriverProps> {
     private landuseAPI: string;
     private tripsAPI: string;
 
+    private network: FluxNetwork | undefined;
 
     constructor(props: FluxDriverProps, layer: Layer) {
         this.networkAPI = props.api + '/network';
@@ -25,6 +27,7 @@ export class FluxDriver implements Driver<FluxDriverProps> {
     async init() {
         //init network
         const network = await axios.get(this.networkAPI);
+        this.network = new FluxNetwork(network.data);
         //init landuse
         //init trips
         //init metrics

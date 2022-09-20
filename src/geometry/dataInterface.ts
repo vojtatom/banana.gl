@@ -10,3 +10,9 @@ export interface MeshData {
     ids: Float32Array;
     colors?: Float32Array;
 } 
+
+export interface LineData {
+    segmentEndpoints: Float32Array;
+    offset: number;
+    width: number;
+}

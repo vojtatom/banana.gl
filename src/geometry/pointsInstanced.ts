@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { CullableInstancedMesh } from './cullable';
-import { MaterialLibrary } from '../layer/materials';
+import { MaterialLibrary } from '../materials/materials';
 import { PointData } from './dataInterface';
 
 export class InstancedPointModel extends THREE.Group {
