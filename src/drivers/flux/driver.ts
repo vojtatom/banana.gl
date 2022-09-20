@@ -23,7 +23,11 @@ export class FluxDriver implements Driver<FluxDriverProps> {
     }
 
     async init() {
-
+        //init network
+        const network = await axios.get(this.networkAPI);
+        //init landuse
+        //init trips
+        //init metrics
     }
 
     async updateView(target: THREE.Vector3, position: THREE.Vector3) {
@@ -31,6 +35,7 @@ export class FluxDriver implements Driver<FluxDriverProps> {
     }
 
     get center(): THREE.Vector3 {
-        return null;
+        //TODO
+        return new THREE.Vector3(0, 0, 0);
     }
 }
