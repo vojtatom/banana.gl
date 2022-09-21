@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { agentMaterial } from './agentMaterial';
 import { lineMaterial } from './lineMaterial';
 
 
@@ -15,6 +16,7 @@ export class MaterialLibrary {
     readonly line: THREE.ShaderMaterial;
     readonly point: THREE.PointsMaterial;
     readonly loading: THREE.MeshBasicMaterial;
+    readonly agents: THREE.ShaderMaterial;
     readonly baseColor: number;
 
     constructor(props: MaterialLibraryProps, useVertexColors?: boolean) {
@@ -35,6 +37,7 @@ export class MaterialLibrary {
         });
 
         this.line = lineMaterial();
+        this.agents = agentMaterial();
 
         this.point = new THREE.PointsMaterial({
             size: 100,
@@ -46,5 +49,14 @@ export class MaterialLibrary {
             side: THREE.DoubleSide,
             color: props.loadingColor ?? 0x88ff88,
         });
+    }
+
+    updateTime(time: number) {
+        this.agents.uniforms.time.value = time;
+    }
+
+    updateSegmentTime(timeStart: number, timeEnd: number) {
+        this.agents.uniforms.timeStart.value = timeStart;
+        this.agents.uniforms.timeEnd.value = timeEnd;
     }
 }

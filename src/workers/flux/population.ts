@@ -78,7 +78,6 @@ export async function loadPopulation(api: string[]) {
         positionsArray.push(new Float32Array(positions[i]));
     }
 
-
     return {
         positions: positionsArray,
         timestamps: new Float32Array(sortedTimestamps)

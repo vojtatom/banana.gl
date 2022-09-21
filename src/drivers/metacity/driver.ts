@@ -29,7 +29,6 @@ export class MetacityDriver implements Driver<MetacityDriverProps> {
     constructor(props: MetacityDriverProps, readonly layer: Layer) {
         this.api = props.api as string;
         this.loadRadius = props.loadRadius ?? 2000;
-        //this.loadRadiusSqr = Math.pow(this.loadRadius, 2);
         this.lodLimits = props.lodLimits ?? [20000];
 
         this.pointInstance = props.pointInstance ? new PointInstance(props.pointInstance) : undefined;
