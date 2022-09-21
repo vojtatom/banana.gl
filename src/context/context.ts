@@ -1,11 +1,11 @@
 import * as THREE from 'three';
 import { Navigation, NavigationProps } from './navigation';
 import { GPUPicker } from './gpuPicker';
-import { MetacityLoaderWorkerPool } from '../pools/metacityPool';
+import { MetacityLoaderWorkerPool } from '../pools/poolMetacity';
 import { createCopyrightLabel, CopyrightProps } from './copyright';
 import { Renderer, RendererProps } from './renderer';
 import { Lights, LightProps } from './lights';
-import { FluxWorkerPool } from '../pools/fluxPool';
+import { FluxWorkerPool } from '../pools/poolFlux';
 
 
 export interface GraphicsProps extends NavigationProps, RendererProps, LightProps, CopyrightProps {

@@ -19,7 +19,7 @@ export class Layer {
 
     constructor(props: LayerProps, readonly ctx: GraphicContext) {
         props.styles = props.styles ?? [];
-        const useVertexColors = props.styles.length > 0;
+        const useVertexColors = props.styles.length > 0 || props.type === 'flux';
         this.materials = new MaterialLibrary(props, useVertexColors);
         this.pickable = props.pickable ?? false;
         this.metadata = {};

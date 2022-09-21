@@ -2,7 +2,7 @@ import { Layer } from "../layer/layer";
 import * as THREE from "three";
 
 export interface DriverProps {
-    api: string;
+    api: string | string[];
 }
 
 

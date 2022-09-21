@@ -6,7 +6,7 @@ import { LineData } from "../../geometry/dataInterface";
 export class FluxNetwork {
     constructor (private driver: FluxDriver) {
         this.driver.layer.ctx.workers.flux.load({
-            api: this.driver.networkAPI,
+            api: this.driver.api,
             type: 'network',
         }, (data) => this.setupModels(data));
     }
@@ -18,10 +18,8 @@ export class FluxNetwork {
             ids: new Float32Array(data.length / 3),
             offset: 1,
             width: 0.1,
-        }
-
-        console.log(lineData);
-
+        };
+        
         let model = new InstancedLineModel(lineData, this.driver.layer.materials);
         this.driver.layer.ctx.scene.add(model);
     }

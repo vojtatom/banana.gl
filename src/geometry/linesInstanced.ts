@@ -64,7 +64,7 @@ export class InstancedLineModel extends THREE.InstancedMesh {
 
         geometry.setAttribute('color', new THREE.InstancedBufferAttribute(data.colors, 3, true, 1));
 
-        super(geometry, materials.line, 16);
+        super(geometry, materials.line, data.segmentEndpoints.length / 6);
         
         this.ids = new Float32Array(data.ids);
         this.matrixAutoUpdate = false;

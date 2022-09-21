@@ -1,6 +1,8 @@
 import { MessageType } from "../../pools/messageInterface";
 import { InputData } from "./dataInterface";
+import { loadLandUse } from "./landuse";
 import { loadNetwork } from "./network";
+import { loadPopulation } from "./population";
 
 //eslint-disable-next-line no-restricted-globals
 self.onmessage = (message: MessageEvent) => {
@@ -15,16 +17,13 @@ async function loadModel(message: MessageEvent<MessageType<InputData>>) {
     let result;
     switch (type) {
         case 'network':
-            result = await loadNetwork(api);
-            break;
-        case 'metrics':
-            //TODO
+            result = await loadNetwork(api as string);
             break;
         case 'landuse':
-            //TODO
+            result = await loadLandUse(api as string);
             break;
-        case 'trips':
-            //TODO
+        case 'population':
+            result = await loadPopulation(api as string[]);
             break;
     }
 

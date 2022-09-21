@@ -43,7 +43,7 @@
 
     </style>
 
-    <title>Metacity - Flux: Dynamic Data Example</title>
+    <title>Flux: Dynamic Data Example</title>
 </head>
 <body>
     <div id="main">
@@ -65,7 +65,20 @@
 
             gl.loadLayer({
                 type: "flux",
+                driverType: "network",
                 api: "http://flux.oncue.design/network"
+            });
+
+            gl.loadLayer({
+                type: "flux",
+                driverType: "landuse",
+                api: "http://flux.oncue.design/landuse"
+            });
+
+            gl.loadLayer({
+                type: "flux",
+                driverType: "population",
+                api: ["http://flux.oncue.design/population", "http://flux.oncue.design/network"]
             });
         }
     </script>
