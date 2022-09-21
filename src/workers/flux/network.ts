@@ -7,6 +7,8 @@ export async function loadNetwork(api: string) {
     const data = await axios.get(api);
     const network = data.data as NetworkData;
 
+    console.log(network);
+
     //construct the geometry with ids and colors
     const segmentCount = Object.keys(network.data.edges).length
     const positions = new Float32Array(segmentCount * 3 * 2);
@@ -21,22 +23,26 @@ export async function loadNetwork(api: string) {
     }
 
     //fill buffers
-    let i = 0, j = 0, k = 0;
+    let i = 0, j = 0;
     for (const edge_id in network.data.edges) {
+        console.log(edge_id);
         const edge = network.data.edges[edge_id];
         const origin = network.data.nodes[edge.oid];
         const destination = network.data.nodes[edge.did];
         const color = colorTypeMap[edge.type];
-        colors[j++] = color[0];
-        colors[j++] = color[1];
-        colors[j++] = color[2];
         positions[i++] = origin.x;
         positions[i++] = origin.y;
         positions[i++] = 0;
         positions[i++] = destination.x;
         positions[i++] = destination.y;
         positions[i++] = 0;
+        colors[j++] = color[0];
+        colors[j++] = color[1];
+        colors[j++] = color[2];
     }
+
+    console.log(i, j);
+    console.log(positions);
 
     //pass it back to the main thread
     return {

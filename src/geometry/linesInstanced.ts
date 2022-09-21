@@ -55,7 +55,6 @@ export class InstancedLineModel extends THREE.InstancedMesh {
 
     constructor(data: LineData, materials: MaterialLibrary) {
         const geometry = new THREE.InstancedBufferGeometry();
-        geometry.instanceCount = data.segmentEndpoints.length / 6;
         geometry.setAttribute('position', new THREE.BufferAttribute(SEGMENT_INSTANCE, 3));
         geometry.setAttribute('lineStart', new THREE.InterleavedBufferAttribute(
             new THREE.InstancedInterleavedBuffer(data.segmentEndpoints, 6, 1), 3, 0));
@@ -63,9 +62,9 @@ export class InstancedLineModel extends THREE.InstancedMesh {
         geometry.setAttribute('lineEnd', new THREE.InterleavedBufferAttribute(
             new THREE.InstancedInterleavedBuffer(data.segmentEndpoints, 6, 1), 3, 3));
 
-        geometry.setAttribute('color', new THREE.InstancedBufferAttribute(data.colors, 3, false, 1));
+        geometry.setAttribute('color', new THREE.InstancedBufferAttribute(data.colors, 3, true, 1));
 
-        super(geometry, materials.line, data.segmentEndpoints.length / 6);
+        super(geometry, materials.line, 16);
         
         this.ids = new Float32Array(data.ids);
         this.matrixAutoUpdate = false;

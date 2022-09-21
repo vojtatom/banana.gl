@@ -24,6 +24,13 @@ mat4 getRotationMat(vec3 vector)
 	vec3 cross = cross(f, unit);
 	vec3 a = normalize(cross);
 	float s = length(cross);
+
+	if (s == 0.0)
+	{
+		return mat4(1.0);
+	}
+
+
 	float c = dot(f, unit);
 	float oc = 1.0 - c;
 	return mat4(oc * a.x * a.x + c,        oc * a.x * a.y - a.z * s,  oc * a.z * a.x + a.y * s,  0.0,
@@ -43,7 +50,8 @@ void main(){
 	float end = float(transformed.x >= 0.9);
 	transformed.x = end * (dist + (transformed.x - 1.0) * thickness) + (1.0 - end) * transformed.x * thickness; //subtract one because its the original length of the template line
 	transformed.y *= thickness;
-    transformed = lineStart + (rot * vec4(transformed, 1.0)).xyz;
+    //transformed = lineStart + (vec4(transformed, 1.0)).xyz;
+	transformed = lineStart + (rot * vec4(transformed, 1.0)).xyz;
 	transformed.z += zoffset;
     //END BananaGL extension
 	
