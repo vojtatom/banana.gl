@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <script>
+        async function fetchData() {
+            console.log("fetching data 1");
+            const network = await fetch('http://flux.oncue.design/network');
+            const data = await network.json();
+            console.log(data);
+            console.log("fetching data 2");
+            const population = await fetch('http://flux.oncue.design/population');
+            const data2 = await population.json();
+            console.log(data2);
+            console.log("fetching data 3");
+            const network2 = await fetch('http://flux.oncue.design/network');
+            const data3 = await network.json();
+            console.log(data3);
+            console.log("done fetching data");
+        }
+
+
+        window.onload = () => {
+            fetchData();
+        }
+    </script>
+</body>
+</html>

@@ -1,10 +1,19 @@
 import { FluxDriver } from "./driver";
 import { InstancedLineModel } from "../../geometry/linesInstanced";
-import { LineData } from "../../geometry/dataInterface";
-import { circleTriangulated } from "../../geometry/circle";
-import THREE from "three";
+import { LineData, PointData } from "../../geometry/dataInterface";
 import { nodeInstance } from "../../geometry/node";
 import { InstancedPointModel } from "../../geometry/pointsInstanced";
+
+
+interface ParsedNetworkData {
+    edges: {
+        positions: Float32Array,
+        colors: Float32Array,
+    },
+    nodes: {
+        positions: Float32Array,
+    }
+}
 
 
 export class FluxNetwork {
@@ -12,24 +21,23 @@ export class FluxNetwork {
         this.driver.layer.ctx.workers.flux.load({
             api: this.driver.api,
             type: 'network',
-        }, (data) => this.setupModels(data));
+        }, (data) => this.setupModels(data as ParsedNetworkData));
     }
 
-    private setupModels(data: any) {
+    private setupModels(data: ParsedNetworkData) {
         const lineData: LineData = {
-            segmentEndpoints: data.edges.positions,
+            positions: data.edges.positions,
             colors: data.edges.colors,
-            ids: new Float32Array(data.length / 3),
-            zoffset: 1,
-            thickness: 10,
+            thickness: this.driver.networkThickness,
+            transparency: this.driver.networkTransparency,
         };
         
         let model = new InstancedLineModel(lineData, this.driver.layer.materials);
         this.driver.layer.ctx.scene.add(model);
 
         //init circle instance for crossroads
-        const nodeModel = [ nodeInstance() ];
-        const pointData = {
+        const nodeModel = [ nodeInstance(this.driver.networkThickness) ];
+        const pointData: PointData = {
             positions: data.nodes.positions,
         };
         const crossings = new InstancedPointModel(pointData, this.driver.layer.materials, nodeModel);

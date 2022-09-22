@@ -7,7 +7,6 @@ attribute vec3 color;
 varying vec3 fscolor;
 attribute vec3 lineStart;
 attribute vec3 lineEnd;
-uniform float zoffset;
 uniform float thickness;
 //END BananaGL Attributes and Uniforms
 
@@ -59,7 +58,6 @@ void main(){
 	transformed.y += thickness_half;
     //transformed = lineStart + (vec4(transformed, 1.0)).xyz;
 	transformed = lineStart + (rot * vec4(transformed, 1.0)).xyz;
-	transformed.z += zoffset;
     //END BananaGL extension
 	
 	gl_Position = projectionMatrix * (modelViewMatrix * vec4( transformed, 1.0));

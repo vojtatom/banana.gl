@@ -7,16 +7,15 @@ export interface PointData {
 export interface MeshData {
     positions: Float32Array;
     normals: Float32Array;
-    ids: Float32Array;
+    ids?: Float32Array;
     colors?: Float32Array;
 } 
 
 export interface LineData {
-    segmentEndpoints: Float32Array;
-    ids: Float32Array;
-    zoffset: number;
-    thickness: number;
+    positions: Float32Array;
     colors: Float32Array;
+    thickness: number;
+    transparency: number;
 }
 
 export interface NodeData {
@@ -27,4 +26,6 @@ export interface AgentData {
     positions: Float32Array[];
     timestamps: Float32Array;
     colors: Float32Array;
+    size: number;
+    zoffset: number;
 }

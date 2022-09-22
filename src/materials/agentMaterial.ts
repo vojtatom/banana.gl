@@ -10,6 +10,7 @@ attribute vec3 positionEnd;
 uniform float time;
 uniform float timeStart;
 uniform float timeEnd;
+uniform float shift;
 //END BananaGL Attributes and Uniforms
 
 
@@ -59,7 +60,7 @@ void main(){
     vec3 dir = positionEnd - positionStart;
 	if (length(dir) > 0.0) {
 		vec3 ndir = normalize(dir);
-		transformed += vec3(0.0, -5.0, 0.0);
+		transformed += vec3(0.0, -shift, 0.0);
 		transformed = (getRotationMat(ndir) * vec4(transformed, 1.0)).xyz;
 	}
     float t = (time - timeStart) / (timeEnd - timeStart);
@@ -83,6 +84,7 @@ export function agentMaterial() {
             time: { value: 0 },
             timeStart: { value: 0 },
             timeEnd: { value: 1 },
+            shift: { value: 0 },
 		},
 		vertexShader: vs3D,
 		fragmentShader: fs3D,

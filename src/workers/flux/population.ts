@@ -4,16 +4,12 @@ import { PopulationData, NetworkData } from "./dataInterface";
 
 
 export async function loadPopulation(api: string[]) {
-    const [ populationAPI, networkAPI ] = api;
-    const pdata = await axios.get(populationAPI);
-    const ndata = await axios.get(networkAPI);
-    const population = pdata.data as PopulationData;
-    const network = ndata.data as NetworkData;
+    console.log('loading population');
+    const { population, network } = await fetchData(api);
+    console.log('loaded');
 
-    //sort movement events and prepare vitual timeline
     const timestamps = extractTimestamps(population);
     const sortedTimestamps = Array.from(timestamps).sort((a, b) => a - b);
-
     const { positions, colors } = agentMovementGeometry(population, sortedTimestamps, network);
 
     return {
@@ -21,6 +17,19 @@ export async function loadPopulation(api: string[]) {
         timestamps: new Float32Array(sortedTimestamps),
         colors: new Float32Array(colors.flat()),
     }
+}
+
+async function fetchData(api: string[]) {
+    const [populationAPI, networkAPI] = api;
+    //const pdata = await axios.get(populationAPI, { onDownloadProgress: (e) => console.log(e.loaded) });
+    const ndata = await fetch(networkAPI);
+    const pdata = await fetch(populationAPI);
+
+    console.log('fetched');
+    const population = await pdata.json() as PopulationData;
+    console.log(population);
+    const network = await ndata.json() as NetworkData;
+    return { population: population, network: network };
 }
 
 function agentMovementGeometry(population: PopulationData, sortedTimestamps: number[], network: NetworkData) {
@@ -32,7 +41,6 @@ function agentMovementGeometry(population: PopulationData, sortedTimestamps: num
     }
 
     const positions = invertTimelineToTimeMajor(timeline);
-
     return { positions, colors };
 }
 

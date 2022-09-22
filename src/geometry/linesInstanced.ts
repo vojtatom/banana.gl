@@ -51,27 +51,23 @@ const SEGMENT_INSTANCE = new Float32Array(segment());
 
 
 export class InstancedLineModel extends THREE.InstancedMesh {
-    ids: Float32Array;
-
     constructor(data: LineData, materials: MaterialLibrary) {
         const geometry = new THREE.InstancedBufferGeometry();
         geometry.setAttribute('position', new THREE.BufferAttribute(SEGMENT_INSTANCE, 3));
         geometry.setAttribute('lineStart', new THREE.InterleavedBufferAttribute(
-            new THREE.InstancedInterleavedBuffer(data.segmentEndpoints, 6, 1), 3, 0));
+            new THREE.InstancedInterleavedBuffer(data.positions, 6, 1), 3, 0));
 
         geometry.setAttribute('lineEnd', new THREE.InterleavedBufferAttribute(
-            new THREE.InstancedInterleavedBuffer(data.segmentEndpoints, 6, 1), 3, 3));
+            new THREE.InstancedInterleavedBuffer(data.positions, 6, 1), 3, 3));
 
         geometry.setAttribute('color', new THREE.InstancedBufferAttribute(data.colors, 3, true, 1));
 
-        super(geometry, materials.line, data.segmentEndpoints.length / 6);
-        
-        this.ids = new Float32Array(data.ids);
+        super(geometry, materials.line, data.positions.length / 6);
         this.matrixAutoUpdate = false;
         this.frustumCulled = false; //this one was a big pain to figure out...
 
+        //TODO this could be optimized to not update if not changed on frontend
         this.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
-            (material as THREE.ShaderMaterial).uniforms.zoffset.value = data.zoffset;
             (material as THREE.ShaderMaterial).uniforms.thickness.value = data.thickness;
             (material as THREE.ShaderMaterial).uniformsNeedUpdate = true;
         }

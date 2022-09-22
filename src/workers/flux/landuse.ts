@@ -3,6 +3,28 @@ import { colorStrToArr } from "../../style/color";
 import { LandUseData } from "./dataInterface";
 
 
+export async function loadLandUse(api: string) {
+    const data = await axios.get(api);
+    const landuse = data.data as LandUseData;
+    
+    const { positions, normals, colors } = tileGeometry(landuse);
+    const { linePositions, lineColors } = tileBoundary(landuse);
+
+    return {
+        tiles: {
+            positions: new Float32Array(positions),
+            normals: new Float32Array(normals),
+            colors: new Float32Array(colors),
+        },
+        boundaries: {
+            positions: new Float32Array(linePositions),
+            colors: new Float32Array(lineColors),
+        }
+    };
+
+}
+
+
 function rotate(x: number, y: number, angle: number) {
     let cos = Math.cos(angle),
         sin = Math.sin(angle),
@@ -56,28 +78,4 @@ function tileGeometry(landuse: LandUseData) {
         }
     }
     return { positions, normals, colors };
-}
-
-
-export async function loadLandUse(api: string) {
-    const data = await axios.get(api);
-    const landuse = data.data as LandUseData;
-    
-    const { positions, normals, colors } = tileGeometry(landuse);
-    const { linePositions, lineColors } = tileBoundary(landuse);
-
-    return {
-        tiles: {
-            positions: new Float32Array(positions),
-            normals: new Float32Array(normals),
-            colors: new Float32Array(colors),
-        },
-        boundaries: {
-            segmentEndpoints: new Float32Array(linePositions),
-            colors: new Float32Array(lineColors),
-            thickness: 5,
-            zoffset: 1,
-        }
-    };
-
 }

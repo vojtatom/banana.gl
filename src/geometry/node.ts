@@ -2,8 +2,8 @@ import * as THREE from "three";
 import { circleTriangulated } from "./circle";
 
 
-export function nodeInstance() {
-    const positions = circleTriangulated(10, 20, 2);
+export function nodeInstance(radius: number) {
+    const positions = circleTriangulated(radius, 20, 2);
     const normals = new Float32Array(positions.length);
     for (let i = 0; i < normals.length; i += 3) {
         normals[i] = 0;

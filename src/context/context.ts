@@ -25,6 +25,8 @@ export class GraphicContext {
     private time_: number = 0;
     private timeMax_: number = 1;
 
+    private beforeFrameUpdateFns: ((time: number) => void)[] = [];
+
     readonly workers: {
         metacity: MetacityLoaderWorkerPool;
         flux: FluxWorkerPool;
@@ -57,6 +59,9 @@ export class GraphicContext {
             this.time_ =  (this.time_ + delta) % this.timeMax_;
             this.scene.userData.time = this.time_;
 
+            //update
+            this.beforeFrameUpdateFns.forEach(fn => fn(this.time_));
+
             //rendering
             this.navigation.controls.update();
             this.renderer.renderer.render(this.scene, this.navigation.camera);
@@ -80,6 +85,10 @@ export class GraphicContext {
     set time(t: number) {
         this.time_ = t;
         this.scene.userData.time = t;
+    }
+
+    set onBeforeFrame(fn: (time: number) => void) {
+        this.beforeFrameUpdateFns.push(fn);
     }
 
     updateSize() {
