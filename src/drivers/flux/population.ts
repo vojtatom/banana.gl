@@ -1,4 +1,5 @@
 import { InstancedAgentModel } from "../../geometry/agents";
+import { AgentData } from "../../geometry/dataInterface";
 import { FluxDriver } from "./driver";
 
 
@@ -7,12 +8,12 @@ export class FluxPopulation {
         this.driver.layer.ctx.workers.flux.load({
             api: this.driver.api,
             type: 'population',
-        }, (data) => this.setupModels(data));
+        }, (data) => this.setupModels(data as AgentData));
     }
 
-    private setupModels(data: any) {
-        const { positions, timestamps } = data;
-        const model = new InstancedAgentModel(positions, timestamps, this.driver.layer.materials);
+    private setupModels(data: AgentData) {
+        const model = new InstancedAgentModel(data, this.driver.layer.materials);
         this.driver.layer.ctx.scene.add(model);
+        this.driver.layer.ctx.timeMax = data.timestamps[data.timestamps.length - 1];
     }
 }

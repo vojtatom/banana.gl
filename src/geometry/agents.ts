@@ -1,20 +1,23 @@
 import * as THREE from 'three';
 import { MaterialLibrary } from '../materials/materials';
+import { AgentData } from './dataInterface';
 
 
-const CUBE_GEOMETRY = new THREE.BoxBufferGeometry(10, 10, 10);
+const AGENT_INSTANCE = new THREE.BoxBufferGeometry(20, 10, 10).toNonIndexed();
 
 
 class MovementInterval extends THREE.InstancedMesh {
     constructor(attrStart: THREE.InstancedBufferAttribute, attrEnd: THREE.InstancedBufferAttribute, 
-                readonly timeStart: number, readonly timeEnd: number, materials: MaterialLibrary) {
+                readonly timeStart: number, readonly timeEnd: number, colors: THREE.InstancedBufferAttribute, materials: MaterialLibrary) {
         const geometry = new THREE.InstancedBufferGeometry();
-        geometry.setAttribute('position', new THREE.BufferAttribute(CUBE_GEOMETRY.attributes.position.array, 3));
+        geometry.setAttribute('position', new THREE.BufferAttribute(AGENT_INSTANCE.attributes.position.array, 3));
+        geometry.setAttribute('normal', new THREE.BufferAttribute(AGENT_INSTANCE.attributes.normal.array, 3));
+        geometry.setAttribute('color', colors);
         geometry.setAttribute('positionStart', attrStart);
         geometry.setAttribute('positionEnd', attrEnd);
 
         const material = materials.agents;
-        super(geometry, material, 1);
+        super(geometry, material, attrStart.count);
 
         this.frustumCulled = false;
         this.matrixAutoUpdate = false;
@@ -29,20 +32,21 @@ class MovementInterval extends THREE.InstancedMesh {
 }
 
 export class InstancedAgentModel extends THREE.Group {
-    
-    
-    constructor(positions: Float32Array[], timeline: number[], materials: MaterialLibrary) {   
+    constructor(data: AgentData, materials: MaterialLibrary) {   
         super();
 
         //construct buffers
         const attrs = [];
-        for(let i = 0; i < positions.length; i++) {
-            const attribute = new THREE.InstancedBufferAttribute(positions[i], 3, false, 1);
+        for(let i = 0; i < data.positions.length; i++) {
+            const attribute = new THREE.InstancedBufferAttribute(data.positions[i], 3, false, 1);
             attrs.push(attribute);
         }
 
-        for (let i = 0; i < positions.length - 1; i++) {
-            const movement = new MovementInterval(attrs[i], attrs[i + 1], timeline[i], timeline[i + 1], materials);
+        console.log(data.colors);
+        const colors = new THREE.InstancedBufferAttribute(data.colors, 3, false, 1);
+
+        for (let i = 0; i < data.positions.length - 1; i++) {
+            const movement = new MovementInterval(attrs[i], attrs[i + 1], data.timestamps[i], data.timestamps[i + 1], colors, materials);
             this.add(movement);
         }
     }

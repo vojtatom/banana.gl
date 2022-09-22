@@ -18,3 +18,9 @@ export interface LineData {
     width: number;
     colors: Float32Array;
 }
+
+export interface AgentData {
+    positions: Float32Array[];
+    timestamps: Float32Array;
+    colors: Float32Array;
+}

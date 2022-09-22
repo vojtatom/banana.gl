@@ -22,6 +22,9 @@ export class GraphicContext {
     readonly picker: GPUPicker;
     readonly container: HTMLDivElement;
 
+    private time_: number = 0;
+    private timeMax_: number = 1;
+
     readonly workers: {
         metacity: MetacityLoaderWorkerPool;
         flux: FluxWorkerPool;
@@ -45,10 +48,15 @@ export class GraphicContext {
             flux: new FluxWorkerPool(props.fluxWorker ?? 'fluxWorker.js'),
         };
 
-        let time = 0;
+        let time = Date.now();
         const frame = async () => {
-            time += 1;
-            this.scene.userData.time = time;
+            //time management
+            const delta = (Date.now() - time) / 1000;
+            time = Date.now();
+            this.time_ =  (this.time_ + delta) % this.timeMax_;
+            this.scene.userData.time = this.time_;
+
+            //rendering
             this.navigation.controls.update();
             this.renderer.renderer.render(this.scene, this.navigation.camera);
             this.renderer.labelRenderer.render(this.labelScene, this.navigation.camera);
@@ -58,6 +66,10 @@ export class GraphicContext {
 
         this.updateSize();
         frame();
+    }
+
+    set timeMax(value: number) {
+        this.timeMax_ = value;
     }
 
     updateSize() {

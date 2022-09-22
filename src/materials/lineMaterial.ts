@@ -2,10 +2,9 @@ import * as THREE from 'three';
 
 
 const vs3D = `
+//BEGIN BananaGL Attributes and Uniforms
 attribute vec3 color;
 varying vec3 fscolor;
-
-//BEGIN BananaGL Attributes and Uniforms
 attribute vec3 lineStart;
 attribute vec3 lineEnd;
 uniform float zoffset;

@@ -1,4 +1,5 @@
 import axios from "axios";
+import { colorStrToArr } from "../../style/color";
 import { PopulationData, NetworkData } from "./dataInterface";
 
 
@@ -24,9 +25,15 @@ export async function loadPopulation(api: string[]) {
     const sortedTimestamps = Array.from(timestamps).sort((a, b) => a - b);
 
     const timeline = [];
+    const colors = [];
     for (let agentID in population.data.agents) {
         const agentTimeline = [];
         const agent = population.data.agents[agentID];
+
+        //assign color to agent
+        colors.push(colorStrToArr(population.data.agentTypes[agent.type].color));
+
+        //prepare agent timeline
         let movementIt = 0, time = 0, movement = agent.movements[movementIt], node;
         for (let i = 0; i < sortedTimestamps.length; i++) {
             time = sortedTimestamps[i];
@@ -73,6 +80,8 @@ export async function loadPopulation(api: string[]) {
         positions.push(row);
     }
 
+
+
     //to Float32Array
     const positionsArray = [];
     for (let i = 0; i < positions.length; i++) {
@@ -81,6 +90,7 @@ export async function loadPopulation(api: string[]) {
 
     return {
         positions: positionsArray,
-        timestamps: new Float32Array(sortedTimestamps)
+        timestamps: new Float32Array(sortedTimestamps),
+        colors: new Float32Array(colors.flat()),
     }
 }
