@@ -51,7 +51,8 @@ export class GraphicContext {
         let time = Date.now();
         const frame = async () => {
             //time management
-            const delta = (Date.now() - time) / 1000;
+            //const delta = (Date.now() - time) / 1000;
+            const delta = 1;
             time = Date.now();
             this.time_ =  (this.time_ + delta) % this.timeMax_;
             this.scene.userData.time = this.time_;

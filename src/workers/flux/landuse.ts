@@ -11,6 +11,7 @@ function rotate(x: number, y: number, angle: number) {
     return [nx, ny];
 }
 
+
 function cwRotatedSquare(diameter: number, angle: number) {
     let half = diameter / 2;
     let x = half, y = half;
@@ -19,10 +20,25 @@ function cwRotatedSquare(diameter: number, angle: number) {
 }
 
 
-export async function loadLandUse(api: string) {
-    const data = await axios.get(api);
-    const landuse = data.data as LandUseData;
-    //setup tiles
+function tileBoundary(landuse: LandUseData) {
+    const linePositions = [];
+    const lineColors = [];
+
+    for (let areaID in landuse.data) {
+        const area = landuse.data[areaID];
+        const color = colorStrToArr(area.color);
+        for (let i = 0; i < area.boundary.length; i++) {
+            const next = (i + 1) % area.boundary.length;
+            linePositions.push(area.boundary[i].x, area.boundary[i].y, 0);
+            linePositions.push(area.boundary[next].x, area.boundary[next].y, 0);
+            lineColors.push(color[0], color[1], color[2]);
+        }
+    }
+    return { linePositions, lineColors };
+}
+
+
+function tileGeometry(landuse: LandUseData) {
     const positions = [];
     const normals = [];
     const colors = [];
@@ -39,21 +55,16 @@ export async function loadLandUse(api: string) {
             }
         }
     }
+    return { positions, normals, colors };
+}
 
-    //setup line boundaries
-    const linePositions = [];
-    const lineColors = [];
 
-    for (let areaID in landuse.data) {
-        const area = landuse.data[areaID];
-        const color = colorStrToArr(area.color);
-        for (let i = 0; i < area.boundary.length; i++) {
-            const next = (i + 1) % area.boundary.length;
-            linePositions.push(area.boundary[i].x, area.boundary[i].y, 0);
-            linePositions.push(area.boundary[next].x, area.boundary[next].y, 0);
-            lineColors.push(color[0], color[1], color[2]);
-        }
-    }
+export async function loadLandUse(api: string) {
+    const data = await axios.get(api);
+    const landuse = data.data as LandUseData;
+    
+    const { positions, normals, colors } = tileGeometry(landuse);
+    const { linePositions, lineColors } = tileBoundary(landuse);
 
     return {
         tiles: {
