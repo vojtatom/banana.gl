@@ -20,18 +20,36 @@ export async function loadNetwork(api: string) {
     }
 
     //fill buffers
+    const zOffsets = 0.01
+    let zLevel = 0; 
     for (const edgeID in network.data.edges) {
         const edge = network.data.edges[edgeID];
         const origin = network.data.nodes[edge.oid];
         const destination = network.data.nodes[edge.did];
         const color = colorTypeMap[edge.type];
-        positions.push(origin.x, origin.y, 0, destination.x, destination.y, 0);
+        positions.push(origin.x, origin.y, zLevel, destination.x, destination.y, zLevel);
         colors.push(color[0], color[1], color[2]);
+        zLevel += zOffsets;
     }
+
+    //extract only node positions
+    const nodePositions = [];
+    for (const nodeID in network.data.nodes) {
+        const node = network.data.nodes[nodeID];
+        nodePositions.push(node.x, node.y, 0);
+    }
+
+    //create instance
+
 
     //pass it back to the main thread
     return {
-        positions: new Float32Array(positions),
-        colors: new Float32Array(colors),
+        edges: {
+            positions: new Float32Array(positions),
+            colors: new Float32Array(colors),
+        },
+        nodes: {
+            positions: new Float32Array(nodePositions),
+        }
     };
 }

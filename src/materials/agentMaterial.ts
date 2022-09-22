@@ -58,6 +58,7 @@ void main(){
 
     vec3 dir = positionEnd - positionStart;
 	vec3 ndir = normalize(dir);
+	transformed += vec3(0.0, -5.0, 0.0);
 	transformed = (getRotationMat(ndir) * vec4(transformed, 1.0)).xyz;
     float t = (time - timeStart) / (timeEnd - timeStart);
     transformed += positionStart + t * dir;

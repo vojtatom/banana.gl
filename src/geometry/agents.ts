@@ -4,6 +4,7 @@ import { AgentData } from './dataInterface';
 
 
 const AGENT_INSTANCE = new THREE.BoxBufferGeometry(20, 10, 10).toNonIndexed();
+AGENT_INSTANCE.translate(0, 0, 7);
 
 
 class MovementInterval extends THREE.InstancedMesh {
@@ -42,7 +43,6 @@ export class InstancedAgentModel extends THREE.Group {
             attrs.push(attribute);
         }
 
-        console.log(data.colors);
         const colors = new THREE.InstancedBufferAttribute(data.colors, 3, false, 1);
 
         for (let i = 0; i < data.positions.length - 1; i++) {

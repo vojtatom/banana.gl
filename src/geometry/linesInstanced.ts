@@ -69,5 +69,11 @@ export class InstancedLineModel extends THREE.InstancedMesh {
         this.ids = new Float32Array(data.ids);
         this.matrixAutoUpdate = false;
         this.frustumCulled = false; //this one was a big pain to figure out...
+
+        this.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
+            (material as THREE.ShaderMaterial).uniforms.zoffset.value = data.zoffset;
+            (material as THREE.ShaderMaterial).uniforms.thickness.value = data.thickness;
+            (material as THREE.ShaderMaterial).uniformsNeedUpdate = true;
+        }
     }
 }

@@ -1,6 +1,6 @@
 export interface PointData {
     positions: Float32Array;
-    ids: Float32Array;
+    ids?: Float32Array;
 }
 
 
@@ -14,9 +14,13 @@ export interface MeshData {
 export interface LineData {
     segmentEndpoints: Float32Array;
     ids: Float32Array;
-    offset: number;
-    width: number;
+    zoffset: number;
+    thickness: number;
     colors: Float32Array;
+}
+
+export interface NodeData {
+    positions: Float32Array;
 }
 
 export interface AgentData {

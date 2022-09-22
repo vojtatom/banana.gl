@@ -72,6 +72,15 @@ export class GraphicContext {
         this.timeMax_ = value;
     }
 
+    get timeframe() {
+        return [0, this.timeMax_];
+    }
+
+    set time(t: number) {
+        this.time_ = t;
+        this.scene.userData.time = t;
+    }
+
     updateSize() {
         let width, height;
         const { container } = this;

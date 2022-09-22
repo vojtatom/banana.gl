@@ -75,4 +75,12 @@ export class BananaGL {
         }
         return undefined;
     }
+
+    get timeframe() {
+        return this.ctx.timeframe;
+    }
+
+    set time(time: number) {
+        this.ctx.time = time;
+    }
 }

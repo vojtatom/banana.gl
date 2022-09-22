@@ -52,8 +52,11 @@ void main(){
     float dist = length(dir);
     mat4 rot = getRotationMat(dir);
 	float end = float(transformed.x >= 0.9);
-	transformed.x = end * (dist + (transformed.x - 1.0) * thickness) + (1.0 - end) * transformed.x * thickness; //subtract one because its the original length of the template line
-	transformed.y *= thickness;
+	float thickness_half = thickness * 0.5;
+	transformed.x = end * (dist + (transformed.x - 1.0) * thickness_half) + ((1.0 - end) * transformed.x * thickness_half); //subtract one because its the original length of the template line
+	//offset a little to the right
+	transformed.y *= thickness_half;
+	transformed.y += thickness_half;
     //transformed = lineStart + (vec4(transformed, 1.0)).xyz;
 	transformed = lineStart + (rot * vec4(transformed, 1.0)).xyz;
 	transformed.z += zoffset;
@@ -66,7 +69,7 @@ const fs3D = `
 varying vec3 fscolor;
 
 void main() {
-	gl_FragColor = vec4(fscolor, 0.9);
+	gl_FragColor = vec4(fscolor, 0.5);
 }`;
 
 
@@ -79,6 +82,6 @@ export function lineMaterial() {
 		vertexShader: vs3D,
 		fragmentShader: fs3D,
 		side: THREE.DoubleSide,
-		transparent: false
+		transparent: true
 	});
 }

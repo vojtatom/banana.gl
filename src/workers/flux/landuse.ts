@@ -64,8 +64,8 @@ export async function loadLandUse(api: string) {
         boundaries: {
             segmentEndpoints: new Float32Array(linePositions),
             colors: new Float32Array(lineColors),
-            width: 1,
-            offset: 1,
+            thickness: 5,
+            zoffset: 1,
         }
     };
 
