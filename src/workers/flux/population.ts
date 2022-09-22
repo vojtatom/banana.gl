@@ -22,6 +22,7 @@ export async function loadPopulation(api: string[]) {
 
     //sort timestamps
     const sortedTimestamps = Array.from(timestamps).sort((a, b) => a - b);
+
     const timeline = [];
     for (let agentID in population.data.agents) {
         const agentTimeline = [];
@@ -53,7 +54,7 @@ export async function loadPopulation(api: string[]) {
                 } else {
                     //fill with static position till the end, no more movements
                     node = network.data.nodes[movement.did];
-                    for (let j = i; j < sortedTimestamps.length; j++) {
+                    for (let j = ++i; j < sortedTimestamps.length; j++) {
                         agentTimeline.push(node.x, node.y, 0);
                     }
                 }

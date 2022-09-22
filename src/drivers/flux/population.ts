@@ -1,5 +1,5 @@
+import { InstancedAgentModel } from "../../geometry/agents";
 import { FluxDriver } from "./driver";
-
 
 
 export class FluxPopulation {
@@ -11,6 +11,8 @@ export class FluxPopulation {
     }
 
     private setupModels(data: any) {
-        console.log(data);
+        const { positions, timestamps } = data;
+        const model = new InstancedAgentModel(positions, timestamps, this.driver.layer.materials);
+        this.driver.layer.ctx.scene.add(model);
     }
 }

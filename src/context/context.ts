@@ -45,7 +45,10 @@ export class GraphicContext {
             flux: new FluxWorkerPool(props.fluxWorker ?? 'fluxWorker.js'),
         };
 
+        let time = 0;
         const frame = async () => {
+            time += 1;
+            this.scene.userData.time = time;
             this.navigation.controls.update();
             this.renderer.renderer.render(this.scene, this.navigation.camera);
             this.renderer.labelRenderer.render(this.labelScene, this.navigation.camera);

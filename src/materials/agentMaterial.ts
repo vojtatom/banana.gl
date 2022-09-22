@@ -11,10 +11,14 @@ uniform float timeEnd;
 //END BananaGL Attributes and Uniforms
 
 void main(){
-	fscolor = color;
 	vec3 transformed = position;
 	
 	//BEGIN BananaGL extension
+	if (time < timeStart || time > timeEnd) {
+		gl_Position = vec4(0.0, 0.0, 0.0, 0.0);
+		return;
+	}
+
     vec3 dir = positionEnd - positionStart;
     float t = (time - timeStart) / (timeEnd - timeStart);
     transformed += positionStart + t * dir;
@@ -25,7 +29,7 @@ void main(){
 
 const fs3D = `
 void main() {
-	gl_FragColor = vec4(1.0, 1.0, 1.0, 0.9);
+	gl_FragColor = vec4(1.0, 1.0, 1.0, 1.0);
 }`;
 
 
