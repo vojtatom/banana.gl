@@ -7,6 +7,7 @@ import { MetadataRecord } from './layer/metadata';
 
 export interface BananaProps extends GraphicsProps {
     onClick?: (id: number, metadata: MetadataRecord) => string;
+    onHover?: (id: number, metadata: MetadataRecord) => string;
 }
 
 
@@ -33,7 +34,6 @@ export class BananaGL {
                 const y = e.clientY;
                 const id = this.ctx.picker.pick(x, y);
                 const data = this.getMetadata(id);
-                console.log(id, data);
                 if (data && data.bbox && props.onClick) {
                     labels.labelForBBox(data.bbox, props.onClick(id, data), id);
                 }
@@ -41,6 +41,18 @@ export class BananaGL {
 
             this.ctx.navigation.update();
         };
+
+        canvas.onpointermove = (e) => {
+            const x = e.clientX;
+            const y = e.clientY;
+            const id = this.ctx.picker.pick(x, y);
+            const data = this.getMetadata(id);
+            if (data && data.bbox && props.onHover) {
+                labels.hoverLabelForBBox(data.bbox, props.onHover(id, data), id);
+            } else {
+                labels.hideHover();
+            }
+        }
 
 
         let updateCall: any;

@@ -14,6 +14,7 @@ export interface MeshData {
 export interface LineData {
     positions: Float32Array;
     colors: Float32Array;
+    ids?: Float32Array;
     thickness: number;
     transparency: number;
 }

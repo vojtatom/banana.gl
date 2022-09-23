@@ -51,6 +51,10 @@
                 background: 0x222222,
                 hideCopyright: true,
                 fluxWorker: "../dist/fluxWorker.js",
+                onHover: (id, metadata) => {
+                    console.log(metadata);
+                    return 'hello! ' + metadata.stringID;
+                }
             });
 
             gl.loadLayer({

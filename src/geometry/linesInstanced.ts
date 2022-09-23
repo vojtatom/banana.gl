@@ -61,6 +61,9 @@ export class InstancedLineModel extends THREE.InstancedMesh {
             new THREE.InstancedInterleavedBuffer(data.positions, 6, 1), 3, 3));
 
         geometry.setAttribute('color', new THREE.InstancedBufferAttribute(data.colors, 3, true, 1));
+        
+        if (data.ids)
+            geometry.setAttribute('idcolor', new THREE.InstancedBufferAttribute(data.ids, 3, true, 1));
 
         super(geometry, materials.line, data.positions.length / 6);
         this.matrixAutoUpdate = false;

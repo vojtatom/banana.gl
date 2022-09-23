@@ -65,9 +65,9 @@ export class GraphicContext {
             //rendering
             this.navigation.controls.update();
             this.renderer.renderer.render(this.scene, this.navigation.camera);
+            //this.renderer.renderer.render(this.picker.pickingScene, this.navigation.camera);
             this.renderer.labelRenderer.render(this.labelScene, this.navigation.camera);
             requestAnimationFrame(frame);
-            //renderer.render(picker.pickingScene, camera);
         };
 
         this.updateSize();

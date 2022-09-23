@@ -4,10 +4,10 @@ import { GraphicContext } from "./context";
 
 export class Labels {
     private labels = new Map<number, CSS2DObject>();
+    private hoverLabel: CSS2DObject | undefined;
+    private hoverLabelID: number | undefined;
     
-    constructor(private ctx: GraphicContext) {
-
-    }
+    constructor(private ctx: GraphicContext) {}
 
     label(x: number, y: number, z: number, text: string, objectID?: number) {
         if (!objectID)
@@ -19,10 +19,32 @@ export class Labels {
         const obj = this.createLabel(x, y, z, text);
         this.labels.set(objectID, obj);
     }
+        
 
     labelForBBox(bbox: [number[], number[]], text: string, objectID?: number) {
         const center = [(bbox[0][0] + bbox[1][0]) * 0.5, (bbox[0][1] + bbox[1][1]) * 0.5, bbox[1][2]];
         this.label(center[0], center[1], center[2], text, objectID);
+    }
+
+    hoverLabelForBBox(bbox: [number[], number[]], text: string, objectID?: number) {
+        if ((objectID !== this.hoverLabelID)) {
+            this.hideHover();
+        }
+
+        if (!this.hoverLabel && bbox) {
+            const [x, y, z] = [(bbox[0][0] + bbox[1][0]) * 0.5, (bbox[0][1] + bbox[1][1]) * 0.5, bbox[1][2]];
+            const obj = this.createLabel(x, y, z, text);
+            this.hoverLabel = obj;
+            this.hoverLabelID = objectID;
+        }
+    }
+
+    hideHover() {
+        if (this.hoverLabel) {
+            this.ctx.labelScene.remove(this.hoverLabel);
+            this.hoverLabel = undefined;
+            this.hoverLabelID = undefined;
+        }
     }
 
     get size() {

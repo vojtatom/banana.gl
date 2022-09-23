@@ -8,11 +8,8 @@ export async function loadPopulation(api: string[]) {
 
     const timestamps = extractTimestamps(population);
     const sortedTimestamps = Array.from(timestamps).sort((a, b) => a - b);
-    console.log(population);
-    console.log(sortedTimestamps);
     const { positions, colors } = agentMovementGeometry(population, sortedTimestamps, network);
-
-    console.log(positions);
+    
     return {
         positions: positions,
         timestamps: new Float32Array(sortedTimestamps),

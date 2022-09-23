@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { agentMaterial } from './agentMaterial';
-import { lineMaterial } from './lineMaterial';
+import { lineMaterial, lineMaterialPick } from './lineMaterial';
 
 
 export interface MaterialLibraryProps {
@@ -14,6 +14,7 @@ export class MaterialLibrary {
     readonly mesh: THREE.MeshLambertMaterial;
     readonly placeholder: THREE.MeshLambertMaterial;
     readonly line: THREE.ShaderMaterial;
+    readonly linePick: THREE.ShaderMaterial;
     readonly point: THREE.PointsMaterial;
     readonly loading: THREE.MeshBasicMaterial;
     readonly agents: THREE.ShaderMaterial;
@@ -37,6 +38,7 @@ export class MaterialLibrary {
         });
 
         this.line = lineMaterial();
+        this.linePick = lineMaterialPick();
         this.agents = agentMaterial();
 
         this.point = new THREE.PointsMaterial({

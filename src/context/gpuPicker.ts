@@ -19,7 +19,7 @@ export class GPUPicker {
     // create a 1x1 pixel render target
     private pickingTexture = new THREE.WebGLRenderTarget(1, 1);
     private pixelBuffer = new Uint8Array(4);
-    private pickingScene = new THREE.Scene();
+    readonly pickingScene = new THREE.Scene();
     private pickingMaterial = new THREE.ShaderMaterial({
             vertexShader: vs3D,
             fragmentShader: fs3D,
@@ -32,6 +32,10 @@ export class GPUPicker {
     addPickable(mesh: THREE.Mesh) {
         const pickingObject = new THREE.Mesh(mesh.geometry, this.pickingMaterial);
         this.pickingScene.add(pickingObject);
+    }
+
+    addPickableWithPickingMaterial(mesh: THREE.Mesh) {
+        this.pickingScene.add(mesh);
     }
 
     pick(x: number, y: number) {
