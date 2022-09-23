@@ -72,6 +72,7 @@ export class InstancedLineModel extends THREE.InstancedMesh {
         //TODO this could be optimized to not update if not changed on frontend
         this.onBeforeRender = (renderer, scene, camera, geometry, material, group) => {
             (material as THREE.ShaderMaterial).uniforms.thickness.value = data.thickness;
+            (material as THREE.ShaderMaterial).uniforms.transparency.value = data.transparency;
             (material as THREE.ShaderMaterial).uniformsNeedUpdate = true;
         }
     }

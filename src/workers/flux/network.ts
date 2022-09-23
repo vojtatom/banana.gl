@@ -42,6 +42,7 @@ function networkLineGeometry(network: NetworkData, colorTypeMap: { [key: string]
     const metadata: {[id: number]: any} = {};
 
     let zLevel = 1;
+    let zLevelOffset = 0.00001;
     for (const edgeID in network.data.edges) {
         const edge = network.data.edges[edgeID];
         const origin = network.data.nodes[edge.oid];
@@ -57,6 +58,7 @@ function networkLineGeometry(network: NetworkData, colorTypeMap: { [key: string]
                    [Math.max(origin.x, destination.x), Math.max(origin.y, destination.y), 0]],
         };
         id++;
+        zLevel -= zLevelOffset;
     }
     return { edgePositions, edgeColors, edgeIDs, metadata};
 }

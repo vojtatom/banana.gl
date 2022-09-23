@@ -65,9 +65,10 @@ void main(){
 
 const fs3D = `
 varying vec3 fscolor;
+uniform float transparency;
 
 void main() {
-	gl_FragColor = vec4(fscolor, 0.5);
+	gl_FragColor = vec4(fscolor, transparency);
 }`;
 
 
@@ -75,6 +76,7 @@ export function lineMaterial() {
 	return new THREE.ShaderMaterial({
 		uniforms: {
 			zoffset: { value: 1 },
+			transparency: { value: 1 },
 			thickness: { value: 10 }
 		},
 		vertexShader: vs3D,
@@ -157,6 +159,7 @@ export function lineMaterialPick() {
 	return new THREE.ShaderMaterial({
 		uniforms: {
 			zoffset: { value: 1 },
+			transparency: { value: 1 },
 			thickness: { value: 10 }
 		},
 		vertexShader: vs3Dpick,

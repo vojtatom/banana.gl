@@ -5,6 +5,7 @@ import { lineMaterial, lineMaterialPick } from './lineMaterial';
 
 export interface MaterialLibraryProps {
     baseColor?: number;
+    meshOpacity?: number;
     placeholderColor?: number;
     placeholderOpacity?: number;
     loadingColor?: number;
@@ -28,6 +29,8 @@ export class MaterialLibrary {
             side: THREE.DoubleSide,
             color: useVertexColors ? undefined : this.baseColor,
             vertexColors: useVertexColors ?? false,
+            opacity: props.meshOpacity ?? 1,
+            transparent: true,
         });
 
         this.placeholder = new THREE.MeshLambertMaterial({

@@ -31,8 +31,8 @@ export class FluxLandUse {
         const lineData : LineData = {
             positions: data.boundaries.positions,
             colors: data.boundaries.colors,
-            thickness: this.driver.landuseThickness,
-            transparency: this.driver.landuseTransparency,
+            thickness: this.driver.landuseBorderThickness,
+            transparency: this.driver.landuseBorderTransparency,
         }
 
         const boundaries = new InstancedLineModel(lineData, this.driver.layer.materials);

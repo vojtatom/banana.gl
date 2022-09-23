@@ -39,7 +39,7 @@ export class InstancedAgentModel extends THREE.Group {
     constructor(data: AgentData, materials: MaterialLibrary) {   
         super();
 
-        const instance = new THREE.BoxBufferGeometry(data.size * 1.5, data.size, data.size).toNonIndexed();
+        const instance = new THREE.BoxGeometry(data.size * 1.5, data.size, data.size).toNonIndexed();
         instance.translate(0, 0, data.zoffset);
 
         const attrs = [];
@@ -47,8 +47,6 @@ export class InstancedAgentModel extends THREE.Group {
             const attribute = new THREE.InstancedBufferAttribute(data.positions[i], 3, false, 1);
             attrs.push(attribute);
         }
-
-        console.log(attrs.length);
 
         const colors = new THREE.InstancedBufferAttribute(data.colors, 3, false, 1);
 

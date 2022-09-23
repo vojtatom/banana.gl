@@ -48,7 +48,7 @@ export class FluxNetwork {
         this.driver.layer.ctx.picker.addPickableWithPickingMaterial(pickingModel);
 
         //init circle instance for crossroads
-        const nodeModel = [ nodeInstance(this.driver.networkThickness) ];
+        const nodeModel = [ nodeInstance(this.driver.networkThickness, this.driver.crossroadColor, this.driver.crossroadTransparency) ];
         const pointData: PointData = {
             positions: data.nodes.positions,
         };
