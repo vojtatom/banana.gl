@@ -61,8 +61,9 @@ export class InstancedAgentModel extends THREE.Group {
     }
 
     updateVisibility(time: number) {
-        //this.children.forEach(child => {
-        //    (child as MovementInterval).updateVisibility(time);
-        //});
+        //this could be improved by A LOT by keeping track of the last visible interval
+        this.children.forEach(child => {
+            (child as MovementInterval).updateVisibility(time);
+        });
     }
 }

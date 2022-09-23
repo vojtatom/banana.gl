@@ -4,9 +4,7 @@ import { NetworkData } from "./dataInterface";
 
 
 export async function loadNetwork(api: string) {
-    console.log('loading network');
-    const data = await axios.get(api, { onDownloadProgress: (e) => console.log(e.loaded) });
-    console.log('loaded');
+    const data = await axios.get(api);
     const network = data.data as NetworkData;
     
     const colorTypeMap: { [key: string]: number[]; } = colorMap(network);

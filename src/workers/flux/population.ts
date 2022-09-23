@@ -4,14 +4,15 @@ import { PopulationData, NetworkData } from "./dataInterface";
 
 
 export async function loadPopulation(api: string[]) {
-    console.log('loading population');
     const { population, network } = await fetchData(api);
-    console.log('loaded');
 
     const timestamps = extractTimestamps(population);
     const sortedTimestamps = Array.from(timestamps).sort((a, b) => a - b);
+    console.log(population);
+    console.log(sortedTimestamps);
     const { positions, colors } = agentMovementGeometry(population, sortedTimestamps, network);
 
+    console.log(positions);
     return {
         positions: positions,
         timestamps: new Float32Array(sortedTimestamps),
@@ -21,15 +22,11 @@ export async function loadPopulation(api: string[]) {
 
 async function fetchData(api: string[]) {
     const [populationAPI, networkAPI] = api;
-    //const pdata = await axios.get(populationAPI, { onDownloadProgress: (e) => console.log(e.loaded) });
-    const ndata = await fetch(networkAPI);
-    const pdata = await fetch(populationAPI);
-
-    console.log('fetched');
-    const population = await pdata.json() as PopulationData;
-    console.log(population);
-    const network = await ndata.json() as NetworkData;
-    return { population: population, network: network };
+    const pdata = await axios.get(populationAPI);
+    const ndata = await axios.get(networkAPI);
+    const population = pdata.data as PopulationData;
+    const network = ndata.data as NetworkData;
+    return { population, network };
 }
 
 function agentMovementGeometry(population: PopulationData, sortedTimestamps: number[], network: NetworkData) {
@@ -63,7 +60,6 @@ function processAgent(population: PopulationData, agentID: string, colors: numbe
     //assign color to agent
     colors.push(colorStrToArr(population.data.agentTypes[agent.type].color));
 
-    //prepare agent timeline
     let movementIt = 0, time = 0, movement = agent.movements[movementIt], node;
     for (let i = 0; i < sortedTimestamps.length; i++) {
         time = sortedTimestamps[i];
@@ -96,7 +92,13 @@ function processAgent(population: PopulationData, agentID: string, colors: numbe
                 }
             }
         }
+
+
+
+        //TODO refactor and simplify
     }
+
+    //console.log(agentTimeline.length === sortedTimestamps.length * 3, "agent timeline length mismatch");
     return agentTimeline;
 }
 
