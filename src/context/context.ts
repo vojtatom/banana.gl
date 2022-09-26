@@ -103,7 +103,7 @@ export class GraphicContext {
             width = window.innerWidth;
             height = window.innerHeight;
         }
-
+        
         this.renderer.resize(width, height);
         this.navigation.controls.updateCamera(width, height);
 

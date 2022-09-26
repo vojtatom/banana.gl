@@ -1,15 +1,23 @@
 import axios from "axios";
 import { colorHex, colorStrToArr } from "../../style/color";
-import { NetworkData } from "./dataInterface";
+import { NetworkData, PerformanceData } from "./dataInterface";
 
 
 export async function loadNetwork(api: string) {
-    const data = await axios.get(api);
+    const data = await axios.get(api[0]);
     const network = data.data as NetworkData;
     
     const colorTypeMap: { [key: string]: number[]; } = colorMap(network);
     const { edgePositions, edgeColors, edgeIDs, metadata } = networkLineGeometry(network, colorTypeMap);
     const nodePositions = networkNodeGeometry(network);
+
+    const performanceData = await axios.get(api[1]);
+    const performance = performanceData.data as PerformanceData;
+
+    for (const edgeID in metadata) {
+        const id = metadata[edgeID].stringID;
+        metadata[edgeID].performance = performance.data.counts[id];
+    }
 
     return {
         edges: {

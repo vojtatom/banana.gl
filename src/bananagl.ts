@@ -73,6 +73,7 @@ export class BananaGL {
         let layer = new Layer(props, this.ctx);
         this.layers.push(layer);
         layer.load();
+        return layer;
     };
 
     get style() {

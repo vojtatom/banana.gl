@@ -4,34 +4,7 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-
-    <style>
-        body, html {
-            margin: 0;
-            padding: 0;
-            font-size: 14px;
-            line-height: 20px;
-            color: #333333;
-            background-color: #ffffff;
-
-            /* font antialiasing */
-            -webkit-font-smoothing: antialiased;
-            -moz-osx-font-smoothing: grayscale;
-        }
-
-        #canvasContainer {
-            width: 100%;
-            height: 100%;
-        }
-
-        #main {
-            width: 100vw;
-            height: 100vh;
-            overflow: hidden;
-        }
-
-    </style>
+    <link rel="stylesheet" href="style.css">
 
     <title>Flux: Dynamic Data Example</title>
 </head>
@@ -42,47 +15,7 @@
         </div>
     </div>
     <script src="../dist/bananagl.js"></script>
-    <script>
-        window.onload = () => {
-            const canvas = document.getElementById("canvas");
-
-            const gl = new BananaGL.BananaGL({ 
-                canvas: canvas,
-                background: 0x222222,
-                hideCopyright: true,
-                fluxWorker: "../dist/fluxWorker.js",
-                onHover: (id, metadata) => {
-                    console.log(metadata);
-                    return 'hello! ' + metadata.stringID;
-                }
-            });
-
-            gl.loadLayer({
-                type: "flux",
-                driverType: "network",
-                api: "http://flux.oncue.design/network",
-                networkThickness: 20,
-                networkTransparency: 0.1,
-                crossroadColor: 0x111111,
-            });
-
-            gl.loadLayer({
-                type: "flux",
-                driverType: "landuse",
-                api: "http://flux.oncue.design/landuse",
-                meshOpacity: 0.5, //tile opacity
-                landuseBorderTransparency: 0.5,
-                landuseBorderThickness: 1,
-            });
-
-            gl.loadLayer({
-                type: "flux",
-                driverType: "population",
-                api: ["http://flux.oncue.design/population", "http://flux.oncue.design/network"],
-                networkThickness: 15,
-            });
-        }
-    </script>
+    <script src="app.js"></script>
 
 </body>
 </html>
