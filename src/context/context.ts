@@ -11,6 +11,7 @@ import { FluxWorkerPool } from '../pools/poolFlux';
 export interface GraphicsProps extends NavigationProps, RendererProps, LightProps, CopyrightProps {
     metacityWorker?: string;
     fluxWorker?: string;
+    onFrame?: (time: number, timeMax: number) => void;
 }
 
 export class GraphicContext {
@@ -22,9 +23,11 @@ export class GraphicContext {
     readonly picker: GPUPicker;
     readonly container: HTMLDivElement;
 
+    private speed_: number = 1;
     private time_: number = 0;
     private timeMax_: number = 1;
 
+    private onFrameFn: ((time: number, timeMax: number) => void) | undefined;
     private beforeFrameUpdateFns: ((time: number) => void)[] = [];
 
     readonly workers: {
@@ -44,6 +47,7 @@ export class GraphicContext {
         this.navigation = new Navigation(props);
         this.picker = new GPUPicker(this.renderer.renderer, this.navigation.camera);
         this.lights = new Lights(props, this.scene);
+        this.onFrameFn = props.onFrame;
 
         this.workers = {
             metacity: new MetacityLoaderWorkerPool(props.metacityWorker ?? 'metacityWorker.js'),
@@ -53,11 +57,13 @@ export class GraphicContext {
         let time = Date.now();
         const frame = async () => {
             //time management
-            //const delta = (Date.now() - time) / 1000;
-            const delta = 1;
+            const delta = (Date.now() - time) / 1000 * this.speed_;
             time = Date.now();
             this.time_ =  (this.time_ + delta) % this.timeMax_;
             this.scene.userData.time = this.time_;
+
+            if (this.onFrameFn)
+                this.onFrameFn(this.time_, this.timeMax_);
 
             //update
             this.beforeFrameUpdateFns.forEach(fn => fn(this.time_));
@@ -85,6 +91,10 @@ export class GraphicContext {
     set time(t: number) {
         this.time_ = t;
         this.scene.userData.time = t;
+    }
+
+    set speed(value: number) {
+        this.speed_ = value;
     }
 
     set onBeforeFrame(fn: (time: number) => void) {

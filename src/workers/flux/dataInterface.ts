@@ -91,22 +91,6 @@ export interface PerformanceData {
             [edge_id: string]: {
                 [mode: string]: number
             }
-        },
-        bargraphs: {
-            xAxis: string;
-            yAxis: string;
-            title: string;
-            bars: [
-                {
-                    xValue: string;
-                    yValue: number;
-                }
-            ]
-        },
-        metrics: {
-            label: string;
-            units: string;
-            value: number;
         }
     }
 }

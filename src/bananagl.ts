@@ -96,4 +96,8 @@ export class BananaGL {
     set time(time: number) {
         this.ctx.time = time;
     }
+
+    set speed(speed: number) {
+        this.ctx.speed = speed;
+    }
 }
