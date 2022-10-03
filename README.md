@@ -1,5 +1,9 @@
 # 🗺 BananaGL 
 
+⚠️ The development of this library is now on hold. ⚠️
+
+<sup> Metacity Tools are in a process of transition from BananaGL to [MetacityGL](https://github.com/MetacityTools/MetacityGL) </sup>
+
 ![BananaGL](./title.png)
 
 Provides web visualization for urban data processed by the [`Metacity` package](https://github.com/MetacitySuite/Metacity).
