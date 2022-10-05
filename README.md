@@ -2,7 +2,7 @@
 
 ⚠️ The development of this library is now on hold. ⚠️
 
-<sup> Metacity Tools are in a process of transition from BananaGL to [MetacityGL](https://github.com/MetacityTools/MetacityGL) </sup>
+<sup> Metacity Tools are in the process of transitioning from BananaGL to [MetacityGL](https://github.com/MetacityTools/MetacityGL) </sup>
 
 ![BananaGL](./title.png)
 
