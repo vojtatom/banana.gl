@@ -1,8 +1,41 @@
 {
   "name": "bananagl",
   "private": true,
-  "version": "0.0.0",
+  "version": "2.0.0",
   "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/vojtatom/BananaGL"
+  },
+  "keywords": [
+    "metacity",
+    "visualization",
+    "urban data",
+    "threejs",
+    "react"
+  ],
+  "author": {
+    "name": "Vojtěch Tomas",
+    "email": "hello@vojtatom.cz",
+    "url": "https://vojtatom.cz"
+  },
+  "license": "MIT",
+  "files": [
+    "dist/**/*"
+  ],
+  "main": "./dist/bananagl.umd.js",
+  "module": "./dist/bananagl.js",
+  "types": "./dist/bananagl/bananagl.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/bananagl.js",
+      "require": "./dist/bananagl.umd.js"
+    },
+    "./style.css": {
+      "import": "./dist/style.css",
+      "require": "./dist/style.css"
+    }
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
@@ -10,7 +43,8 @@
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "vite-plugin-dts": "^2.0.0-beta.3"
   },
   "devDependencies": {
     "@types/react": "^18.0.27",
