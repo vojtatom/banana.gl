@@ -1,34 +1,45 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import './App.css'
+import { useState } from 'react';
+import './style.css';
+import { ShaderTest } from './tests/shader';
 
-function App() {
-  const [count, setCount] = useState(0)
-
-  return (
-    <div className="App">
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
-  )
+function TestSelector(props: { tests: { title: string; view: React.ReactNode }[] }) {
+    const [selected, setSelected] = useState<number | null>(null);
+    return (
+        <div
+            style={{
+                width: '100vw',
+                height: '100vh',
+            }}
+        >
+            {selected === null &&
+                props.tests.map((test, i) => (
+                    <div
+                        key={i}
+                        onClick={() => setSelected(i)}
+                        className={selected === i ? 'selected' : ''}
+                        style={{
+                            cursor: 'pointer',
+                        }}
+                    >
+                        {test.title}
+                    </div>
+                ))}
+            {selected !== null && props.tests[selected].view}
+        </div>
+    );
 }
 
-export default App
+function App() {
+    return (
+        <TestSelector
+            tests={[
+                {
+                    title: 'Shader',
+                    view: <ShaderTest />,
+                },
+            ]}
+        />
+    );
+}
+
+export default App;

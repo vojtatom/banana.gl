@@ -14,8 +14,12 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": true,
-    "jsx": "react-jsx"
+    "jsx": "react-jsx",
+    "baseUrl": "./bananagl",
+    "paths": {
+      "@bananagl/*": ["./*"],
+    }
   },
-  "include": ["example"],
+  "include": ["example", "bananagl", "example/tests"],
   "references": [{ "path": "./tsconfig.node.json" }]
 }

@@ -25,5 +25,10 @@ export default defineConfig({
             },
         },
     },
+    resolve: {
+        alias: {
+            '@bananagl': resolve(__dirname, './bananagl'),
+        },
+    },
     plugins: [dts()],
 });
