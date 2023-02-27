@@ -21,14 +21,14 @@ class Buffer {
         this.buffer = buffer;
     }
 
-    bind(gl: WebGL2RenderingContext) {
+    bind(gl: WebGL2RenderingContext): asserts this is { buffer: WebGLBuffer } {
         if (!this.buffer) this.setup(gl);
         else gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
     }
 }
 
 class Attribute {
-    protected isSetup = false;
+    protected active = false;
 
     constructor(
         public name: string,
@@ -53,11 +53,11 @@ class Attribute {
     }
 
     get count() {
-        return this.buffer.data.length / this.size;
+        return 0; //TODO
     }
 
     bind(gl: WebGL2RenderingContext, location: number) {
-        if (!this.isSetup) this.setup(gl, location), (this.isSetup = true);
+        if (!this.active) this.setup(gl, location), (this.active = true);
         this.buffer.bind(gl);
     }
 }
@@ -85,7 +85,7 @@ class InstancedAttribute extends Attribute {
     }
 
     bind(gl: WebGL2RenderingContext, location: number) {
-        if (!this.isSetup) this.setup(gl, location), (this.isSetup = true);
+        if (!this.active) this.setup(gl, location), (this.active = true);
         super.bind(gl, location);
     }
 }
