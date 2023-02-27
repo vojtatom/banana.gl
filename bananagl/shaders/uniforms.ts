@@ -1,4 +1,4 @@
-import { Shader } from './shaders/shader';
+import { Shader } from './shader';
 
 type Uniform = number | number[] | Float32Array | Int32Array | Uint32Array | WebGLTexture;
 

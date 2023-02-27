@@ -1,14 +1,15 @@
-export class Renderer {
-    private isInitialized = false;
-    private context?: WebGL2RenderingContext;
+import { Window } from './window';
 
-    constructor(canvas?: HTMLCanvasElement) {
-        if (canvas) this.init(canvas);
+export class Renderer {
+    private context?: WebGL2RenderingContext;
+    private window_?: Window;
+
+    constructor(canvas?: HTMLCanvasElement, options?: WebGLContextAttributes) {
+        if (canvas) this.init(canvas, options);
     }
 
     init(canvas: HTMLCanvasElement, options?: WebGLContextAttributes) {
-        if (this.isInitialized) return;
-        this.isInitialized = true;
+        if (!this.context || !this.window_) return;
         console.log('Renderer initialized');
 
         //init with highest performance settings
@@ -25,10 +26,20 @@ export class Renderer {
 
         if (!context) throw new Error('WebGL2 not supported');
         this.context = context;
+        this.window_ = new Window(canvas);
     }
 
     get gl() {
         if (!this.context) throw new Error('Renderer not initialized');
         return this.context;
+    }
+
+    get views() {
+        if (!this.window_) throw new Error('Renderer not initialized');
+        return this.window_;
+    }
+
+    render() {
+        this.views.render(this);
     }
 }
