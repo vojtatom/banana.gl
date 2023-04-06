@@ -7,9 +7,9 @@ export default defineConfig({
     build: {
         lib: {
             entry: resolve(__dirname, 'bananagl/bananagl.ts'),
-            name: 'MetacityGL',
+            name: 'BananaGL',
             // the proper extensions will be added
-            fileName: 'metacitygl',
+            fileName: 'bananagl',
         },
         rollupOptions: {
             // make sure to externalize deps that shouldn't be bundled
