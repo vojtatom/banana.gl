@@ -1,6 +1,6 @@
 import { mat4, quat, vec2, vec3, vec4 } from 'gl-matrix';
 
-import { UniformValue } from '@3D/shaders/shader';
+import { UniformValue } from '@bananagl/shaders/shader';
 
 export enum ProjectionType {
     PERSPECTIVE,

@@ -1,6 +1,6 @@
 {
     "name": "bananagl",
-    "private": true,
+    "private": false,
     "version": "2.0.0",
     "type": "module",
     "repository": {
@@ -10,7 +10,6 @@
     "keywords": [
         "metacity",
         "visualization",
-        "urban data",
         "threejs",
         "react"
     ],
@@ -30,10 +29,6 @@
         ".": {
             "import": "./dist/bananagl.js",
             "require": "./dist/bananagl.umd.js"
-        },
-        "./style.css": {
-            "import": "./dist/style.css",
-            "require": "./dist/style.css"
         }
     },
     "scripts": {
@@ -44,6 +39,7 @@
         "coverage": "vitest run --coverage"
     },
     "dependencies": {
+        "gl-matrix": "^3.4.3",
         "react": "^18.2.0",
         "react-dom": "^18.2.0",
         "vite-plugin-dts": "^2.0.0-beta.3"

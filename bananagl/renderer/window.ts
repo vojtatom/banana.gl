@@ -1,4 +1,4 @@
-import { WindowControls } from '@3D/controls/controls';
+import { WindowControls } from '@bananagl/controls/controls';
 
 import { Renderer } from './renderer';
 import { View } from './view';
@@ -17,12 +17,14 @@ interface ViewPosition {
     mode: 'absolute' | 'relative';
 }
 
+export interface ViewSetup {
+    view: View;
+    size: ViewSize;
+    position: ViewPosition;
+}
+
 export class Window {
-    private views_: {
-        view: View;
-        size: ViewSize;
-        position: ViewPosition;
-    }[] = [];
+    private views_: ViewSetup[] = [];
 
     controls: WindowControls;
     constructor(private canvas: HTMLCanvasElement) {

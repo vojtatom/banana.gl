@@ -1,4 +1,4 @@
-import { Scene } from '@3D/scene/scene';
+import { Scene } from '@bananagl/scene/scene';
 
 function formatByteSize(bytes: number) {
     if (bytes < 1024) {

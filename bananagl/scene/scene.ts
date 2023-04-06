@@ -1,5 +1,5 @@
-import { Buffer } from '@3D/models/attributes';
-import { Renderable } from '@3D/models/renderable';
+import { Buffer } from '@bananagl/models/buffer';
+import { Renderable } from '@bananagl/models/renderable';
 
 export class Scene {
     objects: Renderable[] = [];

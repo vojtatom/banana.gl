@@ -1,4 +1,4 @@
-import { Shader, UniformValue } from '@3D/shaders/shader';
+import { Shader, UniformValue } from '@bananagl/shaders/shader';
 
 import { Attributes } from './attributes';
 

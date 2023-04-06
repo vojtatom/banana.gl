@@ -1,17 +1,16 @@
-import { Vec3 } from 'types';
-
-import { Camera } from '@3D/scene/camera';
-import { Scene } from '@3D/scene/scene';
+import { Camera } from '@bananagl/scene/camera';
+import { Scene } from '@bananagl/scene/scene';
 
 import { viewRenderPass } from './pass';
 import { Renderer } from './renderer';
+import { vec3 } from 'gl-matrix';
 
 export class View {
     x: number = 0;
     y: number = 0;
     private width_: number = 0;
     private height_: number = 0;
-    private randomColor: Vec3;
+    private randomColor: vec3;
     readonly camera: Camera = new Camera();
 
     constructor(readonly scene: Scene) {

@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Renderer } from '@3D/3D';
-import { View as ViewClass } from '@3D/renderer/view';
+import { Renderer } from '@bananagl/bananagl';
+import { View as ViewClass } from '@bananagl/renderer/view';
 
 import { View as ViewComponent, ViewProps } from './View';
 

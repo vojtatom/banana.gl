@@ -1,5 +1,5 @@
-import { View } from '@3D/renderer/view';
-import { Window } from '@3D/renderer/window';
+import { View } from '@bananagl/renderer/view';
+import { Window } from '@bananagl/renderer/window';
 
 import { ViewControls } from './viewControl';
 

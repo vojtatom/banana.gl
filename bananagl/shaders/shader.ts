@@ -1,11 +1,18 @@
-import { TypedArray } from 'types';
-
 import { handleErrors } from './errors';
 
 const PRE = `#version 300 es
 precision highp float;
 precision highp int;
 `;
+
+export type TypedArray =
+    | Float32Array
+    | Uint32Array
+    | Uint16Array
+    | Uint8Array
+    | Int32Array
+    | Int16Array
+    | Int8Array;
 
 export type UniformValue = number | number[] | boolean | boolean[] | TypedArray | null;
 

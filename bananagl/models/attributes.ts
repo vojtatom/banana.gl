@@ -1,4 +1,4 @@
-import { Shader } from '@3D/shaders/shader';
+import { Shader } from '@bananagl/shaders/shader';
 
 import { Attribute, ElementAttribute, InstancedAttribute } from './attribute';
 

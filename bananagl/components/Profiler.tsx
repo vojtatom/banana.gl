@@ -1,7 +1,7 @@
 import React from 'react';
 
-import { Scene } from '@3D/scene/scene';
-import { Profiler as ProfilerClass } from '@3D/utils/profiler';
+import { Scene } from '@bananagl/scene/scene';
+import { Profiler as ProfilerClass } from '@bananagl/utils/profiler';
 
 export interface ViewProps {
     scenes: Scene[];

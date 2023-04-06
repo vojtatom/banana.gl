@@ -1,7 +1,7 @@
-import { Renderable } from '@3D/models/renderable';
-import { Camera } from '@3D/scene/camera';
-import { Scene } from '@3D/scene/scene';
-import { Shader } from '@3D/shaders/shader';
+import { Renderable } from '@bananagl/models/renderable';
+import { Camera } from '@bananagl/scene/camera';
+import { Scene } from '@bananagl/scene/scene';
+import { Shader } from '@bananagl/shaders/shader';
 
 import { Renderer } from './renderer';
 

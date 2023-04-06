@@ -18,6 +18,7 @@
     "baseUrl": "./bananagl",
     "paths": {
       "@bananagl/*": ["./*"],
+      
     }
   },
   "include": ["example", "bananagl", "example/tests"],
