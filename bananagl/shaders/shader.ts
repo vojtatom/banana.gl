@@ -1,3 +1,5 @@
+import { TypedArray } from 'types';
+
 import { handleErrors } from './errors';
 
 const PRE = `#version 300 es
@@ -5,28 +7,55 @@ precision highp float;
 precision highp int;
 `;
 
-export type UniformValue =
-    | number
-    | number[]
-    | boolean
-    | boolean[]
-    | Float32Array
-    | Int32Array
-    | Int16Array
-    | Int8Array
-    | Uint32Array
-    | Uint16Array
-    | Uint8Array
-    | null;
+export type UniformValue = number | number[] | boolean | boolean[] | TypedArray | null;
 
-function iterEqual(a: any, b: any) {
-    if (!a.length || !b.length) return false;
-    if (a.length !== b.length) return false;
-    for (let i = 0; i < a.length; i++) {
-        if (a[i] !== b[i]) return false;
+function isArray(a: any): a is any[] {
+    return Array.isArray(a);
+}
+
+function isTypedArray(a: any): a is TypedArray {
+    return (
+        a instanceof Float32Array ||
+        a instanceof Int32Array ||
+        a instanceof Int16Array ||
+        a instanceof Int8Array ||
+        a instanceof Uint32Array ||
+        a instanceof Uint16Array ||
+        a instanceof Uint8Array
+    );
+}
+
+function isEqual(a: any, b: any) {
+    const aIsArray = isArray(a) || isTypedArray(a);
+    const bIsArray = isArray(b) || isTypedArray(b);
+
+    if (aIsArray !== bIsArray) return false;
+
+    if (aIsArray && bIsArray) {
+        if (a.length !== b.length) return false;
+        for (let i = 0; i < a.length; i++) {
+            if (a[i] !== b[i]) return false;
+        }
+    } else {
+        if ((a === null) !== (b === null)) return false;
+        if (a === b) return true;
     }
     return true;
 }
+
+function cloneValue(value: UniformValue) {
+    if (isArray(value)) return value.slice();
+    if (value instanceof Float32Array) return new Float32Array(value);
+    if (value instanceof Int32Array) return new Int32Array(value);
+    if (value instanceof Int16Array) return new Int16Array(value);
+    if (value instanceof Int8Array) return new Int8Array(value);
+    if (value instanceof Uint32Array) return new Uint32Array(value);
+    if (value instanceof Uint16Array) return new Uint16Array(value);
+    if (value instanceof Uint8Array) return new Uint8Array(value);
+    return value;
+}
+
+const ROW_MAJOR = false;
 
 export class Shader {
     private gl_?: WebGL2RenderingContext;
@@ -121,18 +150,18 @@ export class Shader {
 
     set uniforms(values: { [name: string]: UniformValue }) {
         const gl = this.gl;
-        const program = this.program;
 
         for (const name in values) {
             const uniform = this.uniforms_[name];
-            if (!uniform) throw new Error(`No uniform with name ${name}`);
+            if (!uniform) continue;
 
             const value = values[name];
-            if (value === uniform.value || iterEqual(value, uniform.value)) continue;
+            if (isEqual(value, uniform.value)) continue;
 
             const loc = uniform.loc;
+            console.log(`    Setting uniforms.${name}`);
             this.setValue(value, gl, loc);
-            uniform.value = value;
+            uniform.value = cloneValue(value);
         }
     }
 
@@ -150,6 +179,10 @@ export class Shader {
                 gl.uniform3fv(loc, value);
             } else if (value.length === 4) {
                 gl.uniform4fv(loc, value);
+            } else if (value.length === 9) {
+                gl.uniformMatrix3fv(loc, ROW_MAJOR, value);
+            } else if (value.length === 16) {
+                gl.uniformMatrix4fv(loc, ROW_MAJOR, value);
             } else {
                 throw new Error(`Invalid uniform array length ${value.length}`);
             }
@@ -189,6 +222,10 @@ export class Shader {
                     gl.uniform3fv(loc, value as number[]);
                 } else if (value.length === 4) {
                     gl.uniform4fv(loc, value as number[]);
+                } else if (value.length === 9) {
+                    gl.uniformMatrix3fv(loc, ROW_MAJOR, value as number[]);
+                } else if (value.length === 16) {
+                    gl.uniformMatrix4fv(loc, ROW_MAJOR, value as number[]);
                 } else {
                     throw new Error(`Invalid uniform array length ${value.length}`);
                 }

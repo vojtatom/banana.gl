@@ -1,4 +1,5 @@
-import { Shader, UniformValue } from '@bananagl/shaders/shader';
+import { Shader, UniformValue } from '@3D/shaders/shader';
+
 import { Attributes } from './attributes';
 
 export abstract class Renderable {

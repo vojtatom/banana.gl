@@ -42,7 +42,7 @@ export function handleErrors(
         const fragmentErrors = handleShaderErrors(gl, fs, 'fragment');
 
         console.error(
-            'THREE.WebGLProgram: Shader Error ' +
+            'WebGLProgram: Shader Error ' +
                 gl.getError() +
                 ' - ' +
                 'VALIDATE_STATUS ' +
@@ -57,7 +57,7 @@ export function handleErrors(
         );
         return false;
     } else if (programLog !== '') {
-        console.warn('THREE.WebGLProgram: Program Info Log:', programLog);
+        console.warn('WebGLProgram: Program Info Log:', programLog);
     }
     return true;
 }

@@ -1,3 +1,5 @@
+import { WindowControls } from '@3D/controls/controls';
+
 import { Renderer } from './renderer';
 import { View } from './view';
 
@@ -16,11 +18,13 @@ interface ViewPosition {
 }
 
 export class Window {
-    private views: {
+    private views_: {
         view: View;
         size: ViewSize;
         position: ViewPosition;
     }[] = [];
+
+    controls: WindowControls;
     constructor(private canvas: HTMLCanvasElement) {
         const observer = new ResizeObserver((entries) => {
             for (const entry of entries) {
@@ -29,46 +33,81 @@ export class Window {
             }
         });
         observer.observe(canvas);
+        this.forceResize();
+        this.controls = new WindowControls(canvas, this);
+    }
+
+    get views() {
+        return this.views_;
+    }
+
+    forceResize() {
+        this.resize(this.canvas.clientWidth, this.canvas.clientHeight);
     }
 
     resize(width: number, height: number) {
-        this.views.forEach(({ view, size, position }) => {
-            const { x, y, w, h } = this.compute(size, position, width, height);
+        //const dpr = window.devicePixelRatio;
+        this.canvas.width = width;
+        this.canvas.height = height;
+        this.views_.forEach(({ view, size, position }) => {
+            const { x, y, w, h } = this.compute(
+                size,
+                position,
+                this.canvas.width,
+                this.canvas.height
+            );
             view.resize(x, y, w, h);
         });
     }
 
     add(view: View, size: ViewSize, position: ViewPosition) {
-        this.views.push({ view, size, position });
+        this.views_.push({ view, size, position });
     }
 
     private compute(size: ViewSize, position: ViewPosition, width: number, height: number) {
         const { mode: sizeMode } = size;
         const { mode: positionMode } = position;
 
-        const w = sizeMode === 'absolute' ? size.width : size.width * width;
-        const h = sizeMode === 'absolute' ? size.height : size.height * height;
+        const w = sizeMode === 'absolute' ? size.width : size.width * width * 0.01;
+        const h = sizeMode === 'absolute' ? size.height : size.height * height * 0.01;
 
         let x = 0;
         let y = 0;
 
         if (positionMode === 'absolute') {
-            if (position.left) x = position.left;
-            if (position.right) x = width - position.right - w;
-            if (position.top) y = position.top;
-            if (position.bottom) y = height - position.bottom - h;
+            if (position.left !== undefined) x = position.left;
+            if (position.right !== undefined) x = width - position.right - w;
+            if (position.bottom !== undefined) y = position.bottom;
+            if (position.top !== undefined) y = height - position.top - h;
         } else {
             //percent
-            if (position.left) x = position.left * width;
-            if (position.right) x = width - position.right * width - w;
-            if (position.top) y = position.top * height;
-            if (position.bottom) y = height - position.bottom * height - h;
+            if (position.left !== undefined) x = position.left * 0.01 * width;
+            if (position.right !== undefined) x = width - position.right * 0.01 * width - w;
+            if (position.bottom !== undefined) y = position.bottom * 0.01 * height;
+            if (position.top !== undefined) y = height - position.top * 0.01 * height - h;
         }
-
         return { x, y, w, h };
     }
 
     render(renderer: Renderer) {
-        this.views.forEach(({ view }) => view.render(renderer));
+        this.views_.forEach(({ view }) => view.render(renderer));
+    }
+
+    renderLayout(renderer: Renderer) {
+        this.views_.forEach(({ view }) => view.renderLayout(renderer));
+    }
+
+    getViewAndPosition(event: MouseEvent) {
+        const { offsetX, offsetY } = event;
+        //recompute offestY from bottom
+        const { height } = this.canvas;
+        const offsetYbottom = height - offsetY;
+        for (const { view } of this.views_) {
+            const [x, y] = view.toLocal(offsetX, offsetYbottom);
+            if (x >= 0 && x < view.width && y >= 0 && y < view.height) {
+                return { view, x: offsetX, y: offsetY, lx: x, ly: y };
+            }
+        }
+        return undefined;
     }
 }
