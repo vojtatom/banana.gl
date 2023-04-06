@@ -1,20 +1,23 @@
-# 🗺 BananaGL 
+# 🗺 BananaGL
 
-![BananaGL](./title.png)
+<sup>⚠️ Very early stages of development, use with caution </sup>
 
-Provides web visualization for urban data processed by the [`Metacity` package](https://github.com/MetacitySuite/Metacity).
+BananaGL is a small, low-level WebGL library designed as an alternative to three.js for developers who seek a more hands-on approach without diving into the complexities of bare WebGL. It is optimized for ease of use and seamless integration with React applications, with a focus on support for split views.
 
-Check out [examples](https://demo.metacity.cc) of some outputs, as well as our homepage [here](https://metacity.cc).
+## Features
 
-## Quick start
-1) Go to [releases](https://github.com/MetacitySuite/BananaGL/releases/)
-2) Download the latest release (only the `bananagl.zip` file)
-3) Continue to [documentation](https://docs.metacity.cc/metacity/tools/bananagl).
+-   Lightweight and low-level API
+-   Designed for React integration
+-   Support for split canvas views
 
+## Goals
 
+-   High-performance rendering on the web, minimizing the number of draw calls, program switches, and other costly operations
 
+## Installation
 
+To install BananaGL, run the following command in your project's root directory:
 
-
-
- 
+```bash
+npm install bananagl
+```
