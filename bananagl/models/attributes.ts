@@ -45,7 +45,7 @@ export class Attributes {
         if (this.elements) {
             return this.elements.count;
         } else {
-            return this.attributes[0].count;
+            return this.attributes[0].count / this.attributes[0].size;
         }
     }
 
