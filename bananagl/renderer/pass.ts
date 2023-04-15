@@ -1,5 +1,5 @@
+import { Camera } from '@bananagl/controls/camera';
 import { Renderable } from '@bananagl/models/renderable';
-import { Camera } from '@bananagl/scene/camera';
 import { Scene } from '@bananagl/scene/scene';
 import { Shader } from '@bananagl/shaders/shader';
 
@@ -19,7 +19,7 @@ export function viewRenderPass(scene: Scene, renderer: Renderer, camera: Camera)
     //render by shader class type
     let shader: Shader | null = null;
     for (const renderable of renderables) {
-        if (shader === null || renderable.shader.constructor !== shader.constructor) {
+        if (shader === null || renderable.shader !== shader) {
             shader = renderable.shader;
             if (!shader.active) shader.setup(renderer.gl);
             shader.use();

@@ -1,3 +1,5 @@
+import { mat2, mat3, mat4 } from 'gl-matrix';
+
 import { Buffer, ElementBuffer } from './buffer';
 
 export class Attribute {
@@ -37,6 +39,10 @@ export class Attribute {
     bind(gl: WebGL2RenderingContext, location: number) {
         if (!this.active) this.setup(gl, location);
         else this.buffer.bind(gl);
+    }
+
+    applyMatrix(matrix: mat2 | mat3 | mat4) {
+        this.buffer.applyMatrix(matrix, this.size);
     }
 }
 

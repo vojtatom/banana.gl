@@ -63,7 +63,7 @@ export function Canvas(props: CanvasProps) {
 
     return (
         <>
-            <canvas ref={canvasRef} className={props.className} />
+            <canvas ref={canvasRef} className={props.className} key="canvas" />
             {props.children}
         </>
     );

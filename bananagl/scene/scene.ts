@@ -3,8 +3,15 @@ import { Renderable } from '@bananagl/models/renderable';
 
 export class Scene {
     objects: Renderable[] = [];
+    private onChanges: (() => void)[] = [];
+
     add(object: Renderable) {
         this.objects.push(object);
+        this.onChanges.forEach((callback) => callback());
+    }
+
+    set onChange(callback: () => void) {
+        this.onChanges.push(callback);
     }
 
     get bytesAllocated() {

@@ -1,9 +1,11 @@
-import { Camera } from '@bananagl/scene/camera';
+import { vec3 } from 'gl-matrix';
+
+import { Camera } from '@bananagl/controls/camera';
+import { CameraLock } from '@bananagl/controls/cameraLock';
 import { Scene } from '@bananagl/scene/scene';
 
 import { viewRenderPass } from './pass';
 import { Renderer } from './renderer';
-import { vec3 } from 'gl-matrix';
 
 export class View {
     x: number = 0;
@@ -12,6 +14,7 @@ export class View {
     private height_: number = 0;
     private randomColor: vec3;
     readonly camera: Camera = new Camera();
+    readonly cameraLock = new CameraLock(this.camera);
 
     constructor(readonly scene: Scene) {
         this.randomColor = [Math.random(), Math.random(), Math.random()];
@@ -27,7 +30,6 @@ export class View {
 
     render(renderer: Renderer) {
         const gl = renderer.gl;
-        gl.clearColor(this.randomColor[0], this.randomColor[1], this.randomColor[2], 1);
         gl.viewport(this.x, this.y, this.width, this.height);
         gl.scissor(this.x, this.y, this.width, this.height);
         viewRenderPass(this.scene, renderer, this.camera);

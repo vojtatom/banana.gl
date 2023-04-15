@@ -25,8 +25,8 @@ export interface ViewSetup {
 
 export class Window {
     private views_: ViewSetup[] = [];
-
     controls: WindowControls;
+
     constructor(private canvas: HTMLCanvasElement) {
         const observer = new ResizeObserver((entries) => {
             for (const entry of entries) {
@@ -48,9 +48,9 @@ export class Window {
     }
 
     resize(width: number, height: number) {
-        //const dpr = window.devicePixelRatio;
-        this.canvas.width = width;
-        this.canvas.height = height;
+        const dpr = window.devicePixelRatio;
+        this.canvas.width = width * dpr;
+        this.canvas.height = height * dpr;
         this.views_.forEach(({ view, size, position }) => {
             const { x, y, w, h } = this.compute(
                 size,
