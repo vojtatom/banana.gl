@@ -312,9 +312,23 @@ export class Camera {
         this.updateProjectionViewMatrix();
     }
 
-    sideView() {
+    rightView() {
         const distance = vec3.distance(this.position, this.target);
         vec3.set(this.position, this.target[0] + distance, this.target[1], this.target[2]);
+        this.updateRightVector();
+        this.updateProjectionViewMatrix();
+    }
+
+    leftView() {
+        const distance = vec3.distance(this.position, this.target);
+        vec3.set(this.position, this.target[0] - distance, this.target[1], this.target[2]);
+        this.updateRightVector();
+        this.updateProjectionViewMatrix();
+    }
+
+    backView() {
+        const distance = vec3.distance(this.position, this.target);
+        vec3.set(this.position, this.target[0], this.target[1] + distance, this.target[2]);
         this.updateRightVector();
         this.updateProjectionViewMatrix();
     }

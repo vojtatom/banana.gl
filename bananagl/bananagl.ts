@@ -1,3 +1,5 @@
+import { Profiler as ProfilerClass } from '@bananagl/utils/profiler';
+
 import { Canvas } from './components/Canvas';
 import { Profiler } from './components/Profiler';
 import { View } from './components/View';
@@ -28,6 +30,7 @@ export {
     ProjectionType,
     ViewClass,
     CameraView,
+    ProfilerClass,
     View,
     Profiler,
     Canvas,

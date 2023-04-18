@@ -1,4 +1,5 @@
 import { mat2, mat3, mat4, vec2, vec3, vec4 } from 'gl-matrix';
+import { TypedArray } from '@bananagl/shaders/shader';
 
 type BufferData =
     | Float32Array
@@ -8,6 +9,11 @@ type BufferData =
     | Int16Array
     | Int32Array
     | Int8Array;
+
+export function cloneTypedArrayWithSize(arr: TypedArray, size: number) {
+    const newArr = new (arr.constructor as any)(size);
+    return newArr;
+}
 
 export class Buffer {
     buffer: WebGLBuffer | null = null;
@@ -57,6 +63,12 @@ export class Buffer {
                 `Invalid combination of matrix (${matrix.length}) and element (${size}) size.`
             );
         }
+    }
+
+    swap(index1: number, index2: number, swapArr: TypedArray) {
+        swapArr.set(this.data.subarray(index1, index1 + swapArr.length));
+        this.data.set(this.data.subarray(index2, index2 + swapArr.length), index1);
+        this.data.set(swapArr, index2);
     }
 
     private applyMatrix2(matrix: mat2) {

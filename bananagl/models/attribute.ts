@@ -1,10 +1,12 @@
 import { mat2, mat3, mat4 } from 'gl-matrix';
+import { TypedArray } from '@bananagl/shaders/shader';
 
-import { Buffer, ElementBuffer } from './buffer';
+import { Buffer, ElementBuffer, cloneTypedArrayWithSize } from './buffer';
 
 export class Attribute {
     protected active = false;
     public type?: number;
+    private swapArr: TypedArray;
 
     constructor(
         public name: string,
@@ -13,7 +15,9 @@ export class Attribute {
         public normalized: boolean = false,
         public stride: number = 0,
         public offset: number = 0
-    ) {}
+    ) {
+        this.swapArr = cloneTypedArrayWithSize(buffer.data, size);
+    }
 
     protected setup(gl: WebGL2RenderingContext, location: number) {
         if (location === undefined || location === -1) return;
@@ -43,6 +47,12 @@ export class Attribute {
 
     applyMatrix(matrix: mat2 | mat3 | mat4) {
         this.buffer.applyMatrix(matrix, this.size);
+    }
+
+    swap(index1: number, index2: number) {
+        const bufferIndex1 = index1 * (this.size + this.stride) + this.offset;
+        const bufferIndex2 = index2 * (this.size + this.stride) + this.offset;
+        this.buffer.swap(bufferIndex1, bufferIndex2, this.swapArr);
     }
 }
 

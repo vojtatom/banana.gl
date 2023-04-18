@@ -43,11 +43,12 @@ function isEqual(a: any, b: any) {
         for (let i = 0; i < a.length; i++) {
             if (a[i] !== b[i]) return false;
         }
+        return true;
     } else {
         if ((a === null) !== (b === null)) return false;
         if (a === b) return true;
     }
-    return true;
+    return false;
 }
 
 function cloneValue(value: UniformValue) {

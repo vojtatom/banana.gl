@@ -66,8 +66,23 @@ export class Renderer {
         this.window_ = undefined;
     }
 
+    public frameTimeLog = new Array(60).fill(0);
+    public running = false;
+    private frameTimeIndex = 0;
+    private lastFrameTime = 0;
+
     animationLoop() {
+        if (!this.context) return;
+
+        this.running = true;
         this.render();
+
+        const now = performance.now();
+        const frameTime = now - this.lastFrameTime;
+        this.lastFrameTime = now;
+        this.frameTimeLog[this.frameTimeIndex] = frameTime;
+        this.frameTimeIndex = (this.frameTimeIndex + 1) % this.frameTimeLog.length;
+
         requestAnimationFrame(() => this.animationLoop());
     }
 }

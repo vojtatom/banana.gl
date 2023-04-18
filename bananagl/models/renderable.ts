@@ -9,7 +9,6 @@ export abstract class Renderable {
         uModelMatrix: mat4.identity(mat4.create()),
     };
     private attributes_: Attributes = new Attributes();
-    private data_: { [name: string]: any } = {};
 
     set uniforms(values: { [name: string]: UniformValue }) {
         for (const name in values) {
@@ -25,18 +24,6 @@ export abstract class Renderable {
 
     get attributes() {
         return this.attributes_;
-    }
-
-    set data(data: { [name: string]: any }) {
-        for (const name in data) {
-            const value = data[name];
-            if (value === this.data_[name]) continue;
-            this.data_[name] = value;
-        }
-    }
-
-    get data() {
-        return this.data_;
     }
 
     get transform(): mat4 {

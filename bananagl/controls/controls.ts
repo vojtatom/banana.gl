@@ -8,6 +8,7 @@ export class WindowControls {
     private altKey_: boolean = false;
     private middleMouse_: boolean = false;
     private rightMouse_: boolean = false;
+    private dpr_: number = window.devicePixelRatio;
 
     constructor(private canvas: HTMLCanvasElement, private window: Window) {
         canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
@@ -42,8 +43,8 @@ export class WindowControls {
     onMouseMove(event: MouseEvent) {
         if (!this.activeView_) return;
         const { offsetX, offsetY } = event;
-        const dx = offsetX - this.lastX_;
-        const dy = offsetY - this.lastY_;
+        const dx = (offsetX - this.lastX_) * this.dpr_;
+        const dy = (offsetY - this.lastY_) * this.dpr_;
         this.lastX_ = offsetX;
         this.lastY_ = offsetY;
 

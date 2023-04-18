@@ -1,10 +1,12 @@
 import React from 'react';
 
+import { Renderer } from '@bananagl/renderer/renderer';
 import { Scene } from '@bananagl/scene/scene';
 import { Profiler as ProfilerClass } from '@bananagl/utils/profiler';
 
 export interface ViewProps {
     scenes: Scene[];
+    renderer: Renderer;
 }
 
 export function Profiler(props: ViewProps) {
@@ -15,9 +17,14 @@ export function Profiler(props: ViewProps) {
             profiler.addScene(scene);
         });
 
+        profiler.setRenderer(props.renderer);
+
         const timer = setInterval(() => {
-            profiler.logMemory();
-        }, 2000);
+            const mem = profiler.logMemory();
+            const fps = profiler.logFps();
+
+            console.log(`FPS: ${fps}, Memory: ${mem}`);
+        }, 1000);
 
         return () => {
             clearInterval(timer);

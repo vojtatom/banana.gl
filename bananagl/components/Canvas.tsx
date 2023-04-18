@@ -49,7 +49,7 @@ export function Canvas(props: CanvasProps) {
             if (props.debugLayout) {
                 renderer.renderLayout();
             } else {
-                renderer.animationLoop();
+                if (!renderer.running) renderer.animationLoop();
             }
         }
 

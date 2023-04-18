@@ -9,12 +9,8 @@ export function viewRenderPass(scene: Scene, renderer: Renderer, camera: Camera)
     const gl = renderer.gl;
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
 
+    if (scene.dirtyShaderOrder) scene.sortByShader();
     const renderables = scene.objects;
-    //sort by shader class type
-    renderables.sort((a, b) => {
-        if (a.shader.constructor === b.shader.constructor) return 0;
-        return a.shader.constructor < b.shader.constructor ? -1 : 1;
-    });
 
     //render by shader class type
     let shader: Shader | null = null;

@@ -4,7 +4,9 @@ export enum CameraView {
     Free,
     Top,
     Front,
-    Side,
+    Right,
+    Left,
+    Back,
 }
 
 export class CameraLock {
@@ -19,7 +21,9 @@ export class CameraLock {
                 this.coords[1] = 0;
                 return;
             case CameraView.Front:
-            case CameraView.Side:
+            case CameraView.Right:
+            case CameraView.Left:
+            case CameraView.Back:
                 this.coords[0] = 0;
                 this.coords[1] = 0;
                 return;
@@ -38,8 +42,14 @@ export class CameraLock {
             case CameraView.Front:
                 this.camera.frontView();
                 return;
-            case CameraView.Side:
-                this.camera.sideView();
+            case CameraView.Right:
+                this.camera.rightView();
+                return;
+            case CameraView.Left:
+                this.camera.leftView();
+                return;
+            case CameraView.Back:
+                this.camera.backView();
                 return;
             default:
                 return;

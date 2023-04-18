@@ -1,26 +1,31 @@
+import { Renderer } from '@bananagl/renderer/renderer';
 import { Scene } from '@bananagl/scene/scene';
-
-function formatByteSize(bytes: number) {
-    if (bytes < 1024) {
-        return `${bytes} bytes`;
-    } else if (bytes < 1024 * 1024) {
-        return `${(bytes / 1024).toFixed(2)} KB`;
-    } else if (bytes < 1024 * 1024 * 1024) {
-        return `${(bytes / 1024 / 1024).toFixed(2)} MB`;
-    } else {
-        return `${(bytes / 1024 / 1024 / 1024).toFixed(2)} GB`;
-    }
-}
 
 export class Profiler {
     private scenes: Scene[] = [];
+    private renderer?: Renderer;
+    private renderTimeIndex = 0;
 
     constructor() {
         this.logMemory();
     }
 
-    public addScene(scene: Scene) {
+    addScene(scene: Scene) {
         this.scenes.push(scene);
+    }
+
+    setRenderer(renderer: Renderer) {
+        this.renderer = renderer;
+    }
+
+    logFps() {
+        if (!this.renderer) return;
+
+        const renderTimes = this.renderer.frameTimeLog;
+        const avgTime = renderTimes.reduce((a, b) => a + b, 0) / renderTimes.length;
+        const avgFPS = 1000 / avgTime;
+
+        return avgFPS;
     }
 
     logMemory() {
@@ -28,6 +33,6 @@ export class Profiler {
         for (const scene of this.scenes) {
             bytesAllocated += scene.bytesAllocated;
         }
-        console.log(`Memory: ${formatByteSize(bytesAllocated)}`);
+        return bytesAllocated;
     }
 }
