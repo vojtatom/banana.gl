@@ -1,3 +1,6 @@
+import { mat2, mat3, mat4, vec2, vec3, vec4 } from 'gl-matrix';
+import { TypedArray } from '@bananagl/shaders/shader';
+
 type BufferData =
     | Float32Array
     | Uint16Array
@@ -6,6 +9,11 @@ type BufferData =
     | Int16Array
     | Int32Array
     | Int8Array;
+
+export function cloneTypedArrayWithSize(arr: TypedArray, size: number) {
+    const newArr = new (arr.constructor as any)(size);
+    return newArr;
+}
 
 export class Buffer {
     buffer: WebGLBuffer | null = null;
@@ -41,6 +49,64 @@ export class Buffer {
 
     get bytesAllocated() {
         return this.data.length * this.data.BYTES_PER_ELEMENT;
+    }
+
+    applyMatrix(matrix: mat2 | mat3 | mat4, size: number) {
+        if (matrix.length === 4 && size === 2) {
+            this.applyMatrix2(matrix);
+        } else if (matrix.length === 9 && size === 3) {
+            this.applyMatrix3(matrix);
+        } else if (matrix.length === 16 && (size === 4 || size === 3)) {
+            this.applyMatrix4(matrix, size);
+        } else {
+            throw new Error(
+                `Invalid combination of matrix (${matrix.length}) and element (${size}) size.`
+            );
+        }
+    }
+
+    swap(index1: number, index2: number, swapArr: TypedArray) {
+        swapArr.set(this.data.subarray(index1, index1 + swapArr.length));
+        this.data.set(this.data.subarray(index2, index2 + swapArr.length), index1);
+        this.data.set(swapArr, index2);
+    }
+
+    private applyMatrix2(matrix: mat2) {
+        for (let i = 0; i < this.data.length; i += 2) {
+            vec2.transformMat2(
+                this.data.subarray(i, i + 2) as vec2,
+                this.data.subarray(i, i + 2) as vec2,
+                matrix
+            );
+        }
+    }
+
+    private applyMatrix3(matrix: mat3) {
+        for (let i = 0; i < this.data.length; i += 3) {
+            vec3.transformMat3(
+                this.data.subarray(i, i + 3) as vec3,
+                this.data.subarray(i, i + 3) as vec3,
+                matrix
+            );
+        }
+    }
+
+    private applyMatrix4(matrix: mat4, size: number) {
+        for (let i = 0; i < this.data.length; i += size) {
+            if (size === 3) {
+                vec3.transformMat4(
+                    this.data.subarray(i, i + 3) as vec3,
+                    this.data.subarray(i, i + 3) as vec3,
+                    matrix
+                );
+            } else if (size === 4) {
+                vec4.transformMat4(
+                    this.data.subarray(i, i + 4) as vec4,
+                    this.data.subarray(i, i + 4) as vec4,
+                    matrix
+                );
+            }
+        }
     }
 }
 

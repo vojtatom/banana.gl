@@ -61,6 +61,14 @@ export class Attributes {
         return this.isInstanced_;
     }
 
+    getAttribute(name: string) {
+        return this.attributes.find((a) => a.name === name);
+    }
+
+    get rawAttributes() {
+        return this.attributes;
+    }
+
     get elementType() {
         if (!this.elements) throw new Error('No element buffer');
         if (this.elements.type === undefined) throw new Error('No element type');

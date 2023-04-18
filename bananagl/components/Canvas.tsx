@@ -49,7 +49,7 @@ export function Canvas(props: CanvasProps) {
             if (props.debugLayout) {
                 renderer.renderLayout();
             } else {
-                renderer.animationLoop();
+                if (!renderer.running) renderer.animationLoop();
             }
         }
 
@@ -63,7 +63,7 @@ export function Canvas(props: CanvasProps) {
 
     return (
         <>
-            <canvas ref={canvasRef} className={props.className} />
+            <canvas ref={canvasRef} className={props.className} key="canvas" />
             {props.children}
         </>
     );

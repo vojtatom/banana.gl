@@ -7,15 +7,11 @@ export enum ProjectionType {
     ORTHOGRAPHIC,
 }
 
-function unproject(out: vec3, source: vec3, modelViewProjectionInverse: mat4): vec3 {
-    vec3.transformMat4(out, source, modelViewProjectionInverse);
-    return out;
-}
-
 export interface CameraOptions {
     position?: vec3;
     target?: vec3;
     up?: vec3;
+    right?: vec3;
     projectionType?: ProjectionType;
     fovYRadian?: number;
     width?: number;
@@ -27,18 +23,24 @@ export interface CameraOptions {
 export class Camera {
     position: vec3;
     target: vec3;
-    up: vec3;
     type: ProjectionType;
     fovYRadian: number;
     aspectRatio: number;
     near: number;
     far: number;
-    projectionMatrix: mat4 = mat4.create();
-    viewProjectionInverse: mat4 = mat4.create();
-    viewMatrix: mat4 = mat4.create();
-    projectionViewMatrix: mat4 = mat4.create();
-    private direction: vec3 = vec3.create();
+
+    readonly projectionMatrix: mat4 = mat4.create();
+    readonly viewProjectionInverse: mat4 = mat4.create();
+    readonly viewMatrix: mat4 = mat4.create();
+    readonly projectionViewMatrix: mat4 = mat4.create();
+
+    private upV: vec3;
+    private rightV: vec3;
+    private directionTMP: vec3 = vec3.create();
+    private upTMP: vec3 = vec3.create();
+
     private uniforms_: { [uniform: string]: UniformValue } = {};
+
     private width: number = 0;
     private height: number = 0;
     private maxangle: number = Math.PI / 2;
@@ -54,27 +56,30 @@ export class Camera {
     }
 
     constructor(options: CameraOptions = {}) {
-        this.position = options.position ?? vec3.fromValues(50, 50, 50);
+        this.position = options.position ?? vec3.fromValues(0, 0, 5000);
         this.target = options.target ?? vec3.fromValues(0, 0, 0);
-        this.up = options.up ?? vec3.fromValues(0, 0, 1);
-        this.type = options.projectionType ?? ProjectionType.PERSPECTIVE;
+        this.upV = options.up ?? vec3.fromValues(0, 0, 1);
+        this.rightV = options.right ?? vec3.fromValues(1, 0, 0);
+        this.type = options.projectionType ?? ProjectionType.ORTHOGRAPHIC;
         this.fovYRadian = options.fovYRadian ?? Math.PI / 4;
         this.width = options.width ?? 1;
         this.height = options.height ?? 1;
         this.aspectRatio = this.width / this.height;
         this.near = options.near ?? 1;
-        this.far = options.far ?? 1000;
+        this.far = options.far ?? 10000;
+
         this.uniforms_['uCameraPosition'] = this.position;
         this.uniforms_['uCameraTarget'] = this.target;
-        this.uniforms_['uCameraUp'] = this.up;
+        this.uniforms_['uCameraUp'] = this.upV;
         this.uniforms_['uProjectionMatrix'] = this.projectionMatrix;
         this.uniforms_['uViewMatrix'] = this.viewMatrix;
         this.uniforms_['uProjectionViewMatrix'] = this.projectionViewMatrix;
+
         this.updateOrthoBounds();
         this.updateMatrices();
     }
 
-    updateOrthoBounds() {
+    private updateOrthoBounds() {
         this.left = this.width / -2;
         this.right = this.width / 2;
         this.bottom = this.height / -2;
@@ -84,7 +89,8 @@ export class Camera {
     set(options: CameraOptions) {
         if (options.position) this.position = options.position;
         if (options.target) this.target = options.target;
-        if (options.up) this.up = options.up;
+        if (options.up) this.upV = options.up;
+        if (options.right) this.rightV = options.right;
         if (options.projectionType) this.projectionType = options.projectionType;
         if (options.fovYRadian) this.fovYRadian = options.fovYRadian;
         if (options.width) this.width = options.width;
@@ -97,35 +103,51 @@ export class Camera {
     }
 
     private getFrustrumWidthAtTarget(): number {
+        if (this.projectionType === ProjectionType.ORTHOGRAPHIC) return this.right - this.left;
         const distance = vec3.dist(this.position, this.target);
         return 2 * distance * Math.tan(this.fovYRadian / 2);
     }
 
     private getFrustumHeightAtTarget(): number {
+        if (this.projectionType === ProjectionType.ORTHOGRAPHIC) return this.top - this.bottom;
         return this.getFrustrumWidthAtTarget() / this.aspectRatio;
     }
 
-    private updatePositionForProjectionType(): void {
-        const direction = this.direction;
-        vec3.sub(direction, this.target, this.position);
-        vec3.normalize(direction, direction);
+    private swapPositionForProjection(newProjection: ProjectionType) {
+        vec3.sub(this.directionTMP, this.target, this.position);
+        vec3.normalize(this.directionTMP, this.directionTMP);
 
-        const distance = this.getFrustumHeightAtTarget() / (2 * Math.tan(this.fovYRadian / 2));
-
-        if (this.projectionType === ProjectionType.PERSPECTIVE) {
-            vec3.scale(direction, direction, distance);
-            vec3.sub(this.position, this.target, direction);
+        if (newProjection === ProjectionType.PERSPECTIVE) {
+            const width = this.getFrustrumWidthAtTarget();
+            const distance = width / (2 * Math.tan(this.fovYRadian / 2));
+            vec3.scale(this.directionTMP, this.directionTMP, distance);
+            vec3.sub(this.position, this.target, this.directionTMP);
         } else {
-            vec3.scale(direction, direction, this.near + (this.far - this.near) / 2);
-            vec3.sub(this.position, this.target, direction);
+            const width = this.getFrustrumWidthAtTarget();
+            const height = width / this.aspectRatio;
+            const initDistance = 5000;
+            vec3.scale(this.directionTMP, this.directionTMP, initDistance);
+            vec3.sub(this.position, this.target, this.directionTMP);
+
+            this.left = -width / 2;
+            this.right = width / 2;
+            this.bottom = -height / 2;
+            this.top = height / 2;
         }
     }
 
-    get dir() {
+    private get direction() {
+        vec3.sub(this.directionTMP, this.position, this.target);
+        vec3.normalize(this.directionTMP, this.directionTMP);
+        return this.directionTMP;
+    }
+
+    private get up() {
         const direction = this.direction;
-        vec3.sub(direction, this.position, this.target);
-        vec3.normalize(direction, direction);
-        return direction;
+        if (Math.abs(vec3.dot(direction, this.upV)) === 1) {
+            return vec3.cross(this.upTMP, direction, this.rightV);
+        }
+        return this.upV;
     }
 
     private updateViewMatrix() {
@@ -157,8 +179,9 @@ export class Camera {
     }
 
     set projectionType(projectionType: ProjectionType) {
+        if (projectionType === this.projectionType) return;
+        this.swapPositionForProjection(projectionType);
         this.type = projectionType;
-        this.updatePositionForProjectionType();
         this.updateMatrices();
     }
 
@@ -181,74 +204,74 @@ export class Camera {
         this.aspectRatio = width / height;
         this.width = width;
         this.height = height;
+        this.updateOrthoBounds();
         this.updateProjectionViewMatrix();
     }
 
+    private updateRightVector() {
+        vec3.cross(this.rightV, this.up, this.direction);
+        this.rightV[2] = 0;
+        vec3.normalize(this.rightV, this.rightV);
+    }
+
+    get isOrthographic() {
+        return this.projectionType === ProjectionType.ORTHOGRAPHIC;
+    }
+
+    private rightTMP = vec3.create();
+    private frontTMP = vec3.create();
+
     pan(x: number, y: number) {
-        const right = vec3.create();
-        const front = vec3.create();
+        const right = this.rightTMP;
+        const front = this.frontTMP;
+        vec3.copy(right, this.rightV);
 
-        const offset = vec3.create();
-        vec3.sub(offset, this.position, this.target);
-        let distance = Math.max(vec3.length(offset), 50);
+        //This is a bit riscy, since the right does not always have to be in the horizontal plane
+        vec3.cross(front, this.upV, right);
 
-        distance *= Math.tan(this.fovYRadian / 2);
-
-        const left = (2 * x * distance) / this.height;
-        const up = (2 * y * distance) / this.height;
-
-        const direction = this.direction;
-        vec3.normalize(direction, offset);
-        vec3.cross(right, this.up, direction);
-        vec3.cross(front, right, this.up);
+        const heightUnit = this.getFrustumHeightAtTarget() / this.height;
+        const widthUnit = this.getFrustrumWidthAtTarget() / this.width;
 
         vec3.normalize(right, right);
         vec3.normalize(front, front);
 
-        vec3.scale(right, right, -left);
-        vec3.scale(front, front, -up);
+        vec3.scale(right, right, -widthUnit * x);
+        vec3.scale(front, front, heightUnit * y);
 
         vec3.add(this.position, this.position, right);
         vec3.add(this.position, this.position, front);
         vec3.add(this.target, this.target, right);
         vec3.add(this.target, this.target, front);
 
+        this.updateRightVector();
         this.updateProjectionViewMatrix();
     }
 
     rotate(x: number, y: number) {
-        const right = vec3.create();
-        const front = this.dir;
-        vec3.cross(right, this.up, front);
-        vec3.normalize(right, right);
-
         const angleX = -(x / this.width) * 2 * Math.PI;
-        let angleY = (-(y / this.height) * Math.PI) / 2;
+        let angleY = -(y / this.height) * Math.PI;
 
         //rotate using quaternion around target
         const q1 = quat.create();
         const q2 = quat.create();
 
-        const currentYAngle = Math.acos(vec3.dot(front, this.up));
+        const currentYAngle = Math.acos(vec3.dot(this.direction, this.upV));
         if (currentYAngle + angleY > this.maxangle) {
             angleY = this.maxangle - currentYAngle;
         } else if (currentYAngle + angleY < this.minangle) {
             angleY = this.minangle - currentYAngle;
         }
 
-        quat.setAxisAngle(q1, right, angleY);
-        quat.setAxisAngle(q2, this.up, angleX);
+        quat.setAxisAngle(q1, this.rightV, angleY);
+        quat.setAxisAngle(q2, this.upV, angleX);
         quat.multiply(q1, q1, q2);
 
         vec3.sub(this.position, this.position, this.target);
         vec3.transformQuat(this.position, this.position, q1);
         vec3.add(this.position, this.position, this.target);
+        this.updateRightVector();
 
         this.updateProjectionViewMatrix();
-    }
-
-    get isOrthographic() {
-        return this.projectionType === ProjectionType.ORTHOGRAPHIC;
     }
 
     zoom(factor: number, cursorPxX: number, cursorPxY: number) {
@@ -271,8 +294,53 @@ export class Camera {
         const offset = this.direction;
         vec3.sub(offset, this.position, this.target);
         vec3.scale(offset, offset, factor);
-
         vec3.add(this.position, this.target, offset);
+        this.updateProjectionViewMatrix();
+    }
+
+    topView() {
+        const distance = vec3.distance(this.position, this.target);
+        vec3.set(this.position, this.target[0], this.target[1], this.target[2] + distance);
+        vec3.set(this.rightV, 1, 0, 0);
+        this.updateProjectionViewMatrix();
+    }
+
+    frontView() {
+        const distance = vec3.distance(this.position, this.target);
+        vec3.set(this.position, this.target[0], this.target[1] - distance, this.target[2]);
+        this.updateRightVector();
+        this.updateProjectionViewMatrix();
+    }
+
+    rightView() {
+        const distance = vec3.distance(this.position, this.target);
+        vec3.set(this.position, this.target[0] + distance, this.target[1], this.target[2]);
+        this.updateRightVector();
+        this.updateProjectionViewMatrix();
+    }
+
+    leftView() {
+        const distance = vec3.distance(this.position, this.target);
+        vec3.set(this.position, this.target[0] - distance, this.target[1], this.target[2]);
+        this.updateRightVector();
+        this.updateProjectionViewMatrix();
+    }
+
+    backView() {
+        const distance = vec3.distance(this.position, this.target);
+        vec3.set(this.position, this.target[0], this.target[1] + distance, this.target[2]);
+        this.updateRightVector();
+        this.updateProjectionViewMatrix();
+    }
+
+    get z() {
+        return this.target[2];
+    }
+
+    set z(z: number) {
+        const delta = z - this.target[2];
+        this.target[2] += delta;
+        this.position[2] += delta;
         this.updateProjectionViewMatrix();
     }
 }

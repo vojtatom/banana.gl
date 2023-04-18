@@ -1,6 +1,6 @@
 import React from 'react';
 
-import { Camera } from '@bananagl/scene/camera';
+import { Camera } from '@bananagl/controls/camera';
 import { Scene } from '@bananagl/scene/scene';
 
 export interface ViewProps {
