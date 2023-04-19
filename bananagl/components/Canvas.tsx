@@ -56,7 +56,7 @@ export function Canvas(props: CanvasProps) {
         return () => {
             console.log('Canvas unmounted');
             if (renderer) {
-                renderer.destroy();
+                renderer.dispose();
             }
         };
     }, [canvasRef, renderer]);

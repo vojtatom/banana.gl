@@ -61,7 +61,8 @@ export class Renderer {
         this.window.renderLayout(this);
     }
 
-    destroy() {
+    dispose() {
+        this.window.dispose();
         this.context = undefined;
         this.window_ = undefined;
     }

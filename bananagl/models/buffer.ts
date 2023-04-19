@@ -1,14 +1,6 @@
 import { mat2, mat3, mat4, vec2, vec3, vec4 } from 'gl-matrix';
-import { TypedArray } from '@bananagl/shaders/shader';
 
-type BufferData =
-    | Float32Array
-    | Uint16Array
-    | Uint32Array
-    | Uint8Array
-    | Int16Array
-    | Int32Array
-    | Int8Array;
+import { TypedArray } from '@bananagl/shaders/shader';
 
 export function cloneTypedArrayWithSize(arr: TypedArray, size: number) {
     const newArr = new (arr.constructor as any)(size);
@@ -17,7 +9,8 @@ export function cloneTypedArrayWithSize(arr: TypedArray, size: number) {
 
 export class Buffer {
     buffer: WebGLBuffer | null = null;
-    constructor(public data: BufferData) {}
+    private partsToUpdate_: [number, number][] = [];
+    constructor(public data: TypedArray) {}
 
     protected setup(gl: WebGL2RenderingContext) {
         const buffer = gl.createBuffer();
@@ -30,6 +23,29 @@ export class Buffer {
     bind(gl: WebGL2RenderingContext): asserts this is { buffer: WebGLBuffer } {
         if (!this.buffer) this.setup(gl);
         else gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+    }
+
+    toUpdate(start?: number, end?: number) {
+        if (start === undefined) start = 0;
+        if (end === undefined) end = this.data.length;
+        this.partsToUpdate_.push([start, end]);
+    }
+
+    get needsUpdate() {
+        return this.partsToUpdate_.length > 0;
+    }
+
+    update(gl: WebGL2RenderingContext) {
+        if (!this.buffer) throw new Error('Buffer not setup');
+        gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
+        for (const [start, end] of this.partsToUpdate_) {
+            gl.bufferSubData(
+                gl.ARRAY_BUFFER,
+                start * this.data.BYTES_PER_ELEMENT,
+                this.data.subarray(start, end)
+            );
+        }
+        this.partsToUpdate_.length = 0;
     }
 
     getDataType(gl: WebGL2RenderingContext) {

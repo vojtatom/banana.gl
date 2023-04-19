@@ -28,7 +28,7 @@ export class Window {
     controls: WindowControls;
 
     constructor(private canvas: HTMLCanvasElement) {
-        //TODO ptimize this
+        //TODO optimize this
         function debounce(callback: CallableFunction, delay: number) {
             let timeoutId: NodeJS.Timeout;
             return function (...args: any[]) {
@@ -45,12 +45,16 @@ export class Window {
                     const { width, height } = entry.contentRect;
                     this.resize(width, height);
                 }
-            }, 1000)
+            }, 100)
         );
 
         observer.observe(canvas);
         this.forceResize();
         this.controls = new WindowControls(canvas, this);
+    }
+
+    dispose() {
+        this.controls.dispose();
     }
 
     get views() {
