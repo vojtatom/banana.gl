@@ -14,6 +14,10 @@ export class BBox {
         return (this.min[dim] + this.max[dim]) / 2;
     }
 
+    get isEmpty(): boolean {
+        return this.min[0] > this.max[0] || this.min[1] > this.max[1] || this.min[2] > this.max[2];
+    }
+
     longestDim(): number {
         const [x, y, z] = this.max.map((v, i) => v - this.min[i]);
         if (x > y && x > z) return 0;

@@ -28,6 +28,8 @@ function render(renderer: Renderer, renderable: Renderable, shader: Shader, came
     const gl = renderer.gl;
     shader.uniforms = camera.uniforms;
     shader.uniforms = renderable.uniforms;
+
+    renderable.attributes.update(gl);
     renderable.attributes.bind(gl, shader);
 
     //todo instanced

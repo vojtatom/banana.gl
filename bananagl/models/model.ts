@@ -2,7 +2,7 @@ import { Shader } from '../shaders/shader';
 import { Renderable } from './renderable';
 
 export class Model extends Renderable {
-    private _shader?: Shader;
+    protected _shader?: Shader;
     protected data_: { [name: string]: any } = {};
 
     get shader() {

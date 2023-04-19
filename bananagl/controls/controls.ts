@@ -9,19 +9,32 @@ export class WindowControls {
     private middleMouse_: boolean = false;
     private rightMouse_: boolean = false;
     private dpr_: number = window.devicePixelRatio;
+    private downTime_: number = 0;
 
     constructor(private canvas: HTMLCanvasElement, private window: Window) {
-        canvas.addEventListener('mousedown', this.onMouseDown.bind(this));
-        canvas.addEventListener('mousemove', this.onMouseMove.bind(this));
-        canvas.addEventListener('mouseup', this.onMouseUp.bind(this));
-        canvas.addEventListener('wheel', this.onMouseWheel.bind(this));
-        canvas.addEventListener('mouseout', this.onMouseOut.bind(this));
-        canvas.addEventListener('contextmenu', this.onContextMenu.bind(this));
-        document.addEventListener('keydown', this.onKeyDown.bind(this));
-        document.addEventListener('keyup', this.onKeyUp.bind(this));
+        canvas.addEventListener('mousedown', this.onMouseDown);
+        canvas.addEventListener('mousemove', this.onMouseMove);
+        canvas.addEventListener('mouseup', this.onMouseUp);
+        canvas.addEventListener('wheel', this.onMouseWheel);
+        canvas.addEventListener('mouseout', this.onMouseOut);
+        canvas.addEventListener('contextmenu', this.onContextMenu);
+        document.addEventListener('keydown', this.onKeyDown);
+        document.addEventListener('keyup', this.onKeyUp);
     }
 
-    onMouseDown(event: MouseEvent) {
+    dispose() {
+        const canvas = this.canvas;
+        canvas.removeEventListener('mousedown', this.onMouseDown);
+        canvas.removeEventListener('mousemove', this.onMouseMove);
+        canvas.removeEventListener('mouseup', this.onMouseUp);
+        canvas.removeEventListener('wheel', this.onMouseWheel);
+        canvas.removeEventListener('mouseout', this.onMouseOut);
+        canvas.removeEventListener('contextmenu', this.onContextMenu);
+        document.removeEventListener('keydown', this.onKeyDown);
+        document.removeEventListener('keyup', this.onKeyUp);
+    }
+
+    onMouseDown = (event: MouseEvent) => {
         const local = this.window.getViewAndPosition(event);
         if (!local) return;
         const { view, x, y } = local;
@@ -37,10 +50,11 @@ export class WindowControls {
             this.rightMouse_ = true;
         }
 
+        this.downTime_ = Date.now();
         event.preventDefault();
-    }
+    };
 
-    onMouseMove(event: MouseEvent) {
+    onMouseMove = (event: MouseEvent) => {
         if (!this.activeView_) return;
         const { offsetX, offsetY } = event;
         const dx = (offsetX - this.lastX_) * this.dpr_;
@@ -55,32 +69,41 @@ export class WindowControls {
         } else {
             this.activeView_.camera.pan(dx, dy);
         }
-    }
+    };
 
-    onMouseUp(event: MouseEvent) {
+    onMouseUp = (event: MouseEvent) => {
+        if (Date.now() - this.downTime_ < 200) {
+            if (!this.activeView_) return;
+            console.log('click');
+            const { offsetX, offsetY } = event;
+            const ndc = this.activeView_.toNDC(offsetX, offsetY);
+            const ray = this.activeView_.camera.primaryRay(ndc[0], ndc[1]);
+            const hit = this.activeView_.scene.tracing.trace(ray);
+        }
+
         this.finish(event.button);
-    }
+    };
 
-    onMouseWheel(event: WheelEvent) {
+    onMouseWheel = (event: WheelEvent) => {
         const local = this.window.getViewAndPosition(event);
         if (!local) return;
         const { view, lx, ly } = local;
         const factor = event.deltaY > 0 ? 1.1 : 0.9;
         view.camera.zoom(factor, lx, ly);
         event.preventDefault();
-    }
+    };
 
-    onKeyDown(event: KeyboardEvent) {
+    onKeyDown = (event: KeyboardEvent) => {
         const { key } = event;
         if (key === 'Meta' || key === 'Alt') {
             this.altKey_ = true;
         }
-    }
+    };
 
-    onMouseOut(event: MouseEvent) {
+    onMouseOut = (event: MouseEvent) => {
         const buttons = event.buttons;
         this.finish(buttons);
-    }
+    };
 
     private finish(button: number) {
         if (!this.activeView_) return;
@@ -94,15 +117,15 @@ export class WindowControls {
         }
     }
 
-    onKeyUp(event: KeyboardEvent) {
+    onKeyUp = (event: KeyboardEvent) => {
         const { key } = event;
         if (key === 'Meta' || key === 'Alt') {
             this.altKey_ = false;
         }
-    }
+    };
 
-    onContextMenu(event: MouseEvent) {
+    onContextMenu = (event: MouseEvent) => {
         //None yet
         event.preventDefault();
-    }
+    };
 }

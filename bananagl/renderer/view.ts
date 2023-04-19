@@ -55,4 +55,12 @@ export class View {
     get height() {
         return this.height_;
     }
+
+    toNDC(x: number, y: number) {
+        const invDpr = 1 / window.devicePixelRatio;
+        return [
+            ((x - this.x * invDpr) / (this.width_ * invDpr)) * 2 - 1,
+            -((y - this.y * invDpr) / (this.height_ * invDpr)) * 2 + 1,
+        ];
+    }
 }

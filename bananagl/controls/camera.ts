@@ -1,5 +1,6 @@
 import { mat4, quat, vec2, vec3, vec4 } from 'gl-matrix';
 
+import { Ray } from '@bananagl/picking/ray';
 import { UniformValue } from '@bananagl/shaders/shader';
 
 export enum ProjectionType {
@@ -137,7 +138,7 @@ export class Camera {
     }
 
     private get direction() {
-        vec3.sub(this.directionTMP, this.position, this.target);
+        vec3.sub(this.directionTMP, this.target, this.position);
         vec3.normalize(this.directionTMP, this.directionTMP);
         return this.directionTMP;
     }
@@ -145,7 +146,7 @@ export class Camera {
     private get up() {
         const direction = this.direction;
         if (Math.abs(vec3.dot(direction, this.upV)) === 1) {
-            return vec3.cross(this.upTMP, direction, this.rightV);
+            return vec3.cross(this.upTMP, this.rightV, direction);
         }
         return this.upV;
     }
@@ -209,7 +210,7 @@ export class Camera {
     }
 
     private updateRightVector() {
-        vec3.cross(this.rightV, this.up, this.direction);
+        vec3.cross(this.rightV, this.direction, this.up);
         this.rightV[2] = 0;
         vec3.normalize(this.rightV, this.rightV);
     }
@@ -248,14 +249,17 @@ export class Camera {
     }
 
     rotate(x: number, y: number) {
-        const angleX = -(x / this.width) * 2 * Math.PI;
+        const angleX = (x / this.width) * 2 * Math.PI;
         let angleY = -(y / this.height) * Math.PI;
 
         //rotate using quaternion around target
         const q1 = quat.create();
         const q2 = quat.create();
 
-        const currentYAngle = Math.acos(vec3.dot(this.direction, this.upV));
+        const direction = this.direction;
+        vec3.negate(direction, direction);
+        const currentYAngle = Math.acos(vec3.dot(direction, this.upV));
+
         if (currentYAngle + angleY > this.maxangle) {
             angleY = this.maxangle - currentYAngle;
         } else if (currentYAngle + angleY < this.minangle) {
@@ -263,11 +267,12 @@ export class Camera {
         }
 
         quat.setAxisAngle(q1, this.rightV, angleY);
-        quat.setAxisAngle(q2, this.upV, angleX);
+        quat.setAxisAngle(q2, this.upV, -angleX);
         quat.multiply(q1, q1, q2);
 
         vec3.sub(this.position, this.position, this.target);
         vec3.transformQuat(this.position, this.position, q1);
+        vec3.transformQuat(this.rightV, this.rightV, q1);
         vec3.add(this.position, this.position, this.target);
         this.updateRightVector();
 
@@ -342,5 +347,70 @@ export class Camera {
         this.target[2] += delta;
         this.position[2] += delta;
         this.updateProjectionViewMatrix();
+    }
+
+    primaryRay(ndcX: number, ndcY: number) {
+        if (this.isOrthographic) {
+            return this.primaryRayOrthographic(ndcX, ndcY);
+        }
+        return this.primaryRayPerspective(ndcX, ndcY);
+    }
+
+    private primaryRayOrthographic(ndcX: number, ndcY: number) {
+        const origin = vec3.create();
+        // Normalize camera direction
+        const direction = this.direction;
+        const frustumWidth = this.right - this.left;
+        const frustumHeight = this.top - this.bottom;
+
+        // Compute the right and up vectors for the camera
+        const right = this.rightV;
+        const up = vec3.create();
+        vec3.cross(up, right, direction);
+        vec3.normalize(up, up);
+
+        // Compute the world space coordinates of the pixel
+        const unitWorldX = ndcX * frustumWidth * 0.5;
+        const unitWorldY = ndcY * frustumHeight * 0.5;
+
+        // Compute the primary ray's origin
+        vec3.scaleAndAdd(origin, this.position, right, unitWorldX);
+        vec3.scaleAndAdd(origin, origin, up, unitWorldY);
+
+        const ray = new Ray();
+        vec3.copy(ray.origin, origin);
+        vec3.copy(ray.direction, direction);
+
+        return ray;
+    }
+
+    private primaryRayPerspective(ndcX: number, ndcY: number) {
+        // Normalize camera direction
+        const direction = vec3.create();
+        vec3.copy(direction, this.direction);
+
+        // Compute the right and up vectors for the camera
+        const up = vec3.create();
+        const right = this.rightV;
+        vec3.cross(up, right, direction);
+        vec3.normalize(up, up);
+
+        // Compute the half width and half height of the near plane
+        const halfHeight = Math.tan(this.fovYRadian / 2);
+        const halfWidth = halfHeight * this.aspectRatio;
+
+        // Compute the world space coordinates of the pixel
+        const unitWorldX = ndcX * halfWidth;
+        const unitWorldY = ndcY * halfHeight;
+
+        // Compute the primary ray's direction
+        vec3.scaleAndAdd(direction, direction, right, unitWorldX);
+        vec3.scaleAndAdd(direction, direction, up, unitWorldY);
+        vec3.normalize(direction, direction);
+
+        const ray = new Ray();
+        vec3.copy(ray.origin, this.position);
+        vec3.copy(ray.direction, direction);
+        return ray;
     }
 }

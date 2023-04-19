@@ -9,6 +9,7 @@ import { Attribute, ElementAttribute, InstancedAttribute } from './models/attrib
 import { Attributes } from './models/attributes';
 import { Buffer, ElementBuffer } from './models/buffer';
 import { Model } from './models/model';
+import { Pickable } from './models/pickable';
 import { Renderable } from './models/renderable';
 import { Renderer } from './renderer/renderer';
 import { View as ViewClass } from './renderer/view';
@@ -21,6 +22,7 @@ export {
     Scene,
     Renderable,
     Model,
+    Pickable,
     Attributes,
     Attribute,
     ElementAttribute,

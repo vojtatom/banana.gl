@@ -79,4 +79,11 @@ export class Attributes {
         if (!this.vao) this.setup(gl, shader);
         else gl.bindVertexArray(this.vao);
     }
+
+    update(gl: WebGL2RenderingContext) {
+        const attrs = this.attributes;
+        for (let i = 0; i < attrs.length; i++) {
+            if (attrs[i].buffer.needsUpdate) attrs[i].buffer.update(gl);
+        }
+    }
 }

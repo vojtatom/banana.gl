@@ -17,30 +17,23 @@ The following list is a rough roadmap of what I want to achieve with BananaGL. I
 -   [x] Per-model uniforms
 -   [x] Camera (switchable between perspective and orthographic)
 -   [x] UI controls (map-like)
--   [ ] Optimized for scenes with funky coordinates (e.g. too large or too small)
 -   [ ] View frustum culling
--   [ ] LOD
--   [ ] Textures
--   [ ] Cubemaps
--   [ ] Skybox
--   [ ] Environment maps
 -   [ ] Shadows
--   [ ] Post-processing pipeline
 -   [ ] Transparency
--   [ ] Transform feedback API for general purpose GPU computation (maybe?)
 
 ### Data
 
 -   [x] Basic buffer - WebGLBuffer
--   [x] Element buffer
--   [x] Atttribute
--   [x] Instanced attribute
--   [x] Element attribute
+-   [x] Element buffer/Indexed geometry
+-   [x] Atttributes
+-   [x] Instanced attributes
 
 ### Picking
 
--   [ ] Built-in BVH - ⚠️ in progress
--   [ ] Ray-based picking
+-   [x] Built-in BVH for triangular data
+-   [ ] Built-in BVH for line data?
+-   [ ] Built-in BVH for point data?
+-   [x] Ray-based picking for triangular data
 -   [ ] Texture-based picking
 
 ### Render Pass
@@ -52,6 +45,12 @@ The following list is a rough roadmap of what I want to achieve with BananaGL. I
 -   [ ] Indexed Line Mode
 -   [ ] Line mode
 -   [ ] Instancing mode
+
+### Nice to have
+
+-   [ ] LOD
+-   [ ] Post-processing pipeline
+-   [ ] Optimized for scenes with funky coordinates (e.g. too large or too small)
 
 ## Installation
 
