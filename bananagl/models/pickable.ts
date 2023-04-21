@@ -6,7 +6,8 @@ export type OnPickCallback = (
     object: Pickable,
     primitiveIndex: number,
     ray: Ray,
-    t: number
+    t: number,
+    addToSelection?: boolean
 ) => void;
 
 export abstract class Pickable extends Model {

@@ -1,4 +1,4 @@
-import { Window } from './window';
+import { Window } from '../window/window';
 
 export class Renderer {
     private context?: WebGL2RenderingContext;
@@ -25,12 +25,14 @@ export class Renderer {
         });
 
         if (!gl) throw new Error('WebGL2 not supported');
+
         this.context = gl;
         this.window_ = new Window(canvas);
 
         gl.enable(gl.SCISSOR_TEST);
         gl.enable(gl.DEPTH_TEST);
         gl.disable(gl.CULL_FACE);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
     }
 
     get gl() {

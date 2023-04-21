@@ -1,4 +1,4 @@
-import { Camera } from '@bananagl/controls/camera';
+import { Camera } from '@bananagl/camera/camera';
 import { Renderable } from '@bananagl/models/renderable';
 import { Scene } from '@bananagl/scene/scene';
 import { Shader } from '@bananagl/shaders/shader';
@@ -8,13 +8,23 @@ import { Renderer } from './renderer';
 export function viewRenderPass(scene: Scene, renderer: Renderer, camera: Camera) {
     const gl = renderer.gl;
     gl.clear(gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT | gl.STENCIL_BUFFER_BIT);
+    gl.enable(gl.DEPTH_TEST);
+    gl.disable(gl.BLEND);
 
     if (scene.dirtyShaderOrder) scene.sortByShader();
-    const renderables = scene.objects;
+    const opaque = scene.opaqueObjects;
+    renderObjectGroup(opaque, renderer, camera);
 
+    gl.enable(gl.BLEND);
+    gl.disable(gl.DEPTH_TEST);
+    const transparent = scene.transparentObjects;
+    renderObjectGroup(transparent, renderer, camera);
+}
+
+function renderObjectGroup(opaque: Renderable[], renderer: Renderer, camera: Camera) {
     //render by shader class type
     let shader: Shader | null = null;
-    for (const renderable of renderables) {
+    for (const renderable of opaque) {
         if (shader === null || renderable.shader !== shader) {
             shader = renderable.shader;
             if (!shader.active) shader.setup(renderer.gl);

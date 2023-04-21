@@ -2,35 +2,53 @@ import { Buffer } from '@bananagl/models/buffer';
 import { Pickable } from '@bananagl/models/pickable';
 import { Renderable } from '@bananagl/models/renderable';
 import { TriangleBVH } from '@bananagl/picking/bvh.triangle';
-import { BVHContainer } from '@bananagl/picking/container';
+import { PickerBVH } from '@bananagl/picking/pickerBVH';
 
 export class Scene {
     readonly objects: Renderable[] = [];
-    readonly tracing: BVHContainer = new BVHContainer();
+    readonly pickerBVH: PickerBVH = new PickerBVH();
     private onChanges: (() => void)[] = [];
+
+    private opaqueObjects_: Renderable[] = [];
+    private transparentObjects_: Renderable[] = [];
     private dirtyShaderOrder_ = false;
 
     add(object: Renderable, pickable = false) {
         this.objects.push(object);
         this.onChanges.forEach((callback) => callback());
 
-        if (pickable && object instanceof Pickable) {
-            //TODO: make this more generic
-            const bvh = new TriangleBVH(object);
-
-            object.BVH = bvh;
-            this.tracing.add(object);
-            bvh.validate();
-        }
-
+        if (pickable) this.initTracing(object);
         this.dirtyShaderOrder_ = true;
     }
 
+    private initTracing(object: Renderable) {
+        if (object instanceof Pickable) {
+            //TODO: make this more generic
+            const bvh = new TriangleBVH(object);
+            object.BVH = bvh;
+            this.pickerBVH.add(object);
+        }
+    }
+
     sortByShader() {
-        this.objects.sort((a, b) => {
-            if (a.shader === b.shader) return 0;
-            return a.shader < b.shader ? -1 : 1;
-        });
+        this.opaqueObjects_ = this.objects
+            .filter((object) => !object.shader.transparency)
+            .sort((a, b) => {
+                const shaderA = a.shader;
+                const shaderB = b.shader;
+                if (shaderA === shaderB) return 0;
+                return shaderA < shaderB ? -1 : 1;
+            });
+
+        this.transparentObjects_ = this.objects
+            .filter((object) => object.shader.transparency)
+            .sort((a, b) => {
+                const shaderA = a.shader;
+                const shaderB = b.shader;
+                if (shaderA === shaderB) return 0;
+                return shaderA < shaderB ? -1 : 1;
+            });
+
         this.dirtyShaderOrder_ = false;
     }
 
@@ -38,8 +56,20 @@ export class Scene {
         return this.dirtyShaderOrder_;
     }
 
+    get opaqueObjects() {
+        return this.opaqueObjects_;
+    }
+
+    get transparentObjects() {
+        return this.transparentObjects_;
+    }
+
     set onChange(callback: () => void) {
         this.onChanges.push(callback);
+    }
+
+    set shadersChanged(value: boolean) {
+        this.dirtyShaderOrder_ = value;
     }
 
     get bytesAllocated() {

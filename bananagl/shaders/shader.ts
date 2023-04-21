@@ -1,6 +1,11 @@
+import equal from 'fast-deep-equal/es6';
+
 import { handleErrors } from './errors';
 
-const PRE = `#version 300 es
+const VER = `#version 300 es
+`;
+
+const PRE = `
 precision highp float;
 precision highp int;
 `;
@@ -20,38 +25,8 @@ function isArray(a: any): a is any[] {
     return Array.isArray(a);
 }
 
-function isTypedArray(a: any): a is TypedArray {
-    return (
-        a instanceof Float32Array ||
-        a instanceof Int32Array ||
-        a instanceof Int16Array ||
-        a instanceof Int8Array ||
-        a instanceof Uint32Array ||
-        a instanceof Uint16Array ||
-        a instanceof Uint8Array
-    );
-}
-
-function isEqual(a: any, b: any) {
-    const aIsArray = isArray(a) || isTypedArray(a);
-    const bIsArray = isArray(b) || isTypedArray(b);
-
-    if (aIsArray !== bIsArray) return false;
-
-    if (aIsArray && bIsArray) {
-        if (a.length !== b.length) return false;
-        for (let i = 0; i < a.length; i++) {
-            if (a[i] !== b[i]) return false;
-        }
-        return true;
-    } else {
-        if ((a === null) !== (b === null)) return false;
-        if (a === b) return true;
-    }
-    return false;
-}
-
 function cloneValue(value: UniformValue) {
+    //TODO optimize this to prevent reallocation
     if (isArray(value)) return value.slice();
     if (value instanceof Float32Array) return new Float32Array(value);
     if (value instanceof Int32Array) return new Int32Array(value);
@@ -77,7 +52,11 @@ export class Shader {
     } = {};
     active: boolean = false;
 
-    constructor(private vertexShader: string, private fragmentShader: string) {}
+    constructor(
+        private vertexShader: string,
+        private fragmentShader: string,
+        readonly transparency: boolean = false
+    ) {}
 
     setup(gl: WebGL2RenderingContext) {
         this.gl_ = gl;
@@ -87,18 +66,35 @@ export class Shader {
         this.active = true;
     }
 
+    private preprocessCode(code: string) {
+        //extact lines that start with #extension
+        const { extensions, rest } = code.split('\n').reduce(
+            (acc, line) => {
+                if (line.startsWith('#extension')) {
+                    acc.extensions.push(line);
+                } else {
+                    acc.rest.push(line);
+                }
+                return acc;
+            },
+            { extensions: [] as string[], rest: [] as string[] }
+        );
+
+        return VER + extensions.join('\n') + '\n' + PRE + rest.join('\n');
+    }
+
     private compile() {
         const gl = this.gl;
 
         const vs = gl.createShader(gl.VERTEX_SHADER);
         if (!vs) throw new Error('Failed to create vertex shader');
-        const vsCode = PRE + this.vertexShader;
+        const vsCode = this.preprocessCode(this.vertexShader);
         gl.shaderSource(vs, vsCode);
         gl.compileShader(vs);
 
         const fs = gl.createShader(gl.FRAGMENT_SHADER);
         if (!fs) throw new Error('Failed to create fragment shader');
-        const fsCode = PRE + this.fragmentShader;
+        const fsCode = this.preprocessCode(this.fragmentShader);
         gl.shaderSource(fs, fsCode);
         gl.compileShader(fs);
 
@@ -164,7 +160,7 @@ export class Shader {
             if (!uniform) continue;
 
             const value = values[name];
-            if (isEqual(value, uniform.value)) continue;
+            if (equal(value, uniform.value)) continue;
 
             const loc = uniform.loc;
             console.log(`    Setting uniforms.${name}`);

@@ -7,7 +7,7 @@ import { Ray } from './ray';
 
 const inverseTransform = mat4.create();
 
-export class BVHContainer {
+export class PickerBVH {
     private objects: Pickable[] = [];
 
     add(renderable: Pickable) {
@@ -37,6 +37,10 @@ export class BVHContainer {
         if (bestObjectIndex === -1) return null;
 
         const object = this.objects[bestObjectIndex];
-        if (object.onPick) object.onPick(object, bestPrimitiveIndex, ray, bestT);
+        return {
+            object,
+            primitiveIndex: bestPrimitiveIndex,
+            t: bestT,
+        };
     }
 }

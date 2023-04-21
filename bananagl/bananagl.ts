@@ -1,20 +1,22 @@
 import { Profiler as ProfilerClass } from '@bananagl/utils/profiler';
 
+import { ProjectionType } from './camera/camera';
+import { CameraView } from './camera/cameraLock';
 import { Canvas } from './components/Canvas';
 import { Profiler } from './components/Profiler';
 import { View } from './components/View';
-import { ProjectionType } from './controls/camera';
-import { CameraView } from './controls/cameraLock';
 import { Attribute, ElementAttribute, InstancedAttribute } from './models/attribute';
 import { Attributes } from './models/attributes';
 import { Buffer, ElementBuffer } from './models/buffer';
 import { Model } from './models/model';
 import { Pickable } from './models/pickable';
 import { Renderable } from './models/renderable';
+import { Selectable } from './models/selectable';
 import { Renderer } from './renderer/renderer';
-import { View as ViewClass } from './renderer/view';
 import { Scene } from './scene/scene';
+import { Selection, SelectionManager } from './scene/selection';
 import { Shader } from './shaders/shader';
+import { View as ViewClass } from './window/view';
 
 export {
     Renderer,
@@ -33,7 +35,11 @@ export {
     ViewClass,
     CameraView,
     ProfilerClass,
+    SelectionManager,
+    Selection,
     View,
     Profiler,
     Canvas,
 };
+
+export type { Selectable };

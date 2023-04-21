@@ -7,6 +7,7 @@ export class Attributes {
     private attributes: (Attribute | InstancedAttribute)[] = [];
     private isIndexed_ = false;
     private isInstanced_ = false;
+    private needsRebind_ = false;
     private elements?: ElementAttribute;
 
     constructor() {}
@@ -25,18 +26,26 @@ export class Attributes {
         this.attributes.push(attribute);
     }
 
-    private setup(gl: WebGL2RenderingContext, shader: Shader) {
+    private setup(gl: WebGL2RenderingContext, shader: Shader, rebind?: boolean) {
         const vao = gl.createVertexArray();
         if (!vao) throw new Error('Failed to create vertex array object');
         gl.bindVertexArray(vao);
 
         for (const attribute of this.attributes) {
             const location = shader.attributes[attribute.name];
-            attribute.bind(gl, location);
+            if (rebind) attribute.rebind(gl, location);
+            else attribute.bind(gl, location);
         }
 
-        //gl.bindVertexArray(null);
         this.vao = vao;
+    }
+
+    private rebind(gl: WebGL2RenderingContext, shader: Shader) {
+        if (!this.vao) throw new Error('No vertex array object');
+        gl.deleteVertexArray(this.vao);
+        this.vao = undefined;
+        this.setup(gl, shader, true);
+        this.needsRebind_ = false;
     }
 
     get count() {
@@ -61,6 +70,10 @@ export class Attributes {
         return this.isInstanced_;
     }
 
+    set needsRebind(value: boolean) {
+        this.needsRebind_ = value;
+    }
+
     getAttribute(name: string) {
         return this.attributes.find((a) => a.name === name);
     }
@@ -76,14 +89,15 @@ export class Attributes {
     }
 
     bind(gl: WebGL2RenderingContext, shader: Shader) {
-        if (!this.vao) this.setup(gl, shader);
+        if (this.needsRebind_) this.rebind(gl, shader);
+        else if (!this.vao) this.setup(gl, shader);
         else gl.bindVertexArray(this.vao);
     }
 
     update(gl: WebGL2RenderingContext) {
         const attrs = this.attributes;
         for (let i = 0; i < attrs.length; i++) {
-            if (attrs[i].buffer.needsUpdate) attrs[i].buffer.update(gl);
+            if (attrs[i].buffer.needsUpdate && attrs[i].buffer.active) attrs[i].buffer.update(gl);
         }
     }
 }

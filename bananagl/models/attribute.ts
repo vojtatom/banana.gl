@@ -46,6 +46,11 @@ export class Attribute {
         else this.buffer.bind(gl);
     }
 
+    rebind(gl: WebGL2RenderingContext, location: number) {
+        this.active = false;
+        this.setup(gl, location);
+    }
+
     applyMatrix(matrix: mat2 | mat3 | mat4) {
         this.buffer.applyMatrix(matrix, this.size);
     }

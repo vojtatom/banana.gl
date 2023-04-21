@@ -293,7 +293,34 @@ export class TriangleBVH implements BVH {
         };
     }
 
-    intersectionCounter = 0;
+    anyHit(ray: Ray) {
+        let boxT = Infinity;
+        let hit: [number, number] = [Infinity, -1]; //t, index
+
+        if (!this.root) return false;
+
+        const stack = new Array<BVHNode>();
+        stack.push(this.root);
+
+        while (stack.length > 0) {
+            const node = stack.pop();
+            if (!node) continue;
+            if (node.bbox) {
+                boxT = ray.intersectBox(node.bbox.min, node.bbox.max);
+                if (boxT >= Infinity) continue;
+
+                if (node.left) stack.push(node.left);
+                if (node.right) stack.push(node.right);
+
+                if (node.from !== undefined) {
+                    this.traverseLeaf(node, ray, hit);
+                    if (hit[0] < Infinity) return true;
+                }
+            }
+        }
+
+        return false;
+    }
 
     private traverseLeaf(node: BVHNode, ray: Ray, bestHit: [number, number]) {
         let bestT = Infinity,
@@ -301,7 +328,6 @@ export class TriangleBVH implements BVH {
             hit: number;
         for (let i = node.from!; i < node.to!; i++) {
             hit = ray.intersectTriangle(this.position.buffer.data, i);
-            this.intersectionCounter++;
             if (hit < bestT) {
                 bestT = hit;
                 bestIndex = i;

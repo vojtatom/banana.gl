@@ -1,11 +1,12 @@
-import { View } from '@bananagl/renderer/view';
-import { Window } from '@bananagl/renderer/window';
+import { View } from '@bananagl/window/view';
+import { Window } from '@bananagl/window/window';
 
 export class WindowControls {
     private activeView_: View | null = null;
     private lastX_: number = 0;
     private lastY_: number = 0;
     private altKey_: boolean = false;
+    private shiftKey_: boolean = false;
     private middleMouse_: boolean = false;
     private rightMouse_: boolean = false;
     private dpr_: number = window.devicePixelRatio;
@@ -78,7 +79,9 @@ export class WindowControls {
             const { offsetX, offsetY } = event;
             const ndc = this.activeView_.toNDC(offsetX, offsetY);
             const ray = this.activeView_.camera.primaryRay(ndc[0], ndc[1]);
-            const hit = this.activeView_.scene.tracing.trace(ray);
+            const hit = this.activeView_.scene.pickerBVH.trace(ray);
+            if (hit && hit.object.onPick)
+                hit.object.onPick(hit.object, hit.primitiveIndex, ray, hit.t, this.shiftKey_);
         }
 
         this.finish(event.button);
@@ -97,6 +100,10 @@ export class WindowControls {
         const { key } = event;
         if (key === 'Meta' || key === 'Alt') {
             this.altKey_ = true;
+        }
+
+        if (key === 'Shift') {
+            this.shiftKey_ = true;
         }
     };
 
@@ -121,6 +128,10 @@ export class WindowControls {
         const { key } = event;
         if (key === 'Meta' || key === 'Alt') {
             this.altKey_ = false;
+        }
+
+        if (key === 'Shift') {
+            this.shiftKey_ = false;
         }
     };
 

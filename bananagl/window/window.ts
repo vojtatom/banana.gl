@@ -1,6 +1,6 @@
-import { WindowControls } from '@bananagl/controls/controls';
+import { WindowControls } from '@bananagl/window/controls';
 
-import { Renderer } from './renderer';
+import { Renderer } from '../renderer/renderer';
 import { View } from './view';
 
 interface ViewSize {
