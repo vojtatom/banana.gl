@@ -44,11 +44,26 @@ function render(renderer: Renderer, renderable: Renderable, shader: Shader, came
 
     //todo instanced
     if (renderable.attributes.isIndexed) {
-        gl.drawElements(
-            gl.TRIANGLES,
-            renderable.attributes.count,
-            renderable.attributes.elementType,
-            0
-        );
-    } else gl.drawArrays(gl.TRIANGLES, 0, renderable.attributes.count);
+        if (renderable.attributes.isInstanced) {
+            console.warn('instanced indexed rendering not supported');
+        } else {
+            gl.drawElements(
+                gl.TRIANGLES,
+                renderable.attributes.count,
+                renderable.attributes.elementType,
+                0
+            );
+        }
+    } else {
+        if (renderable.attributes.isInstanced) {
+            gl.drawArraysInstanced(
+                gl.TRIANGLES,
+                0,
+                renderable.attributes.count,
+                renderable.attributes.instanceCount
+            );
+        } else {
+            gl.drawArrays(gl.TRIANGLES, 0, renderable.attributes.count);
+        }
+    }
 }

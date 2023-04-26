@@ -6,7 +6,7 @@ import { PickerBVH } from '@bananagl/picking/pickerBVH';
 
 export class Scene {
     readonly objects: Renderable[] = [];
-    readonly pickerBVH: PickerBVH = new PickerBVH();
+    readonly pickerBVH = new PickerBVH(this);
     private onChanges: (() => void)[] = [];
 
     private opaqueObjects_: Renderable[] = [];
@@ -21,12 +21,20 @@ export class Scene {
         this.dirtyShaderOrder_ = true;
     }
 
+    remove(object: Renderable) {
+        const idx = this.objects.indexOf(object);
+        if (idx === -1) return;
+        this.objects.splice(idx, 1);
+        this.onChanges.forEach((callback) => callback());
+        this.dirtyShaderOrder_ = true;
+    }
+
     private initTracing(object: Renderable) {
         if (object instanceof Pickable) {
             //TODO: make this more generic
+            console.warn('Assuming triangle mesh');
             const bvh = new TriangleBVH(object);
             object.BVH = bvh;
-            this.pickerBVH.add(object);
         }
     }
 
@@ -74,12 +82,12 @@ export class Scene {
 
     get bytesAllocated() {
         const bufferSet = new Set<Buffer>();
+        let total = 0;
         for (const object of this.objects) {
             for (const buffer of object.attributes.buffers) {
                 bufferSet.add(buffer);
             }
         }
-        let total = 0;
         for (const buffer of bufferSet) {
             total += buffer.bytesAllocated;
         }

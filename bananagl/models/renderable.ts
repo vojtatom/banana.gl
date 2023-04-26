@@ -1,4 +1,4 @@
-import { mat4 } from 'gl-matrix';
+import { mat4, vec3 } from 'gl-matrix';
 
 import { Shader, UniformValue } from '@bananagl/shaders/shader';
 
@@ -28,6 +28,52 @@ export abstract class Renderable {
 
     get transform(): mat4 {
         return this.uniforms_.uModelMatrix as mat4;
+    }
+
+    private position_: vec3 = [0, 0, 0];
+    private rotation_: vec3 = [0, 0, 0];
+    private scale_: vec3 = [1, 1, 1];
+
+    get position() {
+        return this.position_;
+    }
+
+    set position(position: vec3) {
+        this.position_ = position;
+        this.updateMatrix();
+    }
+
+    get rotation() {
+        return this.rotation_;
+    }
+
+    set rotation(rotation: vec3) {
+        this.rotation_ = rotation;
+        this.updateMatrix();
+    }
+
+    get scale() {
+        return this.scale_;
+    }
+
+    set scale(scale: vec3) {
+        this.scale_ = scale;
+        this.updateMatrix();
+    }
+
+    translate(translation: vec3) {
+        vec3.add(this.position, this.position, translation);
+        this.updateMatrix();
+    }
+
+    private updateMatrix() {
+        const transfomMatrix = this.transform;
+        mat4.identity(transfomMatrix);
+        mat4.translate(transfomMatrix, transfomMatrix, this.position);
+        mat4.rotateX(transfomMatrix, transfomMatrix, (this.rotation[0] / 180) * Math.PI);
+        mat4.rotateY(transfomMatrix, transfomMatrix, (this.rotation[1] / 180) * Math.PI);
+        mat4.rotateZ(transfomMatrix, transfomMatrix, (this.rotation[2] / 180) * Math.PI);
+        mat4.scale(transfomMatrix, transfomMatrix, this.scale);
     }
 
     abstract get shader(): Shader;

@@ -63,7 +63,15 @@ export function Canvas(props: CanvasProps) {
 
     return (
         <>
-            <canvas ref={canvasRef} className={props.className} key="canvas" />
+            <canvas
+                ref={canvasRef}
+                className={props.className}
+                key="canvas"
+                tabIndex={1000}
+                style={{
+                    outline: 'none',
+                }}
+            />
             {props.children}
         </>
     );

@@ -73,4 +73,20 @@ export class BBox {
     clone() {
         return new BBox(this.min.slice() as vec3, this.max.slice() as vec3);
     }
+
+    distanceTo(point: vec3) {
+        const [x, y, z] = point;
+        const [minX, minY, minZ] = this.min;
+        const [maxX, maxY, maxZ] = this.max;
+        let dx = 0;
+        let dy = 0;
+        let dz = 0;
+        if (x < minX) dx = x - minX;
+        else if (x > maxX) dx = x - maxX;
+        if (y < minY) dy = y - minY;
+        else if (y > maxY) dy = y - maxY;
+        if (z < minZ) dz = z - minZ;
+        else if (z > maxZ) dz = z - maxZ;
+        return Math.sqrt(dx * dx + dy * dy + dz * dz);
+    }
 }

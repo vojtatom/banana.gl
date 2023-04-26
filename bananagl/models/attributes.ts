@@ -58,6 +58,19 @@ export class Attributes {
         }
     }
 
+    get instanceCount() {
+        if (!this.attributes.length) throw new Error('No attributes');
+        if (!this.isInstanced_) throw new Error('Not instanced');
+
+        for (const attribute of this.attributes) {
+            if (attribute instanceof InstancedAttribute) {
+                return attribute.count / attribute.size;
+            }
+        }
+
+        throw new Error('No instanced attributes');
+    }
+
     get buffers() {
         return this.attributes.map((a) => a.buffer);
     }
@@ -99,5 +112,9 @@ export class Attributes {
         for (let i = 0; i < attrs.length; i++) {
             if (attrs[i].buffer.needsUpdate && attrs[i].buffer.active) attrs[i].buffer.update(gl);
         }
+    }
+
+    list() {
+        return this.attributes.map((a) => a.name);
     }
 }

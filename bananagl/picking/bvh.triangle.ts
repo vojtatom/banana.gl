@@ -1,3 +1,5 @@
+import { vec3 } from 'gl-matrix';
+
 import { Attribute } from '@bananagl/models/attribute';
 import { Renderable } from '@bananagl/models/renderable';
 
@@ -336,6 +338,55 @@ export class TriangleBVH implements BVH {
 
         bestHit[0] = bestT;
         bestHit[1] = bestIndex;
+    }
+
+    //--------------------------------------------------------------------------------
+    pointsInDistance(point: vec3, dist: number) {
+        if (!this.root) return [];
+
+        const stack = new Array<BVHNode>();
+        stack.push(this.root);
+        let boxT = Infinity;
+        let distSqrt = dist * dist;
+
+        const pointIndices: number[] = [];
+
+        while (stack.length > 0) {
+            const node = stack.pop();
+            if (!node) continue;
+            if (node.bbox) {
+                boxT = node.bbox.distanceTo(point);
+                if (boxT >= dist) continue;
+
+                if (node.left) stack.push(node.left);
+                if (node.right) stack.push(node.right);
+
+                if (node.from !== undefined) {
+                    this.traverseLeafPoints(node, point, pointIndices, distSqrt);
+                }
+            }
+        }
+
+        return pointIndices;
+    }
+
+    private traverseLeafPoints(
+        node: BVHNode,
+        point: vec3,
+        pointIndices: number[],
+        distSqrt: number
+    ) {
+        for (let i = node.from!; i < node.to!; i++) {
+            for (let j = 0; j < 3; j++) {
+                const iVertex = i * 3 + j;
+                const p = vec3.fromValues(
+                    this.position.buffer.data[iVertex * 3],
+                    this.position.buffer.data[iVertex * 3 + 1],
+                    this.position.buffer.data[iVertex * 3 + 2]
+                );
+                if (vec3.sqrDist(p, point) < distSqrt) pointIndices.push(iVertex * 3);
+            }
+        }
     }
 
     //--------------------------------------------------------------------------------

@@ -38,4 +38,10 @@ export class SelectionManager {
         this.selected.forEach((selection) => selection.object.onDeselect(selection));
         this.selected = [];
     }
+
+    isSelected(identifier: number, object: Selectable) {
+        return this.selected.some(
+            (selection) => selection.identifier === identifier && selection.object === object
+        );
+    }
 }

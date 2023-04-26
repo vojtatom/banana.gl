@@ -86,10 +86,10 @@ export class InstancedAttribute extends Attribute {
         name: string,
         buffer: Buffer,
         size: number,
-        normalized: boolean,
-        stride: number,
-        offset: number,
-        divisor: number
+        divisor: number,
+        normalized?: boolean,
+        stride?: number,
+        offset?: number
     ) {
         super(name, buffer, size, normalized, stride, offset);
         this.divisor = divisor;
