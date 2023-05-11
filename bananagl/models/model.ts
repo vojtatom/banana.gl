@@ -5,6 +5,10 @@ export class Model extends Renderable {
     protected _shader?: Shader;
     protected data_: { [name: string]: any } = {};
 
+    constructor() {
+        super();
+    }
+
     get shader() {
         if (!this._shader) {
             throw new Error('Shader not set');

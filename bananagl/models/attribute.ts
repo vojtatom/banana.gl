@@ -60,6 +60,12 @@ export class Attribute {
         const bufferIndex2 = index2 * (this.size + this.stride) + this.offset;
         this.buffer.swap(bufferIndex1, bufferIndex2, this.swapArr);
     }
+
+    dispose(gl: WebGL2RenderingContext) {
+        this.buffer.dispose(gl);
+        this.buffer = null as any;
+        this.active = false;
+    }
 }
 
 export class ElementAttribute extends Attribute {

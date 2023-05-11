@@ -3,13 +3,13 @@ import { WindowControls } from '@bananagl/window/controls';
 import { Renderer } from '../renderer/renderer';
 import { View } from './view';
 
-interface ViewSize {
+export interface ViewSize {
     width: number;
     height: number;
     mode: 'absolute' | 'relative';
 }
 
-interface ViewPosition {
+export interface ViewPosition {
     top?: number;
     left?: number;
     right?: number;

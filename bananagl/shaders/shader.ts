@@ -55,7 +55,8 @@ export class Shader {
     constructor(
         private vertexShader: string,
         private fragmentShader: string,
-        readonly transparency: boolean = false
+        readonly transparency: boolean = false,
+        readonly depth: boolean = true
     ) {}
 
     setup(gl: WebGL2RenderingContext) {

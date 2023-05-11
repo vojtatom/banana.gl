@@ -5,10 +5,15 @@ import { Shader, UniformValue } from '@bananagl/shaders/shader';
 import { Attributes } from './attributes';
 
 export abstract class Renderable {
+    private attributes_: Attributes = new Attributes();
+    private position_: vec3 = [0, 0, 0];
+    private rotation_: vec3 = [0, 0, 0];
+    private scale_: vec3 = [1, 1, 1];
+    private disposed_ = false;
+    private visible_ = true;
     private uniforms_: { [name: string]: UniformValue } = {
         uModelMatrix: mat4.identity(mat4.create()),
     };
-    private attributes_: Attributes = new Attributes();
 
     set uniforms(values: { [name: string]: UniformValue }) {
         for (const name in values) {
@@ -16,6 +21,14 @@ export abstract class Renderable {
             if (value === this.uniforms_[name]) continue;
             this.uniforms_[name] = value;
         }
+    }
+
+    get visible() {
+        return this.visible_;
+    }
+
+    set visible(visible: boolean) {
+        this.visible_ = visible;
     }
 
     get uniforms() {
@@ -30,9 +43,14 @@ export abstract class Renderable {
         return this.uniforms_.uModelMatrix as mat4;
     }
 
-    private position_: vec3 = [0, 0, 0];
-    private rotation_: vec3 = [0, 0, 0];
-    private scale_: vec3 = [1, 1, 1];
+    dispose(gl: WebGL2RenderingContext) {
+        this.disposed_ = true;
+        this.attributes.dispose(gl);
+    }
+
+    get disposed() {
+        return this.disposed_;
+    }
 
     get position() {
         return this.position_;

@@ -254,7 +254,6 @@ export class Camera {
     }
 
     rotate(x: number, y: number) {
-        console.log(x, y);
         const angleX = (x / this.width) * 2 * Math.PI;
         let angleY = -(y / this.height) * Math.PI;
 
@@ -272,8 +271,7 @@ export class Camera {
             angleY = this.minangle - currentYAngle;
         }
 
-        if (Math.abs(angleY) > EPSILON)
-            console.log(angleY), quat.setAxisAngle(q1, this.rightV, angleY);
+        quat.setAxisAngle(q1, this.rightV, angleY);
         quat.setAxisAngle(q2, this.upV, -angleX);
         quat.multiply(q1, q1, q2);
 

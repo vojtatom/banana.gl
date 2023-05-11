@@ -8,6 +8,7 @@ export class Attributes {
     private isIndexed_ = false;
     private isInstanced_ = false;
     private needsRebind_ = false;
+    private needsDispose_ = false;
     private elements?: ElementAttribute;
 
     constructor() {}
@@ -114,7 +115,25 @@ export class Attributes {
         }
     }
 
-    list() {
-        return this.attributes.map((a) => a.name);
+    set needsDispose(value: boolean) {
+        this.needsDispose_ = value;
+    }
+
+    dispose(gl: WebGL2RenderingContext) {
+        if (this.vao) {
+            gl.deleteVertexArray(this.vao);
+            this.vao = undefined;
+        }
+
+        for (const attribute of this.attributes) {
+            attribute.dispose(gl);
+        }
+
+        this.attributes.length = 0;
+
+        if (this.elements) {
+            this.elements.dispose(gl);
+            this.elements = undefined;
+        }
     }
 }

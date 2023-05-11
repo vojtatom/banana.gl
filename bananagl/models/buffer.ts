@@ -134,6 +134,12 @@ export class Buffer {
             }
         }
     }
+
+    dispose(gl: WebGL2RenderingContext) {
+        if (this.buffer) gl.deleteBuffer(this.buffer);
+        this.buffer = null;
+        this.data = null as any;
+    }
 }
 
 export class ElementBuffer extends Buffer {
