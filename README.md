@@ -16,10 +16,14 @@ The following list is a rough roadmap of what I want to achieve with BananaGL. I
 -   [x] Shader compilation
 -   [x] Per-model uniforms
 -   [x] Camera (switchable between perspective and orthographic)
--   [x] UI controls (map-like)
+-   [x] Mouse controls (map-like)
+-   [x] Keyboard Shortcuts
+-   [x] Resource Disposal (could be better though)
+-   [x] Transparency
+-   [x] Selection Management
+-   [ ] Textures
 -   [ ] View frustum culling
 -   [ ] Shadows
--   [ ] Transparency
 
 ### Data
 
@@ -30,7 +34,7 @@ The following list is a rough roadmap of what I want to achieve with BananaGL. I
 
 ### Picking
 
--   [x] Built-in BVH for triangular data
+-   [x] Built-in BVH for triangular data (worker-based)
 -   [ ] Built-in BVH for line data?
 -   [ ] Built-in BVH for point data?
 -   [x] Ray-based picking for triangular data
@@ -42,9 +46,9 @@ The following list is a rough roadmap of what I want to achieve with BananaGL. I
 -   [x] Per-model uniforms updated only when needed
 -   [x] Indexed triangle mode
 -   [x] Triangle mode
+-   [x] Instancing mode
 -   [ ] Indexed Line Mode
 -   [ ] Line mode
--   [ ] Instancing mode
 
 ### Nice to have
 

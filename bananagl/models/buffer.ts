@@ -7,6 +7,10 @@ export function cloneTypedArrayWithSize(arr: TypedArray, size: number) {
     return newArr;
 }
 
+interface ConstructableTypedArray {
+    new (buffer: ArrayBuffer): TypedArray;
+}
+
 export class Buffer {
     buffer: WebGLBuffer | null = null;
     private partsToUpdate_: [number, number][] = [];
@@ -35,6 +39,10 @@ export class Buffer {
         return this.partsToUpdate_.length > 0;
     }
 
+    get active() {
+        return this.buffer !== null;
+    }
+
     update(gl: WebGL2RenderingContext) {
         if (!this.buffer) throw new Error('Buffer not setup');
         gl.bindBuffer(gl.ARRAY_BUFFER, this.buffer);
@@ -50,13 +58,15 @@ export class Buffer {
 
     getDataType(gl: WebGL2RenderingContext) {
         if (this.data instanceof Float32Array) return gl.FLOAT;
-        else if (this.data instanceof Uint16Array) return gl.UNSIGNED_SHORT;
-        else if (this.data instanceof Uint32Array) return gl.UNSIGNED_INT;
         else if (this.data instanceof Uint8Array) return gl.UNSIGNED_BYTE;
         else if (this.data instanceof Int16Array) return gl.SHORT;
         else if (this.data instanceof Int32Array) return gl.INT;
         else if (this.data instanceof Int8Array) return gl.BYTE;
-        else throw new Error('Unknown data type');
+        else throw new Error('Unsupported data type');
+    }
+
+    getView(typeConstructor: ConstructableTypedArray) {
+        return new typeConstructor(this.data.buffer);
     }
 
     get BYTES_PER_ELEMENT() {
@@ -123,6 +133,12 @@ export class Buffer {
                 );
             }
         }
+    }
+
+    dispose(gl: WebGL2RenderingContext) {
+        if (this.buffer) gl.deleteBuffer(this.buffer);
+        this.buffer = null;
+        this.data = null as any;
     }
 }
 

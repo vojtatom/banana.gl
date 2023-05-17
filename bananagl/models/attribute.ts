@@ -46,6 +46,11 @@ export class Attribute {
         else this.buffer.bind(gl);
     }
 
+    rebind(gl: WebGL2RenderingContext, location: number) {
+        this.active = false;
+        this.setup(gl, location);
+    }
+
     applyMatrix(matrix: mat2 | mat3 | mat4) {
         this.buffer.applyMatrix(matrix, this.size);
     }
@@ -54,6 +59,12 @@ export class Attribute {
         const bufferIndex1 = index1 * (this.size + this.stride) + this.offset;
         const bufferIndex2 = index2 * (this.size + this.stride) + this.offset;
         this.buffer.swap(bufferIndex1, bufferIndex2, this.swapArr);
+    }
+
+    dispose(gl: WebGL2RenderingContext) {
+        this.buffer.dispose(gl);
+        this.buffer = null as any;
+        this.active = false;
     }
 }
 
@@ -81,10 +92,10 @@ export class InstancedAttribute extends Attribute {
         name: string,
         buffer: Buffer,
         size: number,
-        normalized: boolean,
-        stride: number,
-        offset: number,
-        divisor: number
+        divisor: number,
+        normalized?: boolean,
+        stride?: number,
+        offset?: number
     ) {
         super(name, buffer, size, normalized, stride, offset);
         this.divisor = divisor;

@@ -1,8 +1,9 @@
-import { Window } from './window';
+import { Window } from '../window/window';
 
 export class Renderer {
     private context?: WebGL2RenderingContext;
     private window_?: Window;
+    private onInitCallbacks: (() => void)[] = [];
 
     constructor(canvas?: HTMLCanvasElement, options?: WebGLContextAttributes) {
         if (canvas) this.init(canvas, options);
@@ -25,12 +26,22 @@ export class Renderer {
         });
 
         if (!gl) throw new Error('WebGL2 not supported');
+
         this.context = gl;
         this.window_ = new Window(canvas);
 
         gl.enable(gl.SCISSOR_TEST);
         gl.enable(gl.DEPTH_TEST);
         gl.disable(gl.CULL_FACE);
+        gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+
+        this.onInitCallbacks.forEach((callback) => callback());
+        this.onInitCallbacks = [];
+    }
+
+    set onInit(callback: () => void) {
+        if (this.context) callback();
+        else this.onInitCallbacks.push(callback);
     }
 
     get gl() {

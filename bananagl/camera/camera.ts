@@ -8,6 +8,8 @@ export enum ProjectionType {
     ORTHOGRAPHIC,
 }
 
+const EPSILON = 0.000001;
+
 export interface CameraOptions {
     position?: vec3;
     target?: vec3;
@@ -44,8 +46,9 @@ export class Camera {
 
     private width: number = 0;
     private height: number = 0;
+    private screenSize: vec2 = vec2.create();
     private maxangle: number = Math.PI / 2;
-    private minangle: number = 0.01;
+    private minangle: number = 0;
 
     private left: number = 0;
     private right: number = 0;
@@ -75,6 +78,7 @@ export class Camera {
         this.uniforms_['uProjectionMatrix'] = this.projectionMatrix;
         this.uniforms_['uViewMatrix'] = this.viewMatrix;
         this.uniforms_['uProjectionViewMatrix'] = this.projectionViewMatrix;
+        this.uniforms_['uScreenSize'] = this.screenSize;
 
         this.updateOrthoBounds();
         this.updateMatrices();
@@ -205,6 +209,7 @@ export class Camera {
         this.aspectRatio = width / height;
         this.width = width;
         this.height = height;
+        vec2.set(this.screenSize, width, height);
         this.updateOrthoBounds();
         this.updateProjectionViewMatrix();
     }
@@ -412,5 +417,25 @@ export class Camera {
         vec3.copy(ray.origin, this.position);
         vec3.copy(ray.direction, direction);
         return ray;
+    }
+
+    cameraPlaneVector(dx: number, dy: number) {
+        const currentUp = vec3.create();
+        vec3.cross(currentUp, this.rightV, this.direction);
+        vec3.normalize(currentUp, currentUp);
+
+        const currentRight = vec3.create();
+        vec3.cross(currentRight, this.direction, currentUp);
+        vec3.normalize(currentRight, currentRight);
+
+        const heightUnit = this.getFrustumHeightAtTarget() / this.height;
+        const widthUnit = this.getFrustrumWidthAtTarget() / this.width;
+
+        vec3.scale(currentRight, currentRight, widthUnit * dx);
+        vec3.scale(currentUp, currentUp, -heightUnit * dy);
+
+        const dir = vec3.create();
+        vec3.add(dir, currentRight, currentUp);
+        return dir;
     }
 }

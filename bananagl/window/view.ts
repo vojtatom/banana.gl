@@ -1,11 +1,11 @@
 import { vec3 } from 'gl-matrix';
 
-import { Camera } from '@bananagl/controls/camera';
-import { CameraLock } from '@bananagl/controls/cameraLock';
+import { Camera } from '@bananagl/camera/camera';
+import { CameraLock } from '@bananagl/camera/cameraLock';
 import { Scene } from '@bananagl/scene/scene';
 
-import { viewRenderPass } from './pass';
-import { Renderer } from './renderer';
+import { viewRenderPass } from '../renderer/pass';
+import { Renderer } from '../renderer/renderer';
 
 export class View {
     x: number = 0;
@@ -32,6 +32,9 @@ export class View {
         const gl = renderer.gl;
         gl.viewport(this.x, this.y, this.width, this.height);
         gl.scissor(this.x, this.y, this.width, this.height);
+        //gl.disable(gl.DEPTH_TEST);
+        //gl.enable(gl.BLEND);
+        //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         viewRenderPass(this.scene, renderer, this.camera);
     }
 
