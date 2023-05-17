@@ -48,16 +48,12 @@ function render(renderer: Renderer, renderable: Renderable, shader: Shader, came
     renderable.attributes.update(gl);
     renderable.attributes.bind(gl, shader);
 
-    //if ((renderable as any).name && (renderable as any).position) {
-    //    console.log(renderable.name, renderable.position);
-    //}
-
     if (renderable.attributes.isIndexed) {
         if (renderable.attributes.isInstanced) {
             console.warn('Instanced indexed rendering not supported');
         } else {
             gl.drawElements(
-                gl.TRIANGLES,
+                renderable.mode,
                 renderable.attributes.count,
                 renderable.attributes.elementType,
                 0
@@ -66,13 +62,13 @@ function render(renderer: Renderer, renderable: Renderable, shader: Shader, came
     } else {
         if (renderable.attributes.isInstanced) {
             gl.drawArraysInstanced(
-                gl.TRIANGLES,
+                renderable.mode,
                 0,
                 renderable.attributes.count,
                 renderable.attributes.instanceCount
             );
         } else {
-            gl.drawArrays(gl.TRIANGLES, 0, renderable.attributes.count);
+            gl.drawArrays(renderable.mode, 0, renderable.attributes.count);
         }
     }
 }

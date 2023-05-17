@@ -11,6 +11,9 @@ export abstract class Renderable {
     private scale_: vec3 = [1, 1, 1];
     private disposed_ = false;
     private visible_ = true;
+    public mode: WebGLRenderingContextBase['TRIANGLES'] | WebGLRenderingContextBase['LINES'] = 4;
+
+
     private uniforms_: { [name: string]: UniformValue } = {
         uModelMatrix: mat4.identity(mat4.create()),
     };

@@ -36,6 +36,7 @@ export class Renderer {
         gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 
         this.onInitCallbacks.forEach((callback) => callback());
+        this.onInitCallbacks = [];
     }
 
     set onInit(callback: () => void) {

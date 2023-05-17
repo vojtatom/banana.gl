@@ -1,8 +1,14 @@
 import { Attribute } from '@bananagl/bananagl';
 
 import { BVHNode } from '../bvh';
-import BuilderWorker from './build.worker?worker&inline';
-import { BuilderOutput, fromTransferable, getTrasferables, toTransferable } from './transform';
+import BuilderWorker from './build.worker?worker';
+import {
+    BuilderOutput,
+    fromTransferable,
+    getTrasferables,
+    reconstructBBoxes,
+    toTransferable,
+} from './transform';
 
 export async function buildBVHInWorker(position: Attribute, attr: Attribute[]) {
     const data = toTransferable(position, attr);
@@ -12,6 +18,7 @@ export async function buildBVHInWorker(position: Attribute, attr: Attribute[]) {
         worker.onmessage = (e) => {
             const data = e.data as BuilderOutput;
             fromTransferable(position, attr, data.data);
+            reconstructBBoxes(data.rootNode);
             resolve(data.rootNode);
             worker.terminate();
         };

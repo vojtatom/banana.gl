@@ -55,6 +55,7 @@ export class Window {
 
     dispose() {
         this.controls.dispose();
+        this.views_ = [];
     }
 
     get views() {

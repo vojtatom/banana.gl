@@ -8,7 +8,6 @@ export class Attributes {
     private isIndexed_ = false;
     private isInstanced_ = false;
     private needsRebind_ = false;
-    private needsDispose_ = false;
     private elements?: ElementAttribute;
 
     constructor() {}
@@ -113,10 +112,6 @@ export class Attributes {
         for (let i = 0; i < attrs.length; i++) {
             if (attrs[i].buffer.needsUpdate && attrs[i].buffer.active) attrs[i].buffer.update(gl);
         }
-    }
-
-    set needsDispose(value: boolean) {
-        this.needsDispose_ = value;
     }
 
     dispose(gl: WebGL2RenderingContext) {
