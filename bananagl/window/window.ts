@@ -30,7 +30,7 @@ export class Window {
     constructor(private canvas: HTMLCanvasElement) {
         //TODO optimize this
         function debounce(callback: CallableFunction, delay: number) {
-            let timeoutId: NodeJS.Timeout;
+            let timeoutId: any;
             return function (...args: any[]) {
                 clearTimeout(timeoutId);
                 timeoutId = setTimeout(() => {

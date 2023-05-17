@@ -1,7 +1,7 @@
 import { Attribute } from '@bananagl/bananagl';
 
 import { BVHNode } from '../bvh';
-import BuilderWorker from './build.worker?worker';
+import BuilderWorker from './build.worker?worker&inline';
 import {
     BuilderOutput,
     fromTransferable,
