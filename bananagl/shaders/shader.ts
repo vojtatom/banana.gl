@@ -1,5 +1,6 @@
 import equal from 'fast-deep-equal/es6';
 
+import { cloneValue } from './clone';
 import { handleErrors } from './errors';
 
 const VER = `#version 300 es
@@ -20,23 +21,6 @@ export type TypedArray =
     | Int8Array;
 
 export type UniformValue = number | number[] | boolean | boolean[] | TypedArray | null;
-
-function isArray(a: any): a is any[] {
-    return Array.isArray(a);
-}
-
-function cloneValue(value: UniformValue) {
-    //TODO optimize this to prevent reallocation
-    if (isArray(value)) return value.slice();
-    if (value instanceof Float32Array) return new Float32Array(value);
-    if (value instanceof Int32Array) return new Int32Array(value);
-    if (value instanceof Int16Array) return new Int16Array(value);
-    if (value instanceof Int8Array) return new Int8Array(value);
-    if (value instanceof Uint32Array) return new Uint32Array(value);
-    if (value instanceof Uint16Array) return new Uint16Array(value);
-    if (value instanceof Uint8Array) return new Uint8Array(value);
-    return value;
-}
 
 const ROW_MAJOR = false;
 

@@ -38,6 +38,7 @@ The following list is a rough roadmap of what I want to achieve with BananaGL. I
 -   [ ] Built-in BVH for line data?
 -   [ ] Built-in BVH for point data?
 -   [x] Ray-based picking for triangular data
+-   [x] Range-based picking for triangular data
 -   [ ] Texture-based picking
 
 ### Render Pass

@@ -22,12 +22,13 @@ export class ShortcutOnPress implements Shortcut {
     }
 }
 
-export class ShortcutOnMouseMove implements Shortcut {
+export class ShortcutOnMouseMove<StorageT> implements Shortcut {
     constructor(
         readonly code: string,
         private startCallback?: (view: View) => void,
         private moveCallback?: (view: View, dx: number, dy: number) => void,
-        private cancelCallback?: () => void
+        private cancelCallback?: (data?: StorageT) => void,
+        public storage?: StorageT
     ) {}
 
     onStart(view: View) {
@@ -42,7 +43,7 @@ export class ShortcutOnMouseMove implements Shortcut {
 
     onCancel(): void {
         if (!this.cancelCallback) return;
-        this.cancelCallback();
+        this.cancelCallback(this.storage);
     }
 
     set onTrigger(callback: (view: View, dx: number, dy: number) => void) {
@@ -53,7 +54,7 @@ export class ShortcutOnMouseMove implements Shortcut {
         this.startCallback = callback;
     }
 
-    set onCancelCall(callback: () => void) {
+    set onCancelCall(callback: (data?: StorageT) => void) {
         this.cancelCallback = callback;
     }
 }

@@ -6,7 +6,7 @@ export class Scene {
     readonly objects: Renderable[] = [];
     readonly toDispose: Renderable[] = [];
     readonly picker = new Picker(this);
-    private onChanges: (() => void)[] = [];
+    private onChangeCalls: (() => void)[] = [];
 
     private opaqueObjects_: Renderable[] = [];
     private transparentObjects_: Renderable[] = [];
@@ -15,7 +15,7 @@ export class Scene {
 
     add(object: Renderable) {
         this.objects.push(object);
-        this.onChanges.forEach((callback) => callback());
+        this.onChangeCalls.forEach((callback) => callback());
         this.dirtyShaderOrder_ = true;
     }
 
@@ -24,7 +24,7 @@ export class Scene {
         if (idx === -1) return;
         this.toDispose.push(...this.objects.splice(idx, 1));
 
-        this.onChanges.forEach((callback) => callback());
+        this.onChangeCalls.forEach((callback) => callback());
         this.dirtyShaderOrder_ = true;
     }
 
@@ -64,6 +64,16 @@ export class Scene {
         this.dirtyShaderOrder_ = false;
     }
 
+    addChangeListener(callback: () => void) {
+        this.onChangeCalls.push(callback);
+    }
+
+    removeChangeListener(callback: () => void) {
+        const idx = this.onChangeCalls.indexOf(callback);
+        if (idx === -1) return;
+        this.onChangeCalls.splice(idx, 1);
+    }
+
     get dirtyShaderOrder() {
         return this.dirtyShaderOrder_;
     }
@@ -78,16 +88,6 @@ export class Scene {
 
     get noDepthObjects() {
         return this.noDepthObjects_;
-    }
-
-    set onChange(callback: () => void) {
-        this.onChanges.push(callback);
-    }
-
-    set removeChange(callback: () => void) {
-        const idx = this.onChanges.indexOf(callback);
-        if (idx === -1) return;
-        this.onChanges.splice(idx, 1);
     }
 
     set shadersChanged(value: boolean) {

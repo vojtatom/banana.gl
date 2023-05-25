@@ -1,4 +1,4 @@
-import { vec3 } from 'gl-matrix';
+import { vec2, vec3 } from 'gl-matrix';
 
 import { Camera } from '@bananagl/camera/camera';
 import { CameraLock } from '@bananagl/camera/cameraLock';
@@ -32,9 +32,6 @@ export class View {
         const gl = renderer.gl;
         gl.viewport(this.x, this.y, this.width, this.height);
         gl.scissor(this.x, this.y, this.width, this.height);
-        //gl.disable(gl.DEPTH_TEST);
-        //gl.enable(gl.BLEND);
-        //gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
         viewRenderPass(this.scene, renderer, this.camera);
     }
 
@@ -46,8 +43,7 @@ export class View {
         gl.clear(gl.COLOR_BUFFER_BIT);
     }
 
-    //all coords from bottom left
-    toLocal(x: number, y: number) {
+    toLocal(x: number, y: number): vec2 {
         return [x - this.x, y - this.y];
     }
 
@@ -59,7 +55,7 @@ export class View {
         return this.height_;
     }
 
-    toNDC(x: number, y: number) {
+    toNDC(x: number, y: number): vec2 {
         const invDpr = 1 / window.devicePixelRatio;
         return [
             ((x - this.x * invDpr) / (this.width_ * invDpr)) * 2 - 1,
