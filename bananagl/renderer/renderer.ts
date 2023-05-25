@@ -59,6 +59,10 @@ export class Renderer {
         return this.window_;
     }
 
+    get windowNullable() {
+        return this.window_;
+    }
+
     set clearColor(color: [number, number, number, number]) {
         if (!this.context) throw new Error('Renderer not initialized');
         this.context.clearColor(color[0], color[1], color[2], color[3]);

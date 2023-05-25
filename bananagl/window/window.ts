@@ -28,33 +28,19 @@ export class Window {
     controls: WindowControls;
 
     constructor(private canvas: HTMLCanvasElement) {
-        //TODO optimize this
-        function debounce(callback: CallableFunction, delay: number) {
-            let timeoutId: any;
-            return function (...args: any[]) {
-                clearTimeout(timeoutId);
-                timeoutId = setTimeout(() => {
-                    callback(...args);
-                }, delay);
-            };
-        }
-
-        const observer = new ResizeObserver(
-            debounce((entries: ResizeObserverEntry[]) => {
-                for (const entry of entries) {
-                    const { width, height } = entry.contentRect;
-                    this.resize(width, height);
-                }
-            }, 100)
-        );
+        const observer = new ResizeObserver((entries) => {
+            for (const entry of entries) {
+                const { width, height } = entry.contentRect;
+                this.resize(width, height);
+            }
+        });
 
         observer.observe(canvas);
         this.forceResize();
-        this.controls = new WindowControls(canvas, this);
+        this.controls = new WindowControls(this);
     }
 
     dispose() {
-        this.controls.dispose();
         this.views_ = [];
     }
 

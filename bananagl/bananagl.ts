@@ -11,7 +11,7 @@ import { Ray } from './picking/ray';
 import { Renderer } from './renderer/renderer';
 import { mountRenderer, unmountRenderer } from './renderer/setup';
 import { Scene } from './scene/scene';
-import { Selection, SelectionManager } from './scene/selection';
+import { cloneUniforms } from './shaders/clone';
 import { Shader } from './shaders/shader';
 import { Profiler } from './utils/profiler';
 import { Shortcut, ShortcutOnMouseMove, ShortcutOnPress } from './window/shortcuts';
@@ -35,12 +35,11 @@ export {
     View,
     CameraView,
     Profiler,
-    SelectionManager,
-    Selection,
     ShortcutOnPress,
     ShortcutOnMouseMove,
     mountRenderer,
     unmountRenderer,
+    cloneUniforms,
 };
 
 export type { Selectable, Shortcut };

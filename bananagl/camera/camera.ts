@@ -284,7 +284,8 @@ export class Camera {
         this.updateProjectionViewMatrix();
     }
 
-    zoom(factor: number, cursorPxX: number, cursorPxY: number) {
+    zoom(delta: number, cursorPxX: number, cursorPxY: number) {
+        const factor = delta > 0 ? 1.1 : 0.9;
         if (this.isOrthographic) {
             this.zoomOrthographic(factor, cursorPxX, cursorPxY);
         } else {
