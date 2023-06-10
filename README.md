@@ -1,4 +1,4 @@
-# 🍌 banana.gl
+# banana.gl 🍌
 
 <sup>⚠️☕️ Careful, still hot, very early stages of development, consume with caution</sup>
 
