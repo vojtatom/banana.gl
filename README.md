@@ -9,7 +9,7 @@ banana.gl is a small, low-level WebGL library designed as an alternative to thre
 To install banana.gl, run the following command in your project's root directory:
 
 ```bash
-npm install banana.gl
+npm install bananagl
 ```
 
 ## Roadmap
