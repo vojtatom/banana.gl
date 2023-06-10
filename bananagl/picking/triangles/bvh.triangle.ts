@@ -1,4 +1,4 @@
-import { vec3 } from 'gl-matrix';
+import { vec2, vec3 } from 'gl-matrix';
 
 import { Attribute } from '@bananagl/models/attribute';
 import { Renderable } from '@bananagl/models/renderable';
@@ -165,6 +165,40 @@ export class TriangleBVH implements BVH {
         for (let i = node.from!; i < node.to!; i++) {
             hit = rect.triangleInsideFrustum(this.position.buffer.data, i);
             if (hit) indices.push(i);
+        }
+    }
+
+    //--------------------------------------------------------------------------------
+    traceArea(from: vec2, to: vec2) {
+        if (!this.root) return [];
+
+        const stack = new Array<BVHNode>();
+        stack.push(this.root);
+
+        const indices: number[] = [];
+
+        while (stack.length > 0) {
+            const node = stack.pop();
+            if (!node) continue;
+            if (node.bbox) {
+                if (!node.bbox.overlapedBy(from, to)) continue;
+
+                if (node.left) stack.push(node.left);
+                if (node.right) stack.push(node.right);
+
+                if (node.from !== undefined) {
+                    this.traverseLeafTriangleArea(node, indices);
+                }
+            }
+        }
+
+        return indices;
+    }
+
+    private traverseLeafTriangleArea(node: BVHNode, indices: number[]) {
+        for (let i = node.from!; i < node.to!; i++) {
+            //TODO optimize, not all triangles are inside the area
+            indices.push(i);
         }
     }
 }

@@ -1,12 +1,20 @@
-# 🗺 BananaGL
+# 🗺 banana.gl
 
 <sup>⚠️☕️ Careful, still hot, very early stages of development, consume with caution</sup>
 
-BananaGL is a small, low-level WebGL library designed as an alternative to three.js for developers who seek a more hands-on approach without diving into the complexities of bare WebGL. Honestly, it's just a fun project for me after using three.js for a while.
+banana.gl is a small, low-level WebGL library designed as an alternative to three.js for developers who seek a more hands-on approach without diving into the complexities of bare WebGL. Honestly, it's just a fun project for me after using three.js for a while.
+
+## Installation
+
+To install banana.gl, run the following command in your project's root directory:
+
+```bash
+npm install banana.gl
+```
 
 ## Roadmap
 
-The following list is a rough roadmap of what I want to achieve with BananaGL. It's not a promise, but rather a list of things I want to implement:
+The following list is a rough roadmap of what I want to achieve with banana.gl. It's not a promise, but rather a list of things I want to implement:
 
 ### Core
 
@@ -53,14 +61,5 @@ The following list is a rough roadmap of what I want to achieve with BananaGL. I
 
 ### Nice to have
 
--   [ ] LOD
 -   [ ] Post-processing pipeline
 -   [ ] Optimized for scenes with funky coordinates (e.g. too large or too small)
-
-## Installation
-
-To install BananaGL, run the following command in your project's root directory:
-
-```bash
-npm install bananagl
-```

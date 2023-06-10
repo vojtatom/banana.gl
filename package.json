@@ -5,7 +5,7 @@
     "type": "module",
     "repository": {
         "type": "git",
-        "url": "https://github.com/vojtatom/BananaGL"
+        "url": "https://github.com/vojtatom/banana.gl"
     },
     "keywords": [
         "metacity",

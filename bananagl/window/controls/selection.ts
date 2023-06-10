@@ -37,7 +37,6 @@ export class RangeSelection {
     private inScene: boolean = false;
 
     constructor(public x: number, public y: number) {
-        console.log('new range selection');
         const positions = new Float32Array([0, 0, 1, 0, 1, 1, 0, 0, 1, 1, 0, 1]);
         const model = new Model();
         model.attributes.add(new Attribute('position', new Buffer(positions), 2));

@@ -82,17 +82,19 @@ export class MouseControls {
         }
     }
 
-    up(event: IMouseEvent) {
+    up(event: IMouseEvent, disableTrace: boolean) {
         if (!this.view) return null;
         const { x, y, button } = event;
         const duration = Date.now() - this.downAt;
         let hit = null;
 
-        if (duration < 200) {
-            hit = trace(this.view, x, y);
-        } else if (this.keyMap?.shift && this.range) {
-            console.log('there was a range select', this.range);
-            hit = traceRange(this.view, this.range.from, this.range.to);
+        if (!disableTrace) {
+            if (duration < 200) {
+                hit = trace(this.view, x, y);
+            } else if (this.keyMap?.shift && this.range) {
+                console.log('there was a range select', this.range);
+                hit = traceRange(this.view, this.range.from, this.range.to);
+            }
         }
 
         this.range?.dispose(this.view);

@@ -100,10 +100,6 @@ export class Window {
         this.views_.forEach(({ view }) => view.render(renderer));
     }
 
-    renderLayout(renderer: Renderer) {
-        this.views_.forEach(({ view }) => view.renderLayout(renderer));
-    }
-
     getViewAndPosition(event: MouseEvent) {
         const { offsetX, offsetY } = event;
         //recompute offestY from bottom

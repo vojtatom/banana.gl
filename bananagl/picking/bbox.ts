@@ -1,4 +1,4 @@
-import { vec3 } from 'gl-matrix';
+import { vec2, vec3 } from 'gl-matrix';
 
 import { TypedArray } from '@bananagl/shaders/shader';
 
@@ -57,6 +57,15 @@ export class BBox {
             this.max[0] >= bbox.max[0] &&
             this.max[1] >= bbox.max[1] &&
             this.max[2] >= bbox.max[2]
+        );
+    }
+
+    overlapedBy(from: vec2, to: vec2): boolean {
+        return !(
+            from[0] > this.max[0] ||
+            to[0] < this.min[0] ||
+            from[1] > this.max[1] ||
+            to[1] < this.min[1]
         );
     }
 

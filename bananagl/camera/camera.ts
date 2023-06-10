@@ -1,27 +1,9 @@
-import { mat4, quat, vec2, vec3, vec4 } from 'gl-matrix';
+import { mat4, quat, vec2, vec3 } from 'gl-matrix';
 
 import { Ray } from '@bananagl/picking/ray';
 import { UniformValue } from '@bananagl/shaders/shader';
 
-export enum ProjectionType {
-    PERSPECTIVE,
-    ORTHOGRAPHIC,
-}
-
-const EPSILON = 0.000001;
-
-export interface CameraOptions {
-    position?: vec3;
-    target?: vec3;
-    up?: vec3;
-    right?: vec3;
-    projectionType?: ProjectionType;
-    fovYRadian?: number;
-    width?: number;
-    height?: number;
-    near?: number;
-    far?: number;
-}
+import { CameraOptions, ProjectionType } from './cameraInterface';
 
 export class Camera {
     position: vec3;

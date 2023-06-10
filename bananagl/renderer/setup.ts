@@ -24,11 +24,7 @@ export function mountRenderer(
     }
 
     renderer.window.forceResize();
-    if (debugLayout) {
-        renderer.renderLayout();
-    } else {
-        if (!renderer.running) renderer.animationLoop();
-    }
+    if (!renderer.running) renderer.animationLoop();
 }
 
 export function unmountRenderer(renderer: Renderer) {
