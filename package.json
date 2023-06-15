@@ -8,10 +8,12 @@
         "url": "https://github.com/vojtatom/banana.gl"
     },
     "keywords": [
-        "metacity",
         "visualization",
-        "threejs",
-        "react"
+        "webgl",
+        "gl",
+        "3d",
+        "2d",
+        "canvas"
     ],
     "author": {
         "name": "Vojtěch Tomas",

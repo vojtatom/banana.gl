@@ -1,7 +1,5 @@
 # banana.gl 🍌
 
-<sup>⚠️☕️ Careful, still hot, very early stages of development, consume with caution</sup>
-
 banana.gl is a small, low-level WebGL library designed as an alternative to three.js for developers who seek a more hands-on approach without diving into the complexities of bare WebGL. Honestly, it's just a fun project for me after using three.js for a while.
 
 ## Installation
