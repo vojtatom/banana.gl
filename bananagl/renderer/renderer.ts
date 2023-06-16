@@ -59,8 +59,8 @@ export class Renderer {
         return this.window_;
     }
 
-    get windowNullable() {
-        return this.window_;
+    get controls() {
+        return this.window_?.controls;
     }
 
     set clearColor(color: [number, number, number, number]) {
@@ -70,10 +70,6 @@ export class Renderer {
 
     render() {
         this.window.render(this);
-    }
-
-    renderLayout() {
-        this.window.renderLayout(this);
     }
 
     dispose() {

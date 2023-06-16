@@ -1,17 +1,19 @@
 {
     "name": "bananagl",
     "private": false,
-    "version": "2.1.0",
+    "version": "2.1.1",
     "type": "module",
     "repository": {
         "type": "git",
-        "url": "https://github.com/vojtatom/BananaGL"
+        "url": "https://github.com/vojtatom/banana.gl"
     },
     "keywords": [
-        "metacity",
         "visualization",
-        "threejs",
-        "react"
+        "webgl",
+        "gl",
+        "3d",
+        "2d",
+        "canvas"
     ],
     "author": {
         "name": "Vojtěch Tomas",

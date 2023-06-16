@@ -13,7 +13,6 @@ class Plane {
 
     constructor(private normal: vec3, private origin: vec3) {}
     static fromTwoRays(ray1: Ray, ray2: Ray) {
-        console.log(ray1, ray2);
         const crossDir = vec3.add(vec3.create(), ray1.origin, ray1.direction);
         vec3.normalize(crossDir, vec3.sub(crossDir, crossDir, ray2.origin));
         const normal = vec3.cross(vec3.create(), crossDir, ray2.direction);
@@ -76,7 +75,6 @@ export class RectSelector {
         this.bottom = Plane.fromTwoRays(br, bl);
         this.far = new Plane(negatedDir, farPoint);
         this.near = new Plane(dir, nearPoint);
-        console.log(this);
     }
 
     transform(matrix: mat4) {

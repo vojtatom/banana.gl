@@ -17,19 +17,15 @@ export class Model extends Renderable {
         return this._shader;
     }
 
-    set shader(shader: Shader) {
-        this._shader = shader;
+    get data() {
+        return this.data_;
     }
 
     set data(data: { [name: string]: any }) {
-        for (const name in data) {
-            const value = data[name];
-            if (value === this.data_[name]) continue;
-            this.data_[name] = value;
-        }
+        this.data_ = data;
     }
 
-    get data() {
-        return this.data_;
+    set shader(shader: Shader) {
+        this._shader = shader;
     }
 }

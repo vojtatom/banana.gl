@@ -46,6 +46,7 @@ export class Picker {
 
     traceRect(rect: RectSelector) {
         const objects = this.scene.objects;
+        const selection: { object: Pickable; primitiveIndices: number[] }[] = [];
 
         for (let objectIndex = 0; objectIndex < objects.length; objectIndex++) {
             const object = objects[objectIndex];
@@ -60,14 +61,15 @@ export class Picker {
 
             const hits = bvh.traceRect(rect);
             if (hits.length > 0)
-                return {
+                selection.push({
                     object: object as Pickable,
                     primitiveIndices: hits,
-                };
+                });
 
             rect.untransform();
         }
-        return null;
+
+        return selection;
     }
 
     private traceObject(ray: Ray, object: Pickable) {

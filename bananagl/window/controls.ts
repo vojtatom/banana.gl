@@ -11,6 +11,7 @@ export class WindowControls {
     public view?: View;
     readonly mouse = new MouseControls();
     readonly keyboard = new KeyboardControls();
+    private deactSh: boolean = false;
 
     constructor(private window: Window) {}
 
@@ -20,7 +21,7 @@ export class WindowControls {
         this.view = localView.view;
         this.mouse.down(this.getEvent(localView, event));
         //deactivate any active keyboard shortcut
-        this.keyboard.active = undefined;
+        if (this.keyboard.active) (this.deactSh = true), (this.keyboard.active = undefined);
         event.preventDefault();
     }
 
@@ -37,7 +38,9 @@ export class WindowControls {
         if (!localView) return;
         if (!this.view) return;
         event.preventDefault();
-        return this.mouse.up(this.getEvent(localView, event));
+
+        this.deactSh = false;
+        return this.mouse.up(this.getEvent(localView, event), this.deactSh);
     }
 
     pointerOut(event: MouseEvent) {

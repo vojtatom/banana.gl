@@ -23,17 +23,29 @@ export interface ViewSetup {
     position: ViewPosition;
 }
 
+const debounce = (fn: Function, time: number) => {
+    let timeout: any;
+    return (...args: any[]) => {
+        clearTimeout(timeout);
+        timeout = setTimeout(() => {
+            fn(...args);
+        }, time);
+    };
+};
+
 export class Window {
     private views_: ViewSetup[] = [];
     controls: WindowControls;
 
     constructor(private canvas: HTMLCanvasElement) {
-        const observer = new ResizeObserver((entries) => {
-            for (const entry of entries) {
-                const { width, height } = entry.contentRect;
-                this.resize(width, height);
-            }
-        });
+        const observer = new ResizeObserver(
+            debounce((entries: ResizeObserverEntry[]) => {
+                for (const entry of entries) {
+                    const { width, height } = entry.contentRect;
+                    this.resize(width, height);
+                }
+            }, 100)
+        );
 
         observer.observe(canvas);
         this.forceResize();
@@ -98,10 +110,6 @@ export class Window {
 
     render(renderer: Renderer) {
         this.views_.forEach(({ view }) => view.render(renderer));
-    }
-
-    renderLayout(renderer: Renderer) {
-        this.views_.forEach(({ view }) => view.renderLayout(renderer));
     }
 
     getViewAndPosition(event: MouseEvent) {

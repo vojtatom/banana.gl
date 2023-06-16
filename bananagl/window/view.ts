@@ -35,14 +35,6 @@ export class View {
         viewRenderPass(this.scene, renderer, this.camera);
     }
 
-    renderLayout(renderer: Renderer) {
-        const gl = renderer.gl;
-        gl.clearColor(this.randomColor[0], this.randomColor[1], this.randomColor[2], 1);
-        gl.viewport(this.x, this.y, this.width, this.height);
-        gl.scissor(this.x, this.y, this.width, this.height);
-        gl.clear(gl.COLOR_BUFFER_BIT);
-    }
-
     toLocal(x: number, y: number): vec2 {
         return [x - this.x, y - this.y];
     }
