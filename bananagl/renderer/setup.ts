@@ -13,8 +13,7 @@ export function mountRenderer(
     canvas: HTMLCanvasElement,
     renderer: Renderer,
     options: WebGLContextAttributes,
-    views: ViewInterface[],
-    debugLayout: boolean = false
+    views: ViewInterface[]
 ) {
     console.log('Canvas mounted');
     renderer.init(canvas, options);

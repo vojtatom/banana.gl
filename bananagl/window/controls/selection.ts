@@ -45,7 +45,7 @@ export class RangeSelection {
     }
 
     updateSelection(view: View, x: number, y: number) {
-        if (!this.inScene) view.scene.add(this.selectionRectangle), (this.inScene = true);
+        if (!this.inScene) view.scene.add(this.selectionRectangle, true), (this.inScene = true);
         this.selectionRectangle.uniforms = {
             u_from: view.toNDC(this.x, this.y),
             u_to: view.toNDC(x, y),
@@ -55,7 +55,7 @@ export class RangeSelection {
     }
 
     dispose(view: View) {
-        view.scene.remove(this.selectionRectangle);
+        view.scene.remove(this.selectionRectangle, true);
     }
 
     get from() {

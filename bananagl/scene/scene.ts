@@ -13,18 +13,18 @@ export class Scene {
     private noDepthObjects_: Renderable[] = [];
     private dirtyShaderOrder_ = false;
 
-    add(object: Renderable) {
+    add(object: Renderable, noSideEffects = false) {
         this.objects.push(object);
-        this.onChangeCalls.forEach((callback) => callback());
+        if (!noSideEffects) this.onChangeCalls.forEach((callback) => callback());
         this.dirtyShaderOrder_ = true;
     }
 
-    remove(object: Renderable) {
+    remove(object: Renderable, noSideEffects = false) {
         const idx = this.objects.indexOf(object);
         if (idx === -1) return;
         this.toDispose.push(...this.objects.splice(idx, 1));
 
-        this.onChangeCalls.forEach((callback) => callback());
+        if (!noSideEffects) this.onChangeCalls.forEach((callback) => callback());
         this.dirtyShaderOrder_ = true;
     }
 
