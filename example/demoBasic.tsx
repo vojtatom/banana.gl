@@ -1,7 +1,7 @@
 import React from 'react';
 import { Renderer, View, Scene, mountRenderer, unmountRenderer } from '@bananagl/bananagl';
 
-export function DemoBasic() {
+export function DemoInit() {
     const ref = React.useRef<HTMLCanvasElement>(null);
     const [renderer] = React.useState<Renderer>(new Renderer());
     const [scene] = React.useState<Scene>(new Scene());
