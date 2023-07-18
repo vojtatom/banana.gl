@@ -21,6 +21,6 @@
       
     }
   },
-  "include": [ "bananagl"],
+  "include": [ "bananagl", "example" ],
   "references": [{ "path": "./tsconfig.node.json" }]
 }
