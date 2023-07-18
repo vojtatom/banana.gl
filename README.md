@@ -28,6 +28,7 @@ The following list is a rough roadmap of what I want to achieve with banana.gl. 
 -   [x] Transparency
 -   [x] Selection Management
 -   [ ] Textures
+-   [ ] Framebuffers
 -   [ ] View frustum culling
 -   [ ] Shadows
 

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Renderer, View, Scene, mountRenderer } from '@bananagl/bananagl';
+import { Renderer, View, Scene, mountRenderer, unmountRenderer } from '@bananagl/bananagl';
 
 export function DemoBasic() {
     const ref = React.useRef<HTMLCanvasElement>(null);
@@ -19,11 +19,28 @@ export function DemoBasic() {
 
             renderer.clearColor = [0.5, 0.5, 0.5, 1];
         }
-    }, [ref]);
+
+        return () => {
+            unmountRenderer(renderer);
+        };
+    }, []);
 
     return (
-        <div>
-            <canvas id="canvas" width="500" height="500" ref={ref}></canvas>
+        <div
+            style={{
+                width: '100vw',
+                height: '100vh',
+            }}
+        >
+            <canvas
+                id="canvas"
+                key="canvas"
+                ref={ref}
+                style={{
+                    width: '100%',
+                    height: '100%',
+                }}
+            />
         </div>
     );
 }
