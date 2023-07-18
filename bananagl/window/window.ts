@@ -125,4 +125,8 @@ export class Window {
         }
         return undefined;
     }
+
+    get size(): [number, number] {
+        return [this.canvas.width, this.canvas.height];
+    }
 }

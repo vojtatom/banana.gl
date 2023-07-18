@@ -4,7 +4,7 @@ function isArray(a: any): a is any[] {
     return Array.isArray(a);
 }
 
-export function cloneValue(value: UniformValue) {
+export function cloneValue(value: UniformValue): UniformValue {
     //TODO optimize this to prevent reallocation
     if (isArray(value)) return value.slice();
     if (value instanceof Float32Array) return new Float32Array(value);

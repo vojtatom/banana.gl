@@ -20,7 +20,14 @@ export type TypedArray =
     | Int16Array
     | Int8Array;
 
-export type UniformValue = number | number[] | boolean | boolean[] | TypedArray | null;
+export type UniformValue =
+    | number
+    | number[]
+    | boolean
+    | boolean[]
+    | TypedArray
+    | WebGLTexture
+    | null;
 
 const ROW_MAJOR = false;
 
@@ -32,6 +39,11 @@ export class Shader {
         [name: string]: {
             loc: WebGLUniformLocation;
             value: UniformValue;
+        };
+    } = {};
+    private textures_: {
+        [name: string]: {
+            unit: number;
         };
     } = {};
     active: boolean = false;
@@ -149,14 +161,23 @@ export class Shader {
 
             const loc = uniform.loc;
             console.log(`    Setting uniforms.${name}`);
-            this.setValue(value, gl, loc);
+            this.setValue(value, gl, loc, name);
             uniform.value = cloneValue(value);
         }
     }
 
-    private setValue(value: UniformValue, gl: WebGL2RenderingContext, loc: WebGLUniformLocation) {
+    private setValue(
+        value: UniformValue,
+        gl: WebGL2RenderingContext,
+        loc: WebGLUniformLocation,
+        name: string
+    ) {
         if (value === null) {
             gl.uniform1i(loc, 0);
+        } else if (value instanceof WebGLTexture) {
+            gl.uniform1i(loc, 0);
+            gl.activeTexture(gl.TEXTURE0 + this.getTextureUnit(name));
+            gl.bindTexture(this.gl.TEXTURE_2D, value);
         } else if (typeof value === 'number') {
             gl.uniform1f(loc, value);
         } else if (typeof value === 'boolean') {
@@ -234,6 +255,16 @@ export class Shader {
         } else {
             throw new Error(`Invalid uniform type ${typeof value}`);
         }
+    }
+
+    private getTextureUnit(name: string) {
+        const texture = this.textures_[name];
+        if (!texture) {
+            const unit = Object.keys(this.textures_).length;
+            this.textures_[name] = { unit };
+            return unit;
+        }
+        return texture.unit;
     }
 
     get attributes() {

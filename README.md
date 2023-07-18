@@ -62,3 +62,14 @@ The following list is a rough roadmap of what I want to achieve with banana.gl. 
 
 -   [ ] Post-processing pipeline
 -   [ ] Optimized for scenes with funky coordinates (e.g. too large or too small)
+
+## How to run examples
+
+Have Node.js version 18 or higher installed. Then, run the following commands in the root directory of this project:
+
+```bash
+npm i
+npm run dev
+```
+
+and see the examples in your browser. See `example/main.tsx` for URLs of individual examples.

@@ -46,7 +46,7 @@ export class Camera {
         this.target = options.target ?? vec3.fromValues(0, 0, 0);
         this.upV = options.up ?? vec3.fromValues(0, 0, 1);
         this.rightV = options.right ?? vec3.fromValues(1, 0, 0);
-        this.type = options.projectionType ?? ProjectionType.ORTHOGRAPHIC;
+        this.type = options.projectionType ?? ProjectionType.PERSPECTIVE;
         this.fovYRadian = options.fovYRadian ?? Math.PI / 4;
         this.width = options.width ?? 1;
         this.height = options.height ?? 1;

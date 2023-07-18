@@ -1,9 +1,12 @@
+import { PostProcessing } from '../postprocessing/postprocessing';
 import { Window } from '../window/window';
 
 export class Renderer {
     private context?: WebGL2RenderingContext;
     private window_?: Window;
     private onInitCallbacks: (() => void)[] = [];
+
+    readonly postprocess = new PostProcessing();
 
     constructor(canvas?: HTMLCanvasElement, options?: WebGLContextAttributes) {
         if (canvas) this.init(canvas, options);
@@ -69,7 +72,10 @@ export class Renderer {
     }
 
     render() {
+        this.postprocess.bind(this.gl, this.window.size);
         this.window.render(this);
+        this.postprocess.unbind(this.gl);
+        this.postprocess.runPasses(this.gl);
     }
 
     dispose() {

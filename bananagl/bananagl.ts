@@ -9,6 +9,7 @@ import { PRIMITIVE_MODE, PrimitiveMode, Renderable } from './models/renderable';
 import { Selectable } from './models/selectable';
 import { BBox } from './picking/bbox';
 import { Ray } from './picking/ray';
+import { ScreenPass } from './postprocessing/screenPass';
 import { Renderer } from './renderer/renderer';
 import { mountRenderer, unmountRenderer } from './renderer/setup';
 import { Scene } from './scene/scene';
@@ -43,6 +44,7 @@ export {
     unmountRenderer,
     cloneUniforms,
     PrimitiveMode,
+    ScreenPass,
 };
 
 export type { Selectable, Shortcut, TypedArray, PRIMITIVE_MODE };
